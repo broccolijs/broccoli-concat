@@ -1,0 +1,16 @@
+{
+  "name": "broccoli-concat",
+  "description": "Concatenate broccoli trees",
+  "version": "0.0.1",
+  "author": "Richard Livsey <richard@livsey.org>",
+  "main": "index.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rlivsey/broccoli-concat"
+  },
+  "dependencies": {
+    "mkdirp": "~0.3.5",
+    "broccoli-filter": "~0.0.1"
+  }
+}

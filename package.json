@@ -11,6 +11,6 @@
   },
   "dependencies": {
     "mkdirp": "~0.3.5",
-    "broccoli-filter": "~0.0.1"
+    "broccoli-transform": "~0.0.1"
   }
 }

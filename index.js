@@ -20,6 +20,8 @@ function Concat(inputTree, options) {
   this.cache = {}
 }
 
+Concat.prototype.DEFAULT_SEPARATOR = '\n'
+
 Concat.prototype.transform = function (srcDir, destDir) {
   var self = this
   var modulesAdded = {}
@@ -36,7 +38,7 @@ Concat.prototype.transform = function (srcDir, destDir) {
 
   broccoli.helpers.assertAbsolutePaths([this.outputFile])
   mkdirp.sync(path.join(destDir, path.dirname(this.outputFile)))
-  fs.writeFileSync(path.join(destDir, this.outputFile), output.join(''))
+  fs.writeFileSync(path.join(destDir, this.outputFile), output.join(self.separator || self.DEFAULT_SEPARATOR))
 
   self.cache = newCache
 

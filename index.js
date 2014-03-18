@@ -1,7 +1,7 @@
 var fs = require('fs')
 var path = require('path')
 var mkdirp = require('mkdirp')
-var broccoli = require('broccoli')
+var helpers = require('broccoli-kitchen-sink-helpers')
 var Transform = require('broccoli-transform')
 
 module.exports = Concat
@@ -29,12 +29,12 @@ Concat.prototype.transform = function (srcDir, destDir) {
   // unused cache entries are garbage-collected
   var newCache = {}
 
-  var inputFiles = broccoli.helpers.multiGlob(this.inputFiles, {cwd: srcDir})
+  var inputFiles = helpers.multiGlob(this.inputFiles, {cwd: srcDir})
   for (i = 0; i < inputFiles.length; i++) {
     addFile(inputFiles[i])
   }
 
-  broccoli.helpers.assertAbsolutePaths([this.outputFile])
+  helpers.assertAbsolutePaths([this.outputFile])
   mkdirp.sync(path.join(destDir, path.dirname(this.outputFile)))
   fs.writeFileSync(path.join(destDir, this.outputFile), output.join(''))
 
@@ -42,7 +42,7 @@ Concat.prototype.transform = function (srcDir, destDir) {
 
   function addFile (filePath) {
     // This function is just slow enough that we benefit from caching
-    var statsHash = broccoli.helpers.hashStats(fs.statSync(srcDir + '/' + filePath), filePath)
+    var statsHash = helpers.hashStats(fs.statSync(srcDir + '/' + filePath), filePath)
     var cacheObject = self.cache[statsHash]
     if (cacheObject == null) { // cache miss
       var fileContents = fs.readFileSync(srcDir + '/' + filePath, { encoding: 'utf8' })

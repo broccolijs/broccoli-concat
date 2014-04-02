@@ -3,6 +3,7 @@ var path = require('path')
 var mkdirp = require('mkdirp')
 var helpers = require('broccoli-kitchen-sink-helpers')
 var Transform = require('broccoli-transform')
+var jsStringEscape = require('js-string-escape')
 
 module.exports = Concat
 
@@ -19,6 +20,11 @@ function Concat(inputTree, options) {
 
   this.cache = {}
 }
+
+Concat.prototype.getWrapInEval = function () {
+  // default to true for now
+  return this.wrapInEval == null ? true : this.wrapInEval;
+};
 
 Concat.prototype.transform = function (srcDir, destDir) {
   var self = this
@@ -46,6 +52,9 @@ Concat.prototype.transform = function (srcDir, destDir) {
     var cacheObject = self.cache[statsHash]
     if (cacheObject == null) { // cache miss
       var fileContents = fs.readFileSync(srcDir + '/' + filePath, { encoding: 'utf8' })
+      if (self.getWrapInEval()) {
+        fileContents = wrapInEval(fileContents, filePath)
+      }
       cacheObject = {
         output: fileContents
       }
@@ -53,4 +62,13 @@ Concat.prototype.transform = function (srcDir, destDir) {
     newCache[statsHash] = cacheObject
     output.push(cacheObject.output)
   }
+}
+
+function wrapInEval (fileContents, fileName) {
+  // Should pull out copyright comment headers
+  // Eventually we want source maps instead of sourceURL
+  return 'eval("(function() {' +
+    jsStringEscape(fileContents) +
+    '})();//@ sourceURL=' + jsStringEscape(fileName) +
+    '");\n';
 }

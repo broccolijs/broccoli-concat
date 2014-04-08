@@ -9,6 +9,7 @@ var concatenated = concat(sourceTree, {
   inputFiles: [
     'app/**/*.css'
   ],
-  outputFile: '/assets/app.css'
+  outputFile: '/assets/app.css',
+  separator: '\n' // (optional, defaults to \n)
 });
 ```

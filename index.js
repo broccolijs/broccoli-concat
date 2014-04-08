@@ -21,6 +21,8 @@ function Concat(inputTree, options) {
   this.cache = {}
 }
 
+Concat.prototype.DEFAULT_SEPARATOR = '\n'
+
 Concat.prototype.getWrapInEval = function () {
   // default to true for now
   return this.wrapInEval == null ? true : this.wrapInEval;
@@ -42,7 +44,7 @@ Concat.prototype.transform = function (srcDir, destDir) {
 
   helpers.assertAbsolutePaths([this.outputFile])
   mkdirp.sync(path.join(destDir, path.dirname(this.outputFile)))
-  fs.writeFileSync(path.join(destDir, this.outputFile), output.join(''))
+  fs.writeFileSync(path.join(destDir, this.outputFile), output.join(self.separator || self.DEFAULT_SEPARATOR))
 
   self.cache = newCache
 

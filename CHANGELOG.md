@@ -1,5 +1,9 @@
 # master
 
+# 0.0.5
+
+* Disable wrapInEval by default as causes issues with global variables
+
 # 0.0.4
 
 * Make the default separator newline (thanks @jaketrent)

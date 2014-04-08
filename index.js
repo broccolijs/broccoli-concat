@@ -24,8 +24,8 @@ function Concat(inputTree, options) {
 Concat.prototype.DEFAULT_SEPARATOR = '\n'
 
 Concat.prototype.getWrapInEval = function () {
-  // default to true for now
-  return this.wrapInEval == null ? true : this.wrapInEval;
+  // default to false for now
+  return this.wrapInEval == null ? false : this.wrapInEval;
 };
 
 Concat.prototype.transform = function (srcDir, destDir) {

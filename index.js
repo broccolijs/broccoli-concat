@@ -44,7 +44,8 @@ Concat.prototype.transform = function (srcDir, destDir) {
 
   helpers.assertAbsolutePaths([this.outputFile])
   mkdirp.sync(path.join(destDir, path.dirname(this.outputFile)))
-  fs.writeFileSync(path.join(destDir, this.outputFile), output.join(self.separator || self.DEFAULT_SEPARATOR))
+  var separator = self.separator == null ? self.DEFAULT_SEPARATOR : self.separator
+  fs.writeFileSync(path.join(destDir, this.outputFile), output.join(separator))
 
   self.cache = newCache
 

@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "mkdirp": "^0.3.5",
-    "broccoli-transform": "^0.1.1",
+    "broccoli-writer": "^0.1.1",
     "broccoli-kitchen-sink-helpers": "^0.2.0",
     "js-string-escape": "~1.0.0"
   },

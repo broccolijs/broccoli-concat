@@ -1,5 +1,9 @@
 # master
 
+# 0.0.6
+
+* Use broccol-writer instead of broccoli-transform (thanks @mmun)
+
 # 0.0.5
 
 * Disable wrapInEval by default as causes issues with global variables

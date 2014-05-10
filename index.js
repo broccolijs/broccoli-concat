@@ -28,6 +28,11 @@ Concat.prototype.getWrapInEval = function () {
   return this.wrapInEval == null ? false : this.wrapInEval;
 };
 
+Concat.prototype.getWrapInFunction = function() {
+  // default to true for backwards compatibility
+  return this.wrapInFunction == null ? true : this.wrapInFunction;
+};
+
 Concat.prototype.write = function (readTree, destDir) {
   var self = this
   return readTree(this.inputTree).then(function (srcDir) {
@@ -65,7 +70,7 @@ Concat.prototype.write = function (readTree, destDir) {
       if (cacheObject == null) { // cache miss
         var fileContents = fs.readFileSync(srcDir + '/' + filePath, { encoding: 'utf8' })
         if (self.getWrapInEval()) {
-          fileContents = wrapInEval(fileContents, filePath)
+          fileContents = wrapInEval(fileContents, filePath, self.getWrapInFunction())
         }
         cacheObject = {
           output: fileContents
@@ -77,11 +82,23 @@ Concat.prototype.write = function (readTree, destDir) {
   })
 }
 
-function wrapInEval (fileContents, fileName) {
+function wrapInEval (fileContents, fileName, wrapInFunction) {
   // Should pull out copyright comment headers
   // Eventually we want source maps instead of sourceURL
-  return 'eval("(function() {' +
-    jsStringEscape(fileContents) +
-    '})();//@ sourceURL=' + jsStringEscape(fileName) +
-    '");\n';
+  var output = 'eval("'
+
+  if (wrapInFunction) {
+    output += '(function() {'
+  }
+
+  output += jsStringEscape(fileContents)
+
+  if (wrapInFunction) {
+    output += '})();'
+  }
+
+  output += '//@ sourceURL=' + jsStringEscape(fileName) +
+            '");\n'
+
+  return output
 }

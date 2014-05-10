@@ -34,6 +34,10 @@ Concat.prototype.write = function (readTree, destDir) {
     var modulesAdded = {}
     var output = []
 
+    if (self.header) {
+      output.push(self.header)
+    }
+
     // When we are done compiling, we replace self.cache with newCache, so that
     // unused cache entries are garbage-collected
     var newCache = {}
@@ -41,6 +45,10 @@ Concat.prototype.write = function (readTree, destDir) {
     var inputFiles = helpers.multiGlob(self.inputFiles, {cwd: srcDir})
     for (i = 0; i < inputFiles.length; i++) {
       addFile(inputFiles[i])
+    }
+
+    if (self.footer) {
+      output.push(self.footer)
     }
 
     helpers.assertAbsolutePaths([self.outputFile])

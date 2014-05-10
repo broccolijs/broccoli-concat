@@ -81,4 +81,38 @@ describe('broccoli-concat', function(){
       })
     })
   })
+
+  describe('with header', function(){
+    it('prepends a header', function(){
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        inputFiles: ['*.js'],
+        outputFile: '/out.js',
+        header: 'HEADER**HEADER'
+      })
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(results) {
+        var dir = results.directory;
+        expect(readFile(dir + '/out.js')).to.eql('HEADER**HEADER\nvar foo = "bar";\nvar bar = "baz";')
+      })
+    })
+  })
+
+  describe('with footer', function(){
+    it('appends a footer', function(){
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        inputFiles: ['*.js'],
+        outputFile: '/out.js',
+        footer: 'FOOTER**FOOTER'
+      })
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(results) {
+        var dir = results.directory;
+        expect(readFile(dir + '/out.js')).to.eql('var foo = "bar";\nvar bar = "baz";\nFOOTER**FOOTER')
+      })
+    })
+  })
 });

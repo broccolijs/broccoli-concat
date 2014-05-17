@@ -40,7 +40,9 @@ Concat.prototype.write = function (readTree, destDir) {
 
     var inputFiles = helpers.multiGlob(self.inputFiles, {cwd: srcDir})
     for (i = 0; i < inputFiles.length; i++) {
-      addFile(inputFiles[i])
+      if (fs.lstatSync(srcDir + '/' + inputFiles[i]).isFile()) { 
+        addFile(inputFiles[i])
+      }
     }
 
     helpers.assertAbsolutePaths([self.outputFile])

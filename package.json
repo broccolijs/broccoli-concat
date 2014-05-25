@@ -9,11 +9,19 @@
     "type": "git",
     "url": "https://github.com/rlivsey/broccoli-concat"
   },
+  "scripts": {
+    "test": "mocha tests/"
+  },
   "dependencies": {
     "mkdirp": "^0.3.5",
     "broccoli-writer": "^0.1.1",
     "broccoli-kitchen-sink-helpers": "^0.2.0",
     "js-string-escape": "~1.0.0"
+  },
+  "devDependencies": {
+    "mocha": "~1.18.2",
+    "broccoli": "~0.11.0",
+    "expect.js": "~0.3.1"
   },
   "keywords": [
     "broccoli-plugin",

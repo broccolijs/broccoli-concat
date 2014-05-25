@@ -19,3 +19,14 @@ var concatenated = concat(sourceTree, {
 
 * separator - what to separate the files with, defaults to '\n'
 * wrapInEval - whether to wrap in eval for sourceURL, defaults to false as causes problems with global variables
+
+## Running Tests
+
+```javascript
+npm install
+npm test
+```
+
+## License
+
+This project is distributed under the MIT license.

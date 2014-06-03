@@ -17,10 +17,10 @@ var concatenated = concat(sourceTree, {
 });
 ```
 
-## Options
+### Options
 
-* separator - what to separate the files with, defaults to '\n'
-* wrapInEval - whether to wrap in eval for sourceURL, defaults to false as causes problems with global variables
+* `separator` - what to separate the files with, defaults to '\n'
+* `wrapInEval` - whether to wrap in eval for sourceURL, defaults to false as causes problems with global variables
 
 ## Running Tests
 

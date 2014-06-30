@@ -81,4 +81,59 @@ describe('broccoli-concat', function(){
       })
     })
   })
+
+  describe('with wrapInFunction set to false', function(){
+    it('does not wrap the output in a self-invoking function', function(){
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        inputFiles: ['*.js'],
+        outputFile: '/out.js',
+        wrapInEval: true,
+        wrapInFunction: false
+      })
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(results) {
+        var dir = results.directory;
+        expect(readFile(dir + '/out.js')).to.eql(
+          'eval("var foo = \\\"bar\\\";//@ sourceURL=a-file.js");\n\n'+
+          'eval("var bar = \\\"baz\\\";//@ sourceURL=another-file.js");\n'
+        )
+      })
+    })
+  })
+
+  describe('with header', function(){
+    it('prepends a header', function(){
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        inputFiles: ['*.js'],
+        outputFile: '/out.js',
+        header: 'HEADER**HEADER'
+      })
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(results) {
+        var dir = results.directory;
+        expect(readFile(dir + '/out.js')).to.eql('HEADER**HEADER\nvar foo = "bar";\nvar bar = "baz";')
+      })
+    })
+  })
+
+  describe('with footer', function(){
+    it('appends a footer', function(){
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        inputFiles: ['*.js'],
+        outputFile: '/out.js',
+        footer: 'FOOTER**FOOTER'
+      })
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(results) {
+        var dir = results.directory;
+        expect(readFile(dir + '/out.js')).to.eql('var foo = "bar";\nvar bar = "baz";\nFOOTER**FOOTER')
+      })
+    })
+  })
 });

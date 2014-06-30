@@ -1,5 +1,10 @@
 # master
 
+# 0.0.7
+
+* Fix: should not stat directories (thanks @ppcano)
+* Add header/footer & optional function wrapping (thanks @jeffjo)
+
 # 0.0.6
 
 * Use broccol-writer instead of broccoli-transform (thanks @mmun)

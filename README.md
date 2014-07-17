@@ -7,6 +7,8 @@ Concatenate trees into a single file.
 ## Usage
 
 ```js
+var concat = require('broccoli-concat');
+
 var concatenated = concat(sourceTree, {
   inputFiles: [
     'app/**/*.css'

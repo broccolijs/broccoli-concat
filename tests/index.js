@@ -136,4 +136,30 @@ describe('broccoli-concat', function(){
       })
     })
   })
+
+  describe('with a symbolic link', function(){
+
+    beforeEach(function() {
+      fs.symlinkSync('./tests/fixtures/symlink-tree/b-file.js', './tests/fixtures/b-file.js');
+    })
+
+    afterEach(function() {
+      fs.unlinkSync('./tests/fixtures/b-file.js')
+    })
+    it('joins contents together with a newline', function(){
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        inputFiles: ['*.js'],
+        outputFile: '/out.js',
+      })
+
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(results) {
+        var dir = results.directory;
+        expect(readFile(dir + '/out.js')).to.eql('var foo = "bar";\nvar bar = "baz";\nvar foo = "bar";')
+      })
+    })
+
+  })
+
 });

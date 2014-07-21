@@ -46,11 +46,21 @@ Concat.prototype.write = function (readTree, destDir) {
     // When we are done compiling, we replace self.cache with newCache, so that
     // unused cache entries are garbage-collected
     var newCache = {}
+    var lstat
+    var normalizedPath
+    var fileName
+    var isSymbolicLink
 
     var inputFiles = helpers.multiGlob(self.inputFiles, {cwd: srcDir})
     for (i = 0; i < inputFiles.length; i++) {
-      if (fs.lstatSync(srcDir + '/' + inputFiles[i]).isFile()) { 
-        addFile(inputFiles[i])
+
+      fileName = inputFiles[i]
+      normalizedPath = path.join(srcDir, fileName)
+      lstat = fs.lstatSync(normalizedPath)
+      isSymbolicLink = lstat.isSymbolicLink()
+
+      if ( lstat.isFile() || isSymbolicLink ) {
+        addFile(normalizedPath, fileName, isSymbolicLink)
       }
     }
 
@@ -65,14 +75,25 @@ Concat.prototype.write = function (readTree, destDir) {
 
     self.cache = newCache
 
-    function addFile (filePath) {
+    function addFile (normalizedPath, fileName, isSymbolicLink) {
+      
+      if (isSymbolicLink) {
+        normalizedPath = fs.readlinkSync(normalizedPath, { encoding: 'utf8' })
+      }
+      
+      // create a new stat to avoid using fstat information of the symbolic link
+      
+      var stat = fs.statSync(normalizedPath)
+
       // This function is just slow enough that we benefit from caching
-      var statsHash = helpers.hashStats(fs.statSync(srcDir + '/' + filePath), filePath)
+      var statsHash = helpers.hashStats(stat, normalizedPath) // TODO: should it use normalizedPath or fileName?
       var cacheObject = self.cache[statsHash]
       if (cacheObject == null) { // cache miss
-        var fileContents = fs.readFileSync(srcDir + '/' + filePath, { encoding: 'utf8' })
+
+        var fileContents = fs.readFileSync(normalizedPath, { encoding: 'utf8' })
+
         if (self.getWrapInEval()) {
-          fileContents = wrapInEval(fileContents, filePath, self.getWrapInFunction())
+          fileContents = wrapInEval(fileContents, fileName, self.getWrapInFunction())
         }
         cacheObject = {
           output: fileContents

@@ -47,10 +47,16 @@ Concat.prototype.write = function (readTree, destDir) {
     // unused cache entries are garbage-collected
     var newCache = {}
 
-    var inputFiles = helpers.multiGlob(self.inputFiles, {cwd: srcDir})
-    for (i = 0; i < inputFiles.length; i++) {
-      if (fs.lstatSync(srcDir + '/' + inputFiles[i]).isFile()) { 
-        addFile(inputFiles[i])
+    try {
+      var inputFiles = helpers.multiGlob(self.inputFiles, {cwd: srcDir})
+      for (i = 0; i < inputFiles.length; i++) {
+        if (fs.lstatSync(srcDir + '/' + inputFiles[i]).isFile()) { 
+          addFile(inputFiles[i])
+        }
+      }
+    } catch(error) {
+      if (!self.allowNone || !error.message.match("did not match any files")) {
+        throw error.message;
       }
     }
 

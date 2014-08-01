@@ -1,5 +1,7 @@
 # master
 
+* Allow concat to output empty files
+
 # 0.0.7
 
 * Fix: should not stat directories (thanks @ppcano)

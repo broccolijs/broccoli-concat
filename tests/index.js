@@ -136,4 +136,36 @@ describe('broccoli-concat', function(){
       })
     })
   })
+
+  describe('with no matches', function() {
+    it('outputs empty file with allowNone', function() {
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        inputFiles: ['*.css'],
+        outputFile: '/out.css',
+        allowNone: true
+      });
+
+      builder = new broccoli.Builder(tree)
+      return builder.build().then(function(results) {
+        var dir = results.directory
+        expect(readFile(dir + '/out.css')).to.eql('');
+      })
+    })
+
+    it('throws error witouth allowNone', function() {
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        inputFiles: ['*.css'],
+        outputFile: '/out.css'
+      });
+
+      builder = new broccoli.Builder(tree)
+      return builder.build().then(function(results) {
+        expect().fail('allowNone option did not work')
+      }).catch(function(error) {
+        expect(true).to.be.ok()
+      })
+    })
+  })
 });

@@ -1,6 +1,11 @@
 # master
 
+# 0.0.9
+
 * Follow symlinks
+
+# 0.0.8
+
 * Allow concat to output empty files
 
 # 0.0.7

@@ -4,6 +4,8 @@ var mkdirp = require('mkdirp')
 var helpers = require('broccoli-kitchen-sink-helpers')
 var Writer = require('broccoli-writer')
 var jsStringEscape = require('js-string-escape')
+var crypto = require('crypto')
+var quickTemp = require('quick-temp')
 
 module.exports = Concat
 
@@ -19,6 +21,7 @@ function Concat(inputTree, options) {
   }
 
   this.cache = {}
+  this.cachedConcatenatedOutputHash = null
 }
 
 Concat.prototype.DEFAULT_SEPARATOR = '\n'
@@ -32,6 +35,13 @@ Concat.prototype.getWrapInFunction = function() {
   // default to true for backwards compatibility
   return this.wrapInFunction == null ? true : this.wrapInFunction;
 };
+
+Concat.prototype.getCacheDir = function () {
+  return quickTemp.makeOrReuse(this, 'tmpCacheDir')
+}
+Concat.prototype.cleanup = function(){
+  quickTemp.remove(this, 'tmpCacheDir')
+}
 
 Concat.prototype.write = function (readTree, destDir) {
   var self = this
@@ -67,7 +77,16 @@ Concat.prototype.write = function (readTree, destDir) {
     helpers.assertAbsolutePaths([self.outputFile])
     mkdirp.sync(path.join(destDir, path.dirname(self.outputFile)))
     var separator = self.separator == null ? self.DEFAULT_SEPARATOR : self.separator
-    fs.writeFileSync(path.join(destDir, self.outputFile), output.join(separator))
+    var concatenatedOutput = output.join(separator)
+    var concatenatedOutputHash = crypto.createHash('md5').update(concatenatedOutput).digest('hex')
+    var cacheDir = self.getCacheDir()
+    if (concatenatedOutputHash === self.cachedConcatenatedOutputHash) {
+      fs.linkSync(path.join(cacheDir, "cached-output"), path.join(destDir, self.outputFile));
+    } else {
+      fs.writeFileSync(path.join(destDir, self.outputFile), concatenatedOutput)
+      fs.writeFileSync(path.join(cacheDir, "cached-output"), concatenatedOutput)
+    }
+    self.cachedConcatenatedOutputHash = concatenatedOutputHash
 
     self.cache = newCache
 

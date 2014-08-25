@@ -153,7 +153,7 @@ describe('broccoli-concat', function(){
       })
     })
 
-    it('throws error witouth allowNone', function() {
+    it('throws error without allowNone', function() {
       var sourcePath = 'tests/fixtures'
       var tree = concat(sourcePath, {
         inputFiles: ['*.css'],

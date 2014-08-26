@@ -40,6 +40,7 @@ Concat.prototype.getCacheDir = function () {
   return quickTemp.makeOrReuse(this, 'tmpCacheDir')
 }
 Concat.prototype.cleanup = function(){
+  Writer.prototype.cleanup.call(this)
   quickTemp.remove(this, 'tmpCacheDir')
 }
 

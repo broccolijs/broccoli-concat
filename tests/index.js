@@ -10,6 +10,7 @@ var broccoli = require('broccoli')
 var builder
 
 describe('broccoli-concat', function(){
+  var initialTmpContents;
 
   function readFile(path) {
     return fs.readFileSync(path, {encoding: 'utf8'})
@@ -23,14 +24,23 @@ describe('broccoli-concat', function(){
     process.chdir(path)
   }
 
+  before(function() {
+    if (!fs.existsSync('tmp')) {
+      fs.mkdirSync('tmp');
+    }
+  });
+
   beforeEach(function() {
     chdir(root)
+    initialTmpContents = fs.readdirSync('tmp');
   })
 
   afterEach(function() {
     if (builder) {
       builder.cleanup()
     }
+
+    expect(fs.readdirSync('tmp')).to.eql(initialTmpContents);
   })
 
   describe('with defaults', function(){

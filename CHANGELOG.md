@@ -1,5 +1,9 @@
 # master
 
+# 0.0.10
+
+* Link the same file if the content hasn’t changed from the previous build. (thanks @lukemelia)
+
 # 0.0.9
 
 * Follow symlinks

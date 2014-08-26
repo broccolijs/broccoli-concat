@@ -15,6 +15,10 @@ describe('broccoli-concat', function(){
     return fs.readFileSync(path, {encoding: 'utf8'})
   }
 
+  function getMtime(path) {
+    return fs.lstatSync(path).mtime
+  }
+
   function chdir(path) {
     process.chdir(path)
   }
@@ -41,6 +45,34 @@ describe('broccoli-concat', function(){
       return builder.build().then(function(results) {
         var dir = results.directory;
         expect(readFile(dir + '/out.js')).to.eql('var foo = "bar";\nvar bar = "baz";')
+      })
+    })
+    it('reuses cached files if nothing has changed', function(done){
+      this.timeout(10000);
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        inputFiles: ['*.js'],
+        outputFile: '/out.js',
+      })
+
+      var firstMtime, secondMtime
+      builder = new broccoli.Builder(tree);
+      builder.build().then(function(results) {
+        firstMtime = getMtime(results.directory + '/out.js')
+        //need to wait a moment to guarantee mtime change
+        setTimeout(function(){
+          builder.build().then(function(results){
+            secondMtime = getMtime(results.directory + '/out.js')
+            try {
+              expect(secondMtime).to.eql(firstMtime)
+              done()
+            } catch(e) {
+              done(e)
+            }
+          }, function(e){
+              done(e)
+          })
+        }, 1000)
       })
     })
   })

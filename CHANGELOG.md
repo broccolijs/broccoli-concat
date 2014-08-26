@@ -1,5 +1,9 @@
 # master
 
+# 0.0.11
+
+* Ensure that both cache and dest dirs are cleaned up (thanks @rwjblue)
+
 # 0.0.10
 
 * Link the same file if the content hasn’t changed from the previous build. (thanks @lukemelia)

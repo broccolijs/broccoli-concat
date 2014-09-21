@@ -24,6 +24,7 @@ var concatenated = concat(sourceTree, {
 
 ## Options
 
+* inputFiles - the order of files may be important to solve dependencies, [globbing](https://www.npmjs.org/package/glob) is also supported
 * separator - what to separate the files with, defaults to '\n'
 * wrapInEval - whether to wrap in eval for sourceURL, defaults to false as causes problems with global variables
 * wrapInFunction - whether to wrap output in self-invoking function when wrapping output in eval, defaults to true

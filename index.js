@@ -60,9 +60,11 @@ Concat.prototype.write = function (readTree, destDir) {
 
     try {
       var inputFiles = helpers.multiGlob(self.inputFiles, {cwd: srcDir})
+      var stats
       for (i = 0; i < inputFiles.length; i++) {
-        if (fs.statSync(srcDir + '/' + inputFiles[i]).isFile()) {
-          addFile(inputFiles[i])
+        stats = fs.statSync(srcDir + '/' + inputFiles[i])
+        if (stats.isFile()) {
+          addFile(inputFiles[i], stats)
         }
       }
     } catch(error) {
@@ -91,9 +93,9 @@ Concat.prototype.write = function (readTree, destDir) {
 
     self.cache = newCache
 
-    function addFile (filePath) {
+    function addFile (filePath, stats) {
       // This function is just slow enough that we benefit from caching
-      var statsHash = helpers.hashStats(fs.statSync(srcDir + '/' + filePath), filePath)
+      var statsHash = helpers.hashStats(stats, filePath)
       var cacheObject = self.cache[statsHash]
       if (cacheObject == null) { // cache miss
         var fileContents = fs.readFileSync(srcDir + '/' + filePath, { encoding: 'utf8' })

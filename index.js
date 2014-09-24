@@ -61,8 +61,9 @@ Concat.prototype.write = function (readTree, destDir) {
     try {
       var inputFiles = helpers.multiGlob(self.inputFiles, {cwd: srcDir})
       for (i = 0; i < inputFiles.length; i++) {
-        if (fs.statSync(srcDir + '/' + inputFiles[i]).isFile()) {
-          addFile(inputFiles[i])
+        var stat = getStat(srcDir + '/' + inputFiles[i]);
+        if (stat && stat.isFile()) {
+          addFile(inputFiles[i], stat)
         }
       }
     } catch(error) {
@@ -91,9 +92,9 @@ Concat.prototype.write = function (readTree, destDir) {
 
     self.cache = newCache
 
-    function addFile (filePath) {
+    function addFile (filePath, stat) {
       // This function is just slow enough that we benefit from caching
-      var statsHash = helpers.hashStats(fs.statSync(srcDir + '/' + filePath), filePath)
+      var statsHash = helpers.hashStats(stat, filePath)
       var cacheObject = self.cache[statsHash]
       if (cacheObject == null) { // cache miss
         var fileContents = fs.readFileSync(srcDir + '/' + filePath, { encoding: 'utf8' })
@@ -129,4 +130,15 @@ function wrapInEval (fileContents, fileName, wrapInFunction) {
             '");\n'
 
   return output
+}
+
+function getStat(path) {
+  try {
+    return fs.statSync(path);
+  } catch(error) {
+    if (error.code !== 'ENOENT') {
+      throw error;
+    }
+    return null;
+  }
 }

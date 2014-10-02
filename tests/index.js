@@ -117,8 +117,8 @@ describe('broccoli-concat', function(){
       return builder.build().then(function(results) {
         var dir = results.directory;
         expect(readFile(dir + '/out.js')).to.eql(
-          'eval("(function() {var foo = \\\"bar\\\";})();//@ sourceURL=a-file.js");\n\n'+
-          'eval("(function() {var bar = \\\"baz\\\";})();//@ sourceURL=another-file.js");\n'
+          'eval("(function() {var foo = \\\"bar\\\";})();//# sourceURL=a-file.js");\n\n'+
+          'eval("(function() {var bar = \\\"baz\\\";})();//# sourceURL=another-file.js");\n'
         )
       })
     })
@@ -138,8 +138,8 @@ describe('broccoli-concat', function(){
       return builder.build().then(function(results) {
         var dir = results.directory;
         expect(readFile(dir + '/out.js')).to.eql(
-          'eval("var foo = \\\"bar\\\";//@ sourceURL=a-file.js");\n\n'+
-          'eval("var bar = \\\"baz\\\";//@ sourceURL=another-file.js");\n'
+          'eval("var foo = \\\"bar\\\";//# sourceURL=a-file.js");\n\n'+
+          'eval("var bar = \\\"baz\\\";//# sourceURL=another-file.js");\n'
         )
       })
     })

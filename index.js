@@ -125,7 +125,7 @@ function wrapInEval (fileContents, fileName, wrapInFunction) {
     output += '})();'
   }
 
-  output += '//@ sourceURL=' + jsStringEscape(fileName) +
+  output += '//# sourceURL=' + jsStringEscape(fileName) +
             '");\n'
 
   return output

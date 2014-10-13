@@ -68,7 +68,7 @@ Concat.prototype.write = function (readTree, destDir) {
       }
     } catch(error) {
       if (!self.allowNone || !error.message.match("did not match any files")) {
-        throw error.message;
+        throw error;
       }
     }
 

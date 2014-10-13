@@ -1,7 +1,7 @@
 {
   "name": "broccoli-concat",
   "description": "Concatenate broccoli trees",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "author": "Richard Livsey <richard@livsey.org>",
   "main": "index.js",
   "license": "MIT",

@@ -1,5 +1,11 @@
 # master
 
+# 0.0.12
+
+* Rethrow original error object (thanks @diogoko)
+* Updating source URL format from deprecated version. (thanks @ralphholzmann)
+* Ignore broken symlinks. (thanks @rwjblue)
+
 # 0.0.11
 
 * Ensure that both cache and dest dirs are cleaned up (thanks @rwjblue)

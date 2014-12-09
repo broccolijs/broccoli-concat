@@ -195,6 +195,21 @@ describe('broccoli-concat', function(){
       })
     })
 
+    it('processed each input file if an earlier raises with allowNone', function() {
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        inputFiles: ['*.css', '*.js'],
+        outputFile: '/out.wat',
+        allowNone: true
+      });
+
+      builder = new broccoli.Builder(tree)
+      return builder.build().then(function(results) {
+        var dir = results.directory
+        expect(readFile(dir + '/out.wat')).to.not.be.empty();
+      })
+    })
+
     it('throws error without allowNone', function() {
       var sourcePath = 'tests/fixtures'
       var tree = concat(sourcePath, {

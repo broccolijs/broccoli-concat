@@ -21,6 +21,7 @@ function Concat (inputTree, options) {
 
   this.options = merge({
     inputFiles: ['**/*.js'],
+    sourceMapsFor: ['js'],
     separator: '\n'
   }, options);
 
@@ -37,12 +38,26 @@ Concat.prototype.write = function (readTree, outDir) {
   }.bind(this));
 };
 
+Concat.prototype.shouldBuildMap = function() {
+  var extensions = this.options.sourceMapsFor;
+  for (var i = 0; i < extensions.length; i++) {
+    var extension = extensions[i];
+    extension = '.' + extension.replace(/^\./,'');
+    if (this.options.outputFile.slice(-1 * extension.length) === extension) {
+      return true;
+    }
+  }
+  return false;
+};
+
 Concat.prototype.concatenate = function(inDir, outDir) {
   this.openOutputStream(outDir);
-  this.sourceMap = new SourceMapGenerator({
-    file: this.options.outputFile,
-    sourceRoot: this.options.sourceRoot
-  });
+  if (this.shouldBuildMap()) {
+    this.sourceMap = new SourceMapGenerator({
+      file: this.options.outputFile,
+      sourceRoot: this.options.sourceRoot
+    });
+  }
   if (this.options.header) {
     this.pushContent(this.options.header);
   }
@@ -103,9 +118,12 @@ Concat.prototype.addFiles = function(inDir) {
 
 Concat.prototype.addFile = function(file, inDir) {
   var content = fs.readFileSync(path.join(inDir, file), 'utf-8');
+  if (!this.sourceMap) {
+    this.pushContent(content);
+    return;
+  }
   var upstream = this.upstreamSourcemap(inDir, file, content);
-  content = upstream.content;
-  var lineCount = this.pushContent(content);
+  var lineCount = this.pushContent(upstream.content);
 
   for (var i=0; i < lineCount; i++) {
     this.sourceMap.addMapping({
@@ -120,7 +138,7 @@ Concat.prototype.addFile = function(file, inDir) {
       }
     });
   }
-  this.sourceMap.setSourceContent(file, content);
+  this.sourceMap.setSourceContent(file, upstream.content);
   if (upstream.map) {
     this.sourceMap.applySourceMap(upstream.map);
   }
@@ -142,13 +160,17 @@ Concat.prototype.finish = function(outDir) {
     outDir,
     this.options.outputFile.replace(/\.js$/, '')+'.map'
   );
-  this.outStream.write('//# sourceMappingURL=' + path.basename(mapFilename));
+  if (this.sourceMap) {
+    this.outStream.write('//# sourceMappingURL=' + path.basename(mapFilename));
+  }
   return new RSVP.Promise(function(resolve, reject) {
     this.outStream.on('finish', resolve);
     this.outStream.on('error', reject);
     this.outStream.end();
   }.bind(this)).then(function(){
-    fs.writeFileSync(mapFilename, this.sourceMap.toString());
+    if (this.sourceMap) {
+      fs.writeFileSync(mapFilename, this.sourceMap.toString());
+    }
   }.bind(this));
 };
 

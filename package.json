@@ -1,0 +1,24 @@
+{
+  "name": "simple-sourcemap-concat",
+  "version": "1.0.0",
+  "description": "Fast, good-enough concatenation with source maps.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "broccoli": "^0.13.3",
+    "broccoli-merge-trees": "^0.2.1"
+  },
+  "dependencies": {
+    "broccoli-kitchen-sink-helpers": "^0.2.5",
+    "broccoli-writer": "^0.1.1",
+    "lodash-node": "^2.4.1",
+    "mkdirp": "^0.5.0",
+    "rsvp": "^3.0.14",
+    "source-map": "^0.1.40",
+    "source-map-url": "^0.3.0"
+  }
+}

@@ -6,6 +6,7 @@ var Writer = require('broccoli-writer')
 var jsStringEscape = require('js-string-escape')
 var crypto = require('crypto')
 var quickTemp = require('quick-temp')
+var glob = require('glob')
 
 module.exports = Concat
 
@@ -59,7 +60,7 @@ Concat.prototype.write = function (readTree, destDir) {
     var newCache = {}
 
     try {
-      var inputFiles = helpers.multiGlob(self.inputFiles, {cwd: srcDir})
+      var inputFiles = helpers.multiGlob(filterInputFiles(self, srcDir), {cwd: srcDir})
       for (i = 0; i < inputFiles.length; i++) {
         var stat = getStat(srcDir + '/' + inputFiles[i]);
         if (stat && stat.isFile()) {
@@ -142,3 +143,17 @@ function getStat(path) {
     return null;
   }
 }
+
+function filterInputFiles(self, srcDir) {
+  if(self.allowNone) {
+    var filteredInputFiles = [];
+    for (var i = 0; i < self.inputFiles.length; i++) {
+      if(glob.sync(self.inputFiles[i], {cwd: srcDir}).length > 0) {
+        filteredInputFiles.push(self.inputFiles[i]);
+      }
+    }
+    return filteredInputFiles;
+  } else {
+    return self.inputFiles;
+  }
+};

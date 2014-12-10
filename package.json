@@ -17,7 +17,8 @@
     "quick-temp": "~0.1.2",
     "broccoli-writer": "^0.1.1",
     "broccoli-kitchen-sink-helpers": "^0.2.4",
-    "js-string-escape": "~1.0.0"
+    "js-string-escape": "~1.0.0",
+    "glob": "^4.3.1"
   },
   "devDependencies": {
     "mocha": "~1.21.3",

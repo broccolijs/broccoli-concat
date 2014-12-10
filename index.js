@@ -20,7 +20,7 @@ function Concat (inputTree, options) {
   Writer.call(this, inputTree, options);
 
   this.options = merge({
-    files: ['**/*.js'],
+    inputFiles: ['**/*.js'],
     separator: '\n'
   }, options);
 
@@ -50,7 +50,7 @@ Concat.prototype.concatenate = function(inDir, outDir) {
     this.addFiles(inDir);
   } catch(error) {
     // multiGlob is obtuse.
-    if (!error.message.match("did not match any files")) {
+    if (!error.message.match("did not match any files" || !this.options.allowNone)) {
       throw error;
     }
   }
@@ -86,12 +86,18 @@ Concat.prototype.pushSeparator = function() {
 };
 
 Concat.prototype.addFiles = function(inDir) {
-  helpers.multiGlob(this.options.files, {
+  helpers.multiGlob(this.options.inputFiles, {
     cwd: inDir,
     root: inDir,
     nomount: false
   }).forEach(function(file) {
-    this.addFile(file, inDir);
+    var stat;
+    try {
+      stat = fs.statSync(path.join(inDir, file));
+    } catch(err) {}
+    if (stat && !stat.isDirectory()) {
+      this.addFile(file, inDir);
+    }
   }.bind(this));
 };
 

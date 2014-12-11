@@ -1,4 +1,4 @@
-var sourceMapAwareConcat = require('./writer');
+var SourceMapAwareConcat = require('./writer');
 var concat = require('broccoli-concat');
 
 module.exports = function(inputTree, options) {
@@ -9,7 +9,7 @@ module.exports = function(inputTree, options) {
   for (var i=0; i<extensions.length; i++) {
     var ext = '.' + extensions[i].replace(/^\./,'');
     if (options.outputFile.slice(-1 * ext.length) === ext) {
-      return sourceMapAwareConcat(inputTree, options);
+      return new SourceMapAwareConcat(inputTree, options);
     }
   }
   return concat(inputTree, options);

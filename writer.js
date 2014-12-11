@@ -9,7 +9,6 @@ module.exports = CachingWriter.extend({
   enforceSingleInputTree: true,
 
   init: function(inputTrees, options) {
-    CachingWriter.apply(this, arguments);
     this.options = merge({
       inputFiles: ['**/*.js'],
       separator: '\n'

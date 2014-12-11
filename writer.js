@@ -21,14 +21,20 @@ module.exports = CachingWriter.extend({
   },
 
   updateCache: function(inDir, outDir) {
-    this.concat = new ConcatWithSourcemap({
+    var concat = this.concat = new ConcatWithSourcemap({
       outputFile: path.join(outDir, this.options.outputFile),
       sourceRoot: this.options.sourceRoot,
       baseDir: inDir
     });
 
     if (this.options.header) {
-      this.concat.addSpace(this.options.header);
+      concat.addSpace(this.options.header);
+    }
+
+    if (this.options.headerFiles) {
+      this.options.headerFiles.forEach(function(hf) {
+        concat.addFile(hf);
+      });
     }
 
     try {
@@ -41,7 +47,12 @@ module.exports = CachingWriter.extend({
     }
 
     if (this.options.footer) {
-      this.concat.addSpace(this.options.footer);
+      concat.addSpace(this.options.footer);
+    }
+    if (this.options.footerFiles) {
+      this.options.footerFiles.forEach(function(ff) {
+        concat.addFile(ff);
+      });
     }
     return this.concat.end();
   },

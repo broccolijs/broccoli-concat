@@ -3,7 +3,7 @@ var CachingWriter = require('broccoli-caching-writer');
 var path = require('path');
 var fs = require('fs');
 var merge = require('lodash-node/modern/objects/merge');
-var ConcatWithSourcemap = require('fast-source-map');
+var ConcatWithSourcemap = require('fast-sourcemap-concat');
 
 module.exports = CachingWriter.extend({
   enforceSingleInputTree: true,

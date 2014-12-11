@@ -1,11 +1,12 @@
 {
-  "name": "simple-sourcemap-concat",
-  "version": "1.0.0",
+  "name": "broccoli-sourcemap-concat",
+  "version": "0.1.0",
   "description": "Fast, good-enough concatenation with source maps.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": "https://github.com/ef4/broccoli-sourcemap-concat",
   "author": "",
   "license": "MIT",
   "devDependencies": {

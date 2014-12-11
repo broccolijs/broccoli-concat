@@ -1,10 +1,10 @@
-Simple Sourcemap-compatible Broccoli Concatenator
+Broccoli concatenator that generates & propagates sourcemaps
 -------------------------------------------------
 
-"Simple" because it does straight line-to-line translation, with no
-fancy symbol mapping. This is fast and still provides useful
-resolution.
-
+This filter is designed to be fast & good enough. It can generates
+source maps substantially faster than you'll get via
+mozilla/source-map, because it's special-cased for straight
+line-to-line contenation.
 
 It discovers input sourcemaps in relative URLs.
 

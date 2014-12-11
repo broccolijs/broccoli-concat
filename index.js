@@ -1,184 +1,65 @@
 var helpers = require('broccoli-kitchen-sink-helpers');
-var Writer = require('broccoli-writer');
+var CachingWriter = require('broccoli-caching-writer');
 var path = require('path');
 var fs = require('fs');
 var merge = require('lodash-node/modern/objects/merge');
-var mkdirp = require('mkdirp');
-var SourceMapGenerator = require('source-map').SourceMapGenerator;
-var SourceMapConsumer = require('source-map').SourceMapConsumer;
-var RSVP = require('rsvp');
-var sourceMappingURL = require('source-map-url');
+var ConcatWithSourcemap = require('fast-source-map');
 
-module.exports = Concat;
-Concat.prototype = Object.create(Writer.prototype);
-Concat.prototype.constructor = Concat;
+module.exports = CachingWriter.extend({
+  enforceSingleInputTree: true,
 
-function Concat (inputTree, options) {
-  if (!(this instanceof Concat)) {
-    return new Concat(inputTree, options);
-  }
-  Writer.call(this, inputTree, options);
+  init: function(inputTrees, options) {
+    CachingWriter.apply(this, arguments);
+    this.options = merge({
+      inputFiles: ['**/*.js'],
+      separator: '\n'
+    }, options);
 
-  this.options = merge({
-    inputFiles: ['**/*.js'],
-    sourceMapsFor: ['js'],
-    separator: '\n'
-  }, options);
-
-  if (!this.options.outputFile) {
-    throw new Error("outputFile is required");
-  }
-
-  this.inputTree = inputTree;
-}
-
-Concat.prototype.write = function (readTree, outDir) {
-  return readTree(this.inputTree).then(function(inDir) {
-    return this.concatenate(inDir, outDir);
-  }.bind(this));
-};
-
-Concat.prototype.shouldBuildMap = function() {
-  var extensions = this.options.sourceMapsFor;
-  for (var i = 0; i < extensions.length; i++) {
-    var extension = extensions[i];
-    extension = '.' + extension.replace(/^\./,'');
-    if (this.options.outputFile.slice(-1 * extension.length) === extension) {
-      return true;
+    if (!this.options.outputFile) {
+      throw new Error("outputFile is required");
     }
-  }
-  return false;
-};
+  },
 
-Concat.prototype.concatenate = function(inDir, outDir) {
-  this.openOutputStream(outDir);
-  if (this.shouldBuildMap()) {
-    this.sourceMap = new SourceMapGenerator({
-      file: this.options.outputFile,
-      sourceRoot: this.options.sourceRoot
+  updateCache: function(inDir, outDir) {
+    this.concat = new ConcatWithSourcemap({
+      outputFile: path.join(outDir, this.options.outputFile),
+      sourceRoot: this.options.sourceRoot,
+      baseDir: inDir
     });
-  }
-  if (this.options.header) {
-    this.pushContent(this.options.header);
-  }
-  try {
-    this.addFiles(inDir);
-  } catch(error) {
-    // multiGlob is obtuse.
-    if (!error.message.match("did not match any files" || !this.options.allowNone)) {
-      throw error;
+
+    if (this.options.header) {
+      this.concat.addSpace(this.options.header);
     }
-  }
-  if (this.options.footer) {
-    this.pushContent(this.options.footer);
-  }
-  return this.finish(outDir);
-};
 
-Concat.prototype.openOutputStream = function(outDir) {
-  var filename = path.join(outDir, this.options.outputFile);
-  mkdirp(path.dirname(filename));
-  this.outStream = fs.createWriteStream(filename);
-  this.lineOffset = 0;
-};
-
-Concat.prototype.pushContent = function(src) {
-  if (this.lineOffset > 0) {
-    this.pushSeparator();
-  }
-  this.outStream.write(src);
-  var count = countLines(src);
-  this.lineOffset += count;
-  return count;
-};
-
-Concat.prototype.pushSeparator = function() {
-  this.outStream.write(this.options.separator);
-  if (typeof this._separatorLines === 'undefined') {
-    this._separatorLines = countLines(this.options.separator);
-  }
-  this.lineOffset += this._separatorLines;
-};
-
-Concat.prototype.addFiles = function(inDir) {
-  helpers.multiGlob(this.options.inputFiles, {
-    cwd: inDir,
-    root: inDir,
-    nomount: false
-  }).forEach(function(file) {
-    var stat;
     try {
-      stat = fs.statSync(path.join(inDir, file));
-    } catch(err) {}
-    if (stat && !stat.isDirectory()) {
-      this.addFile(file, inDir);
-    }
-  }.bind(this));
-};
-
-Concat.prototype.addFile = function(file, inDir) {
-  var content = fs.readFileSync(path.join(inDir, file), 'utf-8');
-  if (!this.sourceMap) {
-    this.pushContent(content);
-    return;
-  }
-  var upstream = this.upstreamSourcemap(inDir, file, content);
-  var lineCount = this.pushContent(upstream.content);
-
-  for (var i=0; i < lineCount; i++) {
-    this.sourceMap.addMapping({
-      generated: {
-        line: this.lineOffset - lineCount + i + 1, // 1-indexed
-        column: 0
-      },
-      source: file,
-      original: {
-        line: i + 1,
-        column: 0
+      this.addFiles(inDir);
+    } catch(error) {
+      // multiGlob is obtuse.
+      if (!error.message.match("did not match any files" || !this.options.allowNone)) {
+        throw error;
       }
-    });
-  }
-  this.sourceMap.setSourceContent(file, upstream.content);
-  if (upstream.map) {
-    this.sourceMap.applySourceMap(upstream.map);
-  }
-};
-
-Concat.prototype.upstreamSourcemap = function(inDir, file, content) {
-  if (!sourceMappingURL.existsIn(content)) {
-    return {content: content, map: null};
-  }
-  var url = sourceMappingURL.getFrom(content);
-  var map = new SourceMapConsumer(fs.readFileSync(path.join(path.dirname(path.join(inDir, file)), url), 'utf-8'));
-
-  return {content: sourceMappingURL.removeFrom(content), map: map };
-};
-
-
-Concat.prototype.finish = function(outDir) {
-  var mapFilename = path.join(
-    outDir,
-    this.options.outputFile.replace(/\.js$/, '')+'.map'
-  );
-  if (this.sourceMap) {
-    this.outStream.write('//# sourceMappingURL=' + path.basename(mapFilename));
-  }
-  return new RSVP.Promise(function(resolve, reject) {
-    this.outStream.on('finish', resolve);
-    this.outStream.on('error', reject);
-    this.outStream.end();
-  }.bind(this)).then(function(){
-    if (this.sourceMap) {
-      fs.writeFileSync(mapFilename, this.sourceMap.toString());
     }
-  }.bind(this));
-};
 
-function countLines(src) {
-  var newlinePattern = /(\r?\n)/g;
-  var count = 0;
-  while (newlinePattern.exec(src)) {
-    count++;
-  }
-  return count;
-}
+    if (this.options.footer) {
+      this.concat.addSpace(this.options.footer);
+    }
+    return this.concat.end();
+  },
+
+  addFiles: function(inDir) {
+    helpers.multiGlob(this.options.inputFiles, {
+      cwd: inDir,
+      root: inDir,
+      nomount: false
+    }).forEach(function(file) {
+      var stat;
+      try {
+        stat = fs.statSync(path.join(inDir, file));
+      } catch(err) {}
+      if (stat && !stat.isDirectory()) {
+        this.concat.addFile(file);
+      }
+    }.bind(this));
+  },
+
+});

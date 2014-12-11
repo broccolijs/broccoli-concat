@@ -13,12 +13,11 @@
     "broccoli-merge-trees": "^0.2.1"
   },
   "dependencies": {
+    "broccoli-caching-writer": "^0.5.2",
     "broccoli-kitchen-sink-helpers": "^0.2.5",
     "broccoli-writer": "^0.1.1",
+    "core-object": "git://github.com/stefanpenner/core-object#master",
     "lodash-node": "^2.4.1",
-    "mkdirp": "^0.5.0",
-    "rsvp": "^3.0.14",
-    "source-map": "^0.1.40",
-    "source-map-url": "^0.3.0"
+    "fast-source-map":" ^0.1.0"
   }
 }

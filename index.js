@@ -2,7 +2,7 @@ var SourceMapAwareConcat = require('./writer');
 var concat = require('broccoli-concat');
 
 module.exports = function(inputTree, options) {
-  if (!options && !options.outputFile) {
+  if (!options || !options.outputFile) {
     throw new Error("outputFile is required");
   }
   var extensions = (options.sourceMapsForExtensions || ['js']);

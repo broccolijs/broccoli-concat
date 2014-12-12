@@ -90,6 +90,19 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('appends footer files', function() {
+    var tree = concat(fixtures, {
+      outputFile: 'inner-with-footers.js',
+      inputFiles: ['inner/*.js'],
+      footerFiles: ['other/third.js', 'other/fourth.js']
+    });
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('inner-with-footers.js').in(result);
+      expectFile('inner-with-footers.map').in(result);
+    });
+  });
+
   afterEach(function() {
     if (builder) {
       return builder.cleanup();

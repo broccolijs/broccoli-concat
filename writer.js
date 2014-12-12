@@ -54,7 +54,7 @@ module.exports = CachingWriter.extend({
       this.footerFiles.forEach(function(ff) {
         concat.addFile(ff);
         concat.addSpace(this.separator);
-      });
+      }.bind(this));
     }
     return this.concat.end();
   },

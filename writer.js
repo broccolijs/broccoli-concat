@@ -8,31 +8,33 @@ var ConcatWithSourcemap = require('fast-sourcemap-concat');
 module.exports = CachingWriter.extend({
   enforceSingleInputTree: true,
 
-  init: function(inputTrees, options) {
-    this.options = merge({
-      inputFiles: ['**/*.js'],
-      separator: '\n'
-    }, options);
-
-    if (!this.options.outputFile) {
+  init: function() {
+    if (!this.inputFiles) {
+      this.inputFiles = ['**/*.js'];
+    }
+    if (!this.separator) {
+      this.separator = '\n';
+    }
+    if (!this.outputFile) {
       throw new Error("outputFile is required");
     }
   },
 
   updateCache: function(inDir, outDir) {
     var concat = this.concat = new ConcatWithSourcemap({
-      outputFile: path.join(outDir, this.options.outputFile),
-      sourceRoot: this.options.sourceRoot,
+      outputFile: path.join(outDir, this.outputFile),
+      sourceRoot: this.sourceRoot,
       baseDir: inDir
     });
 
-    if (this.options.header) {
-      concat.addSpace(this.options.header);
+    if (this.header) {
+      concat.addSpace(this.header + this.separator);
     }
 
-    if (this.options.headerFiles) {
-      this.options.headerFiles.forEach(function(hf) {
+    if (this.headerFiles) {
+      this.headerFiles.forEach(function(hf) {
         concat.addFile(hf);
+        concat.addSpace(this.separator);
       });
     }
 
@@ -40,24 +42,25 @@ module.exports = CachingWriter.extend({
       this.addFiles(inDir);
     } catch(error) {
       // multiGlob is obtuse.
-      if (!error.message.match("did not match any files" || !this.options.allowNone)) {
+      if (!error.message.match("did not match any files" || !this.allowNone)) {
         throw error;
       }
     }
 
-    if (this.options.footer) {
-      concat.addSpace(this.options.footer);
+    if (this.footer) {
+      concat.addSpace(this.footer + this.separator);
     }
-    if (this.options.footerFiles) {
-      this.options.footerFiles.forEach(function(ff) {
+    if (this.footerFiles) {
+      this.footerFiles.forEach(function(ff) {
         concat.addFile(ff);
+        concat.addSpace(this.separator);
       });
     }
     return this.concat.end();
   },
 
   addFiles: function(inDir) {
-    helpers.multiGlob(this.options.inputFiles, {
+    helpers.multiGlob(this.inputFiles, {
       cwd: inDir,
       root: inDir,
       nomount: false

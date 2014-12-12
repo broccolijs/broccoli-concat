@@ -4,17 +4,21 @@
   "description": "Fast, good-enough concatenation with source maps.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": "https://github.com/ef4/broccoli-sourcemap-concat",
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "broccoli": "^0.13.3",
-    "broccoli-merge-trees": "^0.2.1"
+    "broccoli-merge-trees": "^0.2.1",
+    "chai": "^1.10.0",
+    "mkdirp": "^0.5.0",
+    "mocha": "^2.0.1",
+    "rsvp": "^3.0.14"
   },
   "dependencies": {
-    "broccoli-caching-writer": "git://github.com/ef4/broccoli-caching-writer#master",
+    "broccoli-caching-writer": "0.5.3",
     "broccoli-concat": "0.0.12",
     "broccoli-kitchen-sink-helpers": "^0.2.5",
     "broccoli-writer": "^0.1.1",

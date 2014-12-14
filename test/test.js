@@ -50,6 +50,20 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('inserts header when sourcemaps are disabled', function() {
+    var tree = concat(fixtures, {
+      outputFile: '/all-with-header.js',
+      inputFiles: ['**/*.js'],
+      header: "/* This is my header. */",
+      sourceMapsForExtensions: []
+    });
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('all-with-header.js').withoutSrcURL().in(result);
+      expectFile('all-with-header.map').notIn(result);
+    });
+  });
+
   it('disables sourcemaps when requested', function() {
     var tree = concat(fixtures, {
       outputFile: '/no-sourcemap.js',
@@ -100,7 +114,7 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it.skip('appends footer files when sourcemaps are disabled', function() {
+  it('appends footer files when sourcemaps are disabled', function() {
     var tree = concat(fixtures, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
@@ -109,7 +123,7 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('inner-with-footers.js').in(result);
+      expectFile('inner-with-footers.js').withoutSrcURL().in(result);
       expectFile('inner-with-footers.map').notIn(result);
     });
   });
@@ -123,6 +137,7 @@ describe('sourcemap-concat', function() {
 });
 
 function expectFile(filename) {
+  var stripURL = false;
   return {
       in: function(result) {
         var actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
@@ -131,13 +146,22 @@ function expectFile(filename) {
         var expectedContent;
         try {
           expectedContent = fs.readFileSync(path.join(__dirname, 'expected', filename), 'utf-8');
+          if (stripURL) {
+            expectedContent = expectedContent.replace(/\/\/# sourceMappingURL=.*$/, '');
+          }
+
         } catch (err) {
           console.warn("Missing expcted file: " + path.join(__dirname, 'expected', filename));
         }
         expect(actualContent).to.equal(expectedContent, "discrepancy in " + filename);
+        return this;
       },
     notIn: function(result) {
       expect(fs.existsSync(path.join(result.directory, filename))).to.equal(false);
+      return this;
+    },
+    withoutSrcURL: function() {
+      stripURL = true;
       return this;
     }
   };

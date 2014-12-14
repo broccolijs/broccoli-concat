@@ -66,6 +66,10 @@ module.exports = CachingWriter.extend({
     return new RSVP.Promise(function(resolve, reject) {
       var filename = path.join(outDir, this.outputFile);
       mkdirp.sync(path.dirname(filename));
+      if (firstSection) {
+        resolve();
+        return;
+      }
       var writer = fs.createWriteStream(filename);
       combined.pipe(writer);
       writer.on('finish', resolve);

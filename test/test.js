@@ -128,6 +128,30 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('can ingore empty content', function() {
+    var tree = concat(fixtures, {
+      outputFile: '/nothing.js',
+      inputFiles: ['nothing/*.jsa'],
+      allowNone: true
+    });
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('nothing.js').notIn(result);
+    });
+  });
+
+  it('can ingore empty content when sourcemaps are disabled', function() {
+    var tree = concat(fixtures, {
+      outputFile: '/nothing.css',
+      inputFiles: ['nothing/*.css'],
+      allowNone: true
+    });
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('nothing.js').notIn(result);
+    });
+  });
+
   afterEach(function() {
     if (builder) {
       return builder.cleanup();
@@ -157,7 +181,7 @@ function expectFile(filename) {
         return this;
       },
     notIn: function(result) {
-      expect(fs.existsSync(path.join(result.directory, filename))).to.equal(false);
+      expect(fs.existsSync(path.join(result.directory, filename))).to.equal(false, filename + ' should not have been present');
       return this;
     },
     withoutSrcURL: function() {

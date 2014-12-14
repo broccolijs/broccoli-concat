@@ -67,8 +67,7 @@ module.exports = CachingWriter.extend({
       var filename = path.join(outDir, this.outputFile);
       mkdirp.sync(path.dirname(filename));
       if (firstSection) {
-        resolve();
-        return;
+        combined.append(streamFor(null));
       }
       var writer = fs.createWriteStream(filename);
       combined.pipe(writer);
@@ -101,7 +100,9 @@ module.exports = CachingWriter.extend({
 function streamFor(string) {
   var r = new Readable();
   RSVP.async(function(){
-    r.push(string);
+    if (string) {
+      r.push(string);
+    }
     r.push(null);
   });
   return r;

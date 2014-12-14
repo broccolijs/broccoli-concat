@@ -136,7 +136,8 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('nothing.js').notIn(result);
+      expectFile('nothing.js').in(result);
+      expectFile('nothing.map').in(result);
     });
   });
 
@@ -148,7 +149,7 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('nothing.js').notIn(result);
+      expectFile('nothing.css').in(result);
     });
   });
 

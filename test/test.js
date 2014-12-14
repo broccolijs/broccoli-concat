@@ -15,7 +15,7 @@ var builder;
 describe('sourcemap-concat', function() {
   it('concatenates files in one dir', function() {
     var tree = concat(fixtures, {
-      outputFile: 'all-inner.js',
+      outputFile: '/all-inner.js',
       inputFiles: ['inner/*.js']
     });
     builder = new broccoli.Builder(tree);
@@ -27,7 +27,7 @@ describe('sourcemap-concat', function() {
 
   it('concatenates files across dirs', function() {
     var tree = concat(fixtures, {
-      outputFile: 'all.js',
+      outputFile: '/all.js',
       inputFiles: ['**/*.js']
     });
     builder = new broccoli.Builder(tree);
@@ -39,7 +39,7 @@ describe('sourcemap-concat', function() {
 
   it('inserts header', function() {
     var tree = concat(fixtures, {
-      outputFile: 'all-with-header.js',
+      outputFile: '/all-with-header.js',
       inputFiles: ['**/*.js'],
       header: "/* This is my header. */"
     });
@@ -66,17 +66,17 @@ describe('sourcemap-concat', function() {
 
   it('assimilates existing sourcemap', function() {
     var inner = concat(fixtures, {
-      outputFile: 'all-inner.js',
+      outputFile: '/all-inner.js',
       inputFiles: ['inner/*.js'],
       header: "/* This is my header. */"
     });
     var other = concat(fixtures, {
-      outputFile: 'all-other.js',
+      outputFile: '/all-other.js',
       inputFiles: ['other/*.js'],
       header: "/* Other header. */"
     });
     var final = concat(merge([inner, other]), {
-      outputFile: 'staged.js',
+      outputFile: '/staged.js',
       inputFiles: ['all-inner.js', 'all-other.js'],
     });
 
@@ -89,7 +89,7 @@ describe('sourcemap-concat', function() {
 
   it('appends footer files', function() {
     var tree = concat(fixtures, {
-      outputFile: 'inner-with-footers.js',
+      outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
       footerFiles: ['other/third.js', 'other/fourth.js']
     });

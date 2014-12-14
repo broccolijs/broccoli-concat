@@ -68,6 +68,7 @@ module.exports = CachingWriter.extend({
       } catch(err) {}
       if (stat && !stat.isDirectory()) {
         this.concat.addFile(file);
+        this.concat.addSpace(this.separator);
       }
     }.bind(this));
   },

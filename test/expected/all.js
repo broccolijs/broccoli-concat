@@ -5,16 +5,20 @@ function meaningOfLife() {
 function boom() {
   throw new Error('boom');
 }
+
 function somethingElse() {
   throw new Error("somethign else");
 }
+
 
 // Hello world
 
 function fourth(){
   throw new Error('fourth');
 }
+
 function third(){
   throw new Error("oh no");
 }
+
 //# sourceMappingURL=all.map

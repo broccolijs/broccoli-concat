@@ -9,9 +9,6 @@ module.exports = CachingWriter.extend({
   enforceSingleInputTree: true,
 
   init: function() {
-    if (!this.inputFiles) {
-      this.inputFiles = ['**/*.js'];
-    }
     if (!this.separator) {
       this.separator = '\n';
     }

@@ -18,25 +18,36 @@ module.exports = CachingWriter.extend({
 
   updateCache: function(inDir, outDir) {
     var separator = this.separator;
+    var firstSection = true;
+
     var concat = this.concat = new ConcatWithSourcemap({
       outputFile: path.join(outDir, this.outputFile),
       sourceRoot: this.sourceRoot,
       baseDir: inDir
     });
 
+    function beginSection() {
+      if (firstSection) {
+        firstSection = false;
+      } else {
+        concat.addSpace(separator);
+      }
+    }
+
     if (this.header) {
-      concat.addSpace(this.header + separator);
+      beginSection();
+      concat.addSpace(this.header);
     }
 
     if (this.headerFiles) {
       this.headerFiles.forEach(function(hf) {
+        beginSection();
         concat.addFile(hf);
-        concat.addSpace(separator);
       });
     }
 
     try {
-      this.addFiles(inDir);
+      this.addFiles(inDir, beginSection);
     } catch(error) {
       // multiGlob is obtuse.
       if (!error.message.match("did not match any files" || !this.allowNone)) {
@@ -45,18 +56,19 @@ module.exports = CachingWriter.extend({
     }
 
     if (this.footer) {
-      concat.addSpace(this.footer + separator);
+      beginSection();
+      concat.addSpace(this.footer);
     }
     if (this.footerFiles) {
       this.footerFiles.forEach(function(ff) {
+        beginSection();
         concat.addFile(ff);
-        concat.addSpace(separator);
       });
     }
     return this.concat.end();
   },
 
-  addFiles: function(inDir) {
+  addFiles: function(inDir, beginSection) {
     helpers.multiGlob(this.inputFiles, {
       cwd: inDir,
       root: inDir,
@@ -67,8 +79,8 @@ module.exports = CachingWriter.extend({
         stat = fs.statSync(path.join(inDir, file));
       } catch(err) {}
       if (stat && !stat.isDirectory()) {
+        beginSection();
         this.concat.addFile(file);
-        this.concat.addSpace(this.separator);
       }
     }.bind(this));
   },

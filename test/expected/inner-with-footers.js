@@ -20,5 +20,4 @@ function third(){
 function fourth(){
   throw new Error('fourth');
 }
-
 //# sourceMappingURL=inner-with-footers.map

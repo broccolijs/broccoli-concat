@@ -11,7 +11,6 @@ function somethingElse() {
   throw new Error("somethign else");
 }
 
-
 /* Other header. */
 
 // Hello world
@@ -23,6 +22,4 @@ function fourth(){
 function third(){
   throw new Error("oh no");
 }
-
-
 //# sourceMappingURL=staged.map

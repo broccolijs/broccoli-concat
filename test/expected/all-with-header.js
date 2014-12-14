@@ -21,5 +21,4 @@ function fourth(){
 function third(){
   throw new Error("oh no");
 }
-
 //# sourceMappingURL=all-with-header.map

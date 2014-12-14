@@ -9,5 +9,4 @@ function boom() {
 function somethingElse() {
   throw new Error("somethign else");
 }
-
 //# sourceMappingURL=all-inner.map

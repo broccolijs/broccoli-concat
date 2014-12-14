@@ -13,9 +13,7 @@
     "broccoli": "^0.13.3",
     "broccoli-merge-trees": "^0.2.1",
     "chai": "^1.10.0",
-    "mkdirp": "^0.5.0",
-    "mocha": "^2.0.1",
-    "rsvp": "^3.0.14"
+    "mocha": "^2.0.1"
   },
   "dependencies": {
     "broccoli-caching-writer": "0.5.3",

@@ -100,6 +100,20 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it.skip('appends footer files when sourcemaps are disabled', function() {
+    var tree = concat(fixtures, {
+      outputFile: '/inner-with-footers.js',
+      inputFiles: ['inner/*.js'],
+      footerFiles: ['other/third.js', 'other/fourth.js'],
+      sourceMapsForExtensions: []
+    });
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('inner-with-footers.js').in(result);
+      expectFile('inner-with-footers.map').notIn(result);
+    });
+  });
+
   afterEach(function() {
     if (builder) {
       return builder.cleanup();

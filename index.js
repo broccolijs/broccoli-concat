@@ -1,5 +1,5 @@
 var SourceMapAwareConcat = require('./concat-with-maps');
-var SimpleConcat = require('broccoli-concat');
+var SimpleConcat = require('./simple-concat');
 var helpers = require('broccoli-kitchen-sink-helpers');
 
 module.exports = function(inputTree, options) {

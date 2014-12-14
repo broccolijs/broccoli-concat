@@ -19,13 +19,6 @@ module.exports = CachingWriter.extend({
     }
   },
 
-  _openStream: function(outDir) {
-    var filename = path.join(outDir, this.outputFile);
-    mkdirp.sync(path.dirname(filename));
-    this.stream = fs.createWriteStream(filename);
-  },
-
-
   updateCache: function(inDir, outDir) {
     var combined = new CombinedStream();
     var firstSection = true;
@@ -52,7 +45,7 @@ module.exports = CachingWriter.extend({
     }
 
     try {
-      this.addFiles(combined, inDir, beginSection);
+      this._addFiles(combined, inDir, beginSection);
     } catch(error) {
       // multiGlob is obtuse.
       if (!error.message.match("did not match any files" || !this.allowNone)) {
@@ -80,7 +73,7 @@ module.exports = CachingWriter.extend({
     }.bind(this));
   },
 
-  addFiles: function(combined, inDir, beginSection) {
+  _addFiles: function(combined, inDir, beginSection) {
     helpers.multiGlob(this.inputFiles, {
       cwd: inDir,
       root: inDir,

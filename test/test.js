@@ -12,23 +12,6 @@ var merge = require('broccoli-merge-trees');
 var fixtures = path.join(__dirname, 'fixtures');
 var builder;
 
-function expectFile(filename) {
-  return {
-      in: function(result) {
-        var actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
-        fs.writeFileSync(path.join(__dirname, 'actual', filename), actualContent);
-
-        var expectedContent;
-        try {
-          expectedContent = fs.readFileSync(path.join(__dirname, 'expected', filename), 'utf-8');
-        } catch (err) {
-          console.warn("Missing expcted file: " + path.join(__dirname, 'expected', filename));
-        }
-        expect(actualContent).to.equal(expectedContent, "discrepancy in " + filename);
-      }
-  };
-}
-
 describe('sourcemap-concat', function() {
   it('concatenates files in one dir', function() {
     var tree = concat(fixtures, {
@@ -64,6 +47,20 @@ describe('sourcemap-concat', function() {
     return builder.build().then(function(result) {
       expectFile('all-with-header.js').in(result);
       expectFile('all-with-header.map').in(result);
+    });
+  });
+
+  it('disables sourcemaps when requested', function() {
+    var tree = concat(fixtures, {
+      outputFile: '/no-sourcemap.js',
+      inputFiles: ['**/*.js'],
+      header: "/* This is my header. */",
+      sourceMapsForExtensions: []
+    });
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('no-sourcemap.js').in(result);
+      expectFile('no-sourcemap.map').notIn(result);
     });
   });
 
@@ -110,3 +107,24 @@ describe('sourcemap-concat', function() {
   });
 
 });
+
+function expectFile(filename) {
+  return {
+      in: function(result) {
+        var actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
+        fs.writeFileSync(path.join(__dirname, 'actual', filename), actualContent);
+
+        var expectedContent;
+        try {
+          expectedContent = fs.readFileSync(path.join(__dirname, 'expected', filename), 'utf-8');
+        } catch (err) {
+          console.warn("Missing expcted file: " + path.join(__dirname, 'expected', filename));
+        }
+        expect(actualContent).to.equal(expectedContent, "discrepancy in " + filename);
+      },
+    notIn: function(result) {
+      expect(fs.existsSync(path.join(result.directory, filename))).to.equal(false);
+      return this;
+    }
+  };
+}

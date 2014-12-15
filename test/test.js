@@ -178,7 +178,7 @@ function expectFile(filename) {
         } catch (err) {
           console.warn("Missing expcted file: " + path.join(__dirname, 'expected', filename));
         }
-        expect(actualContent).to.equal(expectedContent, "discrepancy in " + filename);
+        expectSameFiles(actualContent, expectedContent, filename);
         return this;
       },
     notIn: function(result) {
@@ -190,4 +190,12 @@ function expectFile(filename) {
       return this;
     }
   };
+}
+
+function expectSameFiles(actualContent, expectedContent, filename) {
+  if (/\.map$/.test(filename)) {
+    expect(JSON.parse(actualContent)).to.deep.equal(JSON.parse(expectedContent), 'discrepancy in ' + filename);
+  } else {
+    expect(actualContent).to.equal(expectedContent, 'discrepancy in ' + filename);
+  }
 }

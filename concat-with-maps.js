@@ -14,6 +14,7 @@ module.exports = CachingWriter.extend({
     if (!this.outputFile) {
       throw new Error("outputFile is required");
     }
+    this.encoderCache = {};
   },
 
   updateCache: function(inDir, outDir) {
@@ -23,7 +24,8 @@ module.exports = CachingWriter.extend({
     var concat = this.concat = new ConcatWithSourcemap({
       outputFile: path.join(outDir, this.outputFile),
       sourceRoot: this.sourceRoot,
-      baseDir: inDir
+      baseDir: inDir,
+      cache: this.encoderCache
     });
 
     function beginSection() {

@@ -20,12 +20,24 @@ module.exports = CachingWriter.extend({
   updateCache: function(inDir, outDir) {
     var separator = this.separator;
     var firstSection = true;
+    var mapFile, mapURL;
+
+    if (this.mapDir) {
+      mapFile = path.join(
+        outDir,
+        this.mapDir,
+        path.basename(this.outputFile).replace(/\.\w+$/, '') + '.map'
+      );
+      mapURL = '/' + this.mapDir + '/' + path.basename(mapFile);
+    }
 
     var concat = this.concat = new ConcatWithSourcemap({
       outputFile: path.join(outDir, this.outputFile),
       sourceRoot: this.sourceRoot,
       baseDir: inDir,
-      cache: this.encoderCache
+      cache: this.encoderCache,
+      mapFile: mapFile,
+      mapURL: mapURL
     });
 
     function beginSection() {

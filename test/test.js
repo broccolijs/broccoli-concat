@@ -153,6 +153,19 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('can use mapDir', function(){
+    var tree = concat(fixtures, {
+      outputFile: '/assets/mapped.js',
+      inputFiles: ['inner/*.js'],
+      mapDir: 'maps'
+    });
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('mapped.js').in(result, 'assets');
+      expectFile('mapped.map').in(result, 'maps');
+    });
+  });
+
   afterEach(function() {
     if (builder) {
       return builder.cleanup();
@@ -164,8 +177,11 @@ describe('sourcemap-concat', function() {
 function expectFile(filename) {
   var stripURL = false;
   return {
-      in: function(result) {
-        var actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
+      in: function(result, subdir) {
+        if (!subdir) {
+          subdir = '.';
+        }
+        var actualContent = fs.readFileSync(path.join(result.directory, subdir, filename), 'utf-8');
         fs.writeFileSync(path.join(__dirname, 'actual', filename), actualContent);
 
         var expectedContent;
@@ -194,7 +210,7 @@ function expectFile(filename) {
 
 function expectSameFiles(actualContent, expectedContent, filename) {
   if (/\.map$/.test(filename)) {
-    expect(JSON.parse(actualContent)).to.deep.equal(JSON.parse(expectedContent), 'discrepancy in ' + filename);
+    expect(JSON.parse(actualContent)).to.deep.equal(expectedContent ? JSON.parse(expectedContent) : undefined, 'discrepancy in ' + filename);
   } else {
     expect(actualContent).to.equal(expectedContent, 'discrepancy in ' + filename);
   }

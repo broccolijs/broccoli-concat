@@ -22,13 +22,13 @@ module.exports = CachingWriter.extend({
     var firstSection = true;
     var mapFile, mapURL;
 
-    if (this.mapDir) {
+    if (this.sourceMapConfig && this.sourceMapConfig.mapDir) {
       mapFile = path.join(
         outDir,
-        this.mapDir,
+        this.sourceMapConfig.mapDir,
         path.basename(this.outputFile).replace(/\.\w+$/, '') + '.map'
       );
-      mapURL = '/' + this.mapDir + '/' + path.basename(mapFile);
+      mapURL = '/' + this.sourceMapConfig.mapDir + '/' + path.basename(mapFile);
     }
 
     var concat = this.concat = new ConcatWithSourcemap({

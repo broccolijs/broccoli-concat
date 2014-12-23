@@ -55,7 +55,7 @@ describe('sourcemap-concat', function() {
       outputFile: '/all-with-header.js',
       inputFiles: ['**/*.js'],
       header: "/* This is my header. */",
-      sourceMapsForExtensions: []
+      sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
@@ -69,7 +69,7 @@ describe('sourcemap-concat', function() {
       outputFile: '/no-sourcemap.js',
       inputFiles: ['**/*.js'],
       header: "/* This is my header. */",
-      sourceMapsForExtensions: []
+      sourceMapConfig: { extensions: [] }
     });
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
@@ -119,7 +119,7 @@ describe('sourcemap-concat', function() {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
       footerFiles: ['other/third.js', 'other/fourth.js'],
-      sourceMapsForExtensions: []
+      sourceMapConfig: { extensions: [] }
     });
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
@@ -157,7 +157,7 @@ describe('sourcemap-concat', function() {
     var tree = concat(fixtures, {
       outputFile: '/assets/mapped.js',
       inputFiles: ['inner/*.js'],
-      mapDir: 'maps'
+      sourceMapConfig: { mapDir: 'maps' }
     });
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {

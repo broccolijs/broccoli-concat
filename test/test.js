@@ -153,19 +153,6 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('can use mapDir', function(){
-    var tree = concat(fixtures, {
-      outputFile: '/assets/mapped.js',
-      inputFiles: ['inner/*.js'],
-      sourceMapConfig: { mapDir: 'maps' }
-    });
-    builder = new broccoli.Builder(tree);
-    return builder.build().then(function(result) {
-      expectFile('mapped.js').in(result, 'assets');
-      expectFile('mapped.map').in(result, 'maps');
-    });
-  });
-
   afterEach(function() {
     if (builder) {
       return builder.cleanup();

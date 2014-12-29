@@ -99,6 +99,7 @@ module.exports = CachingWriter.extend({
 
 function streamFor(string) {
   var r = new Readable();
+  r._read = function(){};
   RSVP.async(function(){
     if (string) {
       r.push(string);

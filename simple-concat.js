@@ -11,6 +11,8 @@ module.exports = CachingWriter.extend({
   enforceSingleInputTree: true,
 
   init: function() {
+    this.description = 'SourcemapConcat';
+    
     if (!this.separator) {
       this.separator = '\n';
     }

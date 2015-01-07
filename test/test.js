@@ -131,7 +131,7 @@ describe('sourcemap-concat', function() {
   it('can ingore empty content', function() {
     var tree = concat(fixtures, {
       outputFile: '/nothing.js',
-      inputFiles: ['nothing/*.jsa'],
+      inputFiles: ['nothing/*.js'],
       allowNone: true
     });
     builder = new broccoli.Builder(tree);

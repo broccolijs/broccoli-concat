@@ -1,6 +1,7 @@
 /* global describe, afterEach, it, expect */
 
 var expect = require('chai').expect;  // jshint ignore:line
+var sinon = require('sinon');
 var concat = require('..');
 var RSVP = require('rsvp');
 RSVP.on('error', function(err){throw err;});
@@ -152,6 +153,31 @@ describe('sourcemap-concat', function() {
       expectFile('nothing.css').in(result);
     });
   });
+
+  it('does not ignore empty content when allowNone is not explicitly set', function() {
+    var tree = concat(fixtures, {
+      outputFile: '/nothing.js',
+      inputFiles: ['nothing/*.js']
+    });
+    var failure = sinon.spy();
+    builder = new broccoli.Builder(tree);
+    return builder.build().catch(failure).then(function(){
+      expect(failure.called).to.be.true();
+    });
+  });
+
+  it('does not ignore empty content when allowNone is not explicitly set and sourcemaps are disabled', function() {
+    var tree = concat(fixtures, {
+      outputFile: '/nothing.css',
+      inputFiles: ['nothing/*.css']
+    });
+    var failure = sinon.spy();
+    builder = new broccoli.Builder(tree);
+    return builder.build().catch(failure).then(function(){
+      expect(failure.called).to.be.true();
+    });
+  });
+
 
   afterEach(function() {
     if (builder) {

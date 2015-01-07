@@ -52,7 +52,7 @@ module.exports = CachingWriter.extend({
       this.addFiles(inDir, beginSection);
     } catch(error) {
       // multiGlob is obtuse.
-      if (!error.message.match("did not match any files" || !this.allowNone)) {
+      if (!error.message.match("did not match any files") || !this.allowNone) {
         throw error;
       }
     }

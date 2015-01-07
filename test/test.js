@@ -128,7 +128,7 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('can ingore empty content', function() {
+  it('can ignore empty content', function() {
     var tree = concat(fixtures, {
       outputFile: '/nothing.js',
       inputFiles: ['nothing/*.js'],
@@ -141,7 +141,7 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('can ingore empty content when sourcemaps are disabled', function() {
+  it('can ignore empty content when sourcemaps are disabled', function() {
     var tree = concat(fixtures, {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css'],

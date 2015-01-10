@@ -84,7 +84,11 @@ Concat.prototype.write = function (readTree, destDir) {
     var concatenatedOutputHash = crypto.createHash('md5').update(concatenatedOutput).digest('hex')
     var cacheDir = self.getCacheDir()
     if (concatenatedOutputHash === self.cachedConcatenatedOutputHash) {
-      fs.linkSync(path.join(cacheDir, "cached-output"), path.join(destDir, self.outputFile));
+      try {
+        fs.linkSync(path.join(cacheDir, "cached-output"), path.join(destDir, self.outputFile));
+      } catch (error) {
+        fs.writeFileSync(path.join(destDir, self.outputFile), fs.readFileSync(path.join(cacheDir, "cached-output")));
+      }
     } else {
       fs.writeFileSync(path.join(destDir, self.outputFile), concatenatedOutput)
       fs.writeFileSync(path.join(cacheDir, "cached-output"), concatenatedOutput)

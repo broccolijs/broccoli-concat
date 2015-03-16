@@ -1,5 +1,10 @@
 # master
 
+# 0.0.13
+
+* Fail-over to copying files instead of linking (thanks @danlynn)
+* Document `allowNone` option and make it work for multiple globs (thanks @searls)
+
 # 0.0.12
 
 * Rethrow original error object (thanks @diogoko)

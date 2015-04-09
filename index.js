@@ -54,6 +54,14 @@ Concat.prototype.write = function (readTree, destDir) {
     if (self.header) {
       output.push(self.header)
     }
+    
+    if (!self.inputFiles) {
+      throw new Error("inputFiles must be provided for broccoli-concat");
+    }
+
+    if (!self.outputFile) {
+      throw new Error("outputFile must be provided for broccoli-concat");
+    }
 
     // When we are done compiling, we replace self.cache with newCache, so that
     // unused cache entries are garbage-collected

@@ -42,6 +42,38 @@ describe('broccoli-concat', function(){
 
     expect(fs.readdirSync('tmp')).to.eql(initialTmpContents);
   })
+  
+  describe('with no inputFiles', function() {
+    it('throws an error', function() {
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        outputFile: '/out.js'
+      })
+      
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(results) {
+        expect().fail("Passing no inputFiles did not throw any error")
+      }, function(error) {
+        expect(error).to.match(/inputFiles must be provided/)
+      })
+    })
+  })
+  
+  describe('with no outputFile', function() {
+    it('throws an error', function() {
+      var sourcePath = 'tests/fixtures'
+      var tree = concat(sourcePath, {
+        inputFiles: ['*.js']
+      })
+      
+      builder = new broccoli.Builder(tree);
+      return builder.build().then(function(results) {
+        expect().fail("Passing no outputFile did not throw any error")
+      }, function(error) {
+        expect(error).to.match(/outputFile must be provided/)
+      })
+    })
+  })
 
   describe('with defaults', function(){
     it('joins contents together with a newline', function(){

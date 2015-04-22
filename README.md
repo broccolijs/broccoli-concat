@@ -8,3 +8,9 @@ line-to-line contenation.
 
 It discovers input sourcemaps in relative URLs, including data URIs.
 
+```js
+var tree = concat(tree, {
+  outputFile: '/output.js',
+  inputFiles: ['loader.js', '**/*']
+});
+```

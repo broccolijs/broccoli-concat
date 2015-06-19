@@ -189,31 +189,38 @@ describe('sourcemap-concat', function() {
 
 function expectFile(filename) {
   var stripURL = false;
+
   return {
-      in: function(result, subdir) {
-        if (!subdir) {
-          subdir = '.';
-        }
-        var actualContent = fs.readFileSync(path.join(result.directory, subdir, filename), 'utf-8');
-        fs.writeFileSync(path.join(__dirname, 'actual', filename), actualContent);
+    in: function(result, subdir) {
+      if (!subdir) {
+        subdir = '.';
+      }
 
-        var expectedContent;
-        try {
-          expectedContent = fs.readFileSync(path.join(__dirname, 'expected', filename), 'utf-8');
-          if (stripURL) {
-            expectedContent = expectedContent.replace(/\/\/# sourceMappingURL=.*$/, '');
-          }
+      var actualContent = fs.readFileSync(path.join(result.directory, subdir, filename), 'utf-8');
+      fs.writeFileSync(path.join(__dirname, 'actual', filename), actualContent);
 
-        } catch (err) {
-          console.warn("Missing expcted file: " + path.join(__dirname, 'expected', filename));
+      var expectedContent;
+
+      try {
+        expectedContent = fs.readFileSync(path.join(__dirname, 'expected', filename), 'utf-8');
+        if (stripURL) {
+          expectedContent = expectedContent.replace(/\/\/# sourceMappingURL=.*$/, '');
         }
-        expectSameFiles(actualContent, expectedContent, filename);
-        return this;
-      },
+
+      } catch (err) {
+        console.warn('Missing expcted file: ' + path.join(__dirname, 'expected', filename));
+      }
+
+      expectSameFiles(actualContent, expectedContent, filename);
+
+      return this;
+    },
+
     notIn: function(result) {
       expect(fs.existsSync(path.join(result.directory, filename))).to.equal(false, filename + ' should not have been present');
       return this;
     },
+
     withoutSrcURL: function() {
       stripURL = true;
       return this;

@@ -4,7 +4,8 @@
   "description": "Fast, good-enough concatenation with source maps.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "test:debug": "mocha debug"
   },
   "repository": "https://github.com/ef4/broccoli-sourcemap-concat",
   "author": "Edward Faulkner <ef@alum.mit.edu>",

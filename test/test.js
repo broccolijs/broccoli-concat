@@ -3,8 +3,6 @@
 var expect = require('chai').expect;  // jshint ignore:line
 var sinon = require('sinon');
 var concat = require('..');
-var RSVP = require('rsvp');
-RSVP.on('error', function(err){throw err;});
 var fs = require('fs');
 var path = require('path');
 var broccoli = require('broccoli');

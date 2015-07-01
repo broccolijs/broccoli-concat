@@ -10,6 +10,9 @@
   "repository": "https://github.com/ef4/broccoli-sourcemap-concat",
   "author": "Edward Faulkner <ef@alum.mit.edu>",
   "license": "MIT",
+  "keywords": [
+    "broccoli-plugin"
+  ],
   "devDependencies": {
     "broccoli": "^0.13.3",
     "broccoli-merge-trees": "^0.2.1",

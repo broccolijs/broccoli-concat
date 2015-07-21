@@ -24,7 +24,7 @@ module.exports = CachingWriter.extend({
   enforceSingleInputTree: true,
 
   init: function() {
-    this.description = 'SourcemapConcat';
+    this._super.apply(this, arguments);
 
     if (!this.separator) {
       this.separator = '\n';
@@ -35,6 +35,7 @@ module.exports = CachingWriter.extend({
     }
   },
 
+  description: 'SimpleConcat',
   updateCache: function(inDir, outDir) {
     var combined = new Combined();
     var firstSection = true;

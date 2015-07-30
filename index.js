@@ -1,4 +1,4 @@
-var SourceMapAwareConcat = require('./concat-with-maps');
+var ConcatWithMaps = require('./concat-with-maps');
 var SimpleConcat = require('./simple-concat');
 var merge = require('lodash-node/modern/objects/merge');
 
@@ -13,9 +13,10 @@ module.exports = function(inputTree, options) {
     for (var i=0; i<extensions.length; i++) {
       var ext = '.' + extensions[i].replace(/^\./,'');
       if (options.outputFile.slice(-1 * ext.length) === ext) {
-        return new SourceMapAwareConcat(inputTree, options);
+        return new ConcatWithMaps(inputTree, options);
       }
     }
   }
+
   return new SimpleConcat(inputTree, options);
 };

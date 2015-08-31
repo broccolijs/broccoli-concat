@@ -23,7 +23,6 @@
   "dependencies": {
     "broccoli-caching-writer": "^1.0.0",
     "broccoli-kitchen-sink-helpers": "^0.2.5",
-    "broccoli-writer": "^0.1.1",
     "fast-sourcemap-concat": " ^0.2.4",
     "lodash-node": "^2.4.1",
     "mkdirp": "^0.5.0"

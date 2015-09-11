@@ -9,7 +9,7 @@ line-to-line contenation.
 It discovers input sourcemaps in relative URLs, including data URIs.
 
 ```js
-var tree = concat(tree, {
+var node = concat(node, {
   outputFile: '/output.js',
   inputFiles: ['loader.js', '**/*']
 });

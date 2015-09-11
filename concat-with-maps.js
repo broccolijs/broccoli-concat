@@ -31,71 +31,71 @@ function ConcatWithMaps(inputNode, options) {
 }
 
 ConcatWithMaps.prototype.build = function() {
-    var separator = this.separator;
-    var firstSection = true;
+  var separator = this.separator;
+  var firstSection = true;
 
-    var concat = this.concat = new ConcatWithSourcemap({
-      outputFile: path.join(this.outputPath, this.outputFile),
-      sourceRoot: this.sourceRoot,
-      baseDir: this.inputPaths[0],
-      cache: this.encoderCache
+  var concat = this.concat = new ConcatWithSourcemap({
+    outputFile: path.join(this.outputPath, this.outputFile),
+    sourceRoot: this.sourceRoot,
+    baseDir: this.inputPaths[0],
+    cache: this.encoderCache
+  });
+
+  function beginSection() {
+    if (firstSection) {
+      firstSection = false;
+    } else {
+      concat.addSpace(separator);
+    }
+  }
+
+  if (this.header) {
+    beginSection();
+    concat.addSpace(this.header);
+  }
+
+  if (this.headerFiles) {
+    this.headerFiles.forEach(function(hf) {
+      beginSection();
+      concat.addFile(hf);
     });
+  }
 
-    function beginSection() {
-      if (firstSection) {
-        firstSection = false;
-      } else {
-        concat.addSpace(separator);
-      }
+  try {
+    this.addFiles(this.inputPaths[0], beginSection);
+  } catch(error) {
+    // multiGlob is obtuse.
+    if (!error.message.match("did not match any files") || !this.allowNone) {
+      throw error;
     }
+  }
 
-    if (this.header) {
+  if (this.footer) {
+    beginSection();
+    concat.addSpace(this.footer);
+  }
+  if (this.footerFiles) {
+    this.footerFiles.forEach(function(ff) {
       beginSection();
-      concat.addSpace(this.header);
-    }
-
-    if (this.headerFiles) {
-      this.headerFiles.forEach(function(hf) {
-        beginSection();
-        concat.addFile(hf);
-      });
-    }
-
-    try {
-      this.addFiles(this.inputPaths[0], beginSection);
-    } catch(error) {
-      // multiGlob is obtuse.
-      if (!error.message.match("did not match any files") || !this.allowNone) {
-        throw error;
-      }
-    }
-
-    if (this.footer) {
-      beginSection();
-      concat.addSpace(this.footer);
-    }
-    if (this.footerFiles) {
-      this.footerFiles.forEach(function(ff) {
-        beginSection();
-        concat.addFile(ff);
-      });
-    }
-    return this.concat.end();
+      concat.addFile(ff);
+    });
+  }
+  return this.concat.end();
 }
 
 ConcatWithMaps.prototype.addFiles = function(inputPath, beginSection) {
-    helpers.multiGlob(this.inputFiles, {
-      cwd: inputPath,
-      root: inputPath,
-      nomount: false
-    }).forEach(function(file) {
-      var stat;
-      try {
-        stat = fs.statSync(path.join(inputPath, file));
-      } catch(err) {}
-      if (stat && !stat.isDirectory()) {
-        beginSection();
-        this.concat.addFile(file);
-      }
-    }.bind(this));
+  helpers.multiGlob(this.inputFiles, {
+    cwd: inputPath,
+    root: inputPath,
+    nomount: false
+  }).forEach(function(file) {
+    var stat;
+    try {
+      stat = fs.statSync(path.join(inputPath, file));
+    } catch(err) {}
+    if (stat && !stat.isDirectory()) {
+      beginSection();
+      this.concat.addFile(file);
+    }
+  }.bind(this));
 }

@@ -45,80 +45,80 @@ function SimpleConcat(inputNode, options) {
 }
 
 SimpleConcat.prototype.build = function() {
-    var combined = new Combined();
-    var firstSection = true;
-    var separator = this.separator;
+  var combined = new Combined();
+  var firstSection = true;
+  var separator = this.separator;
 
-    function beginSection() {
-      if (firstSection) {
-        firstSection = false;
-      } else {
-        combined.append(separator);
-      }
-    }
-
-    if (this.header) {
-      beginSection();
-      combined.append(this.header);
-    }
-
-    if (this.headerFiles) {
-      this.headerFiles.forEach(function(file) {
-        beginSection();
-        combined.append(fs.readFileSync(path.join(this.inputPaths[0], file), 'UTF-8'));
-      });
-    }
-
-    try {
-      this._addFiles(combined, this.inputPaths[0], beginSection);
-    } catch(error) {
-      // multiGlob is obtuse.
-      if (!error.message.match('did not match any files') || !this.allowNone) {
-        throw error;
-      }
-    }
-
-    if (this.footer) {
-      beginSection();
-      combined.append(this.footer);
-    }
-
-    if (this.footerFiles) {
-      this.footerFiles.forEach(function(file) {
-        beginSection();
-        combined.append(fs.readFileSync(path.join(this.inputPaths[0], file), 'UTF-8'));
-      }.bind(this));
-    }
-
-    var filePath = path.join(this.outputPath, this.outputFile);
-
-    mkdirp.sync(path.dirname(filePath));
-
+  function beginSection() {
     if (firstSection) {
-      combined.append('');
+      firstSection = false;
+    } else {
+      combined.append(separator);
     }
+  }
 
-    fs.writeFileSync(filePath, combined);
+  if (this.header) {
+    beginSection();
+    combined.append(this.header);
+  }
+
+  if (this.headerFiles) {
+    this.headerFiles.forEach(function(file) {
+      beginSection();
+      combined.append(fs.readFileSync(path.join(this.inputPaths[0], file), 'UTF-8'));
+    });
+  }
+
+  try {
+    this._addFiles(combined, this.inputPaths[0], beginSection);
+  } catch(error) {
+    // multiGlob is obtuse.
+    if (!error.message.match('did not match any files') || !this.allowNone) {
+      throw error;
+    }
+  }
+
+  if (this.footer) {
+    beginSection();
+    combined.append(this.footer);
+  }
+
+  if (this.footerFiles) {
+    this.footerFiles.forEach(function(file) {
+      beginSection();
+      combined.append(fs.readFileSync(path.join(this.inputPaths[0], file), 'UTF-8'));
+    }.bind(this));
+  }
+
+  var filePath = path.join(this.outputPath, this.outputFile);
+
+  mkdirp.sync(path.dirname(filePath));
+
+  if (firstSection) {
+    combined.append('');
+  }
+
+  fs.writeFileSync(filePath, combined);
 }
 
 SimpleConcat.prototype._addFiles = function(combined, inputPath, beginSection) {
-    helpers.multiGlob(this.inputFiles, {
-      cwd: inputPath,
-      root: inputPath,
-      nomount: false
-    }).forEach(function(file) {
-      var filePath = path.join(inputPath, file);
-      var stat;
+  helpers.multiGlob(this.inputFiles, {
+    cwd: inputPath,
+    root: inputPath,
+    nomount: false
+  }).forEach(function(file) {
+    var filePath = path.join(inputPath, file);
+    var stat;
 
-      try {
-        stat = fs.statSync(filePath);
-      } catch(err) {}
+    try {
+      stat = fs.statSync(filePath);
+    } catch(err) {}
 
-      if (stat && !stat.isDirectory()) {
-        beginSection();
-        combined.append(fs.readFileSync(filePath, 'UTF-8'));
-      }
-    });
+    if (stat && !stat.isDirectory()) {
+      beginSection();
+      combined.append(fs.readFileSync(filePath, 'UTF-8'));
+    }
+  });
 
-    return combined;
-  }
+  return combined;
+}

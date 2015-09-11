@@ -4,30 +4,40 @@ var path = require('path');
 var fs = require('fs');
 var ConcatWithSourcemap = require('fast-sourcemap-concat');
 
-module.exports = CachingWriter.extend({
-  enforceSingleInputTree: true,
+module.exports = ConcatWithMaps;
+ConcatWithMaps.prototype = Object.create(CachingWriter.prototype);
+ConcatWithMaps.prototype.constructor = ConcatWithMaps;
+function ConcatWithMaps(inputNode, options) {
+  if (!(this instanceof ConcatWithMaps)) return new ConcatWithMaps(inputNode, options);
+  if (!options || !options.outputFile || !options.inputFiles) {
+    throw new Error('inputFiles and outputFile options ware required');
+  }
 
-  init: function() {
-    this._super.apply(this, arguments);
+  CachingWriter.call(this, [inputNode], {
+    inputFiles: options.inputFiles,
+    annotation: options.annotation
+  });
 
-    if (!this.separator) {
-      this.separator = '\n';
-    }
-    if (!this.outputFile) {
-      throw new Error("outputFile is required");
-    }
-    this.encoderCache = {};
-  },
-  description: 'ConcatWithMaps',
+  this.inputFiles = options.inputFiles;
+  this.outputFile = options.outputFile;
+  this.allowNone = options.allowNone;
+  this.header = options.header;
+  this.headerFiles = options.headerFiles;
+  this.footer = options.footer;
+  this.footerFiles = options.footerFiles;
+  this.separator = (options.separator != null) ? options.separator : '\n';
 
-  updateCache: function(inDir, outDir) {
+  this.encoderCache = {};
+}
+
+ConcatWithMaps.prototype.build = function() {
     var separator = this.separator;
     var firstSection = true;
 
     var concat = this.concat = new ConcatWithSourcemap({
-      outputFile: path.join(outDir, this.outputFile),
+      outputFile: path.join(this.outputPath, this.outputFile),
       sourceRoot: this.sourceRoot,
-      baseDir: inDir,
+      baseDir: this.inputPaths[0],
       cache: this.encoderCache
     });
 
@@ -52,7 +62,7 @@ module.exports = CachingWriter.extend({
     }
 
     try {
-      this.addFiles(inDir, beginSection);
+      this.addFiles(this.inputPaths[0], beginSection);
     } catch(error) {
       // multiGlob is obtuse.
       if (!error.message.match("did not match any files") || !this.allowNone) {
@@ -71,23 +81,21 @@ module.exports = CachingWriter.extend({
       });
     }
     return this.concat.end();
-  },
+}
 
-  addFiles: function(inDir, beginSection) {
+ConcatWithMaps.prototype.addFiles = function(inputPath, beginSection) {
     helpers.multiGlob(this.inputFiles, {
-      cwd: inDir,
-      root: inDir,
+      cwd: inputPath,
+      root: inputPath,
       nomount: false
     }).forEach(function(file) {
       var stat;
       try {
-        stat = fs.statSync(path.join(inDir, file));
+        stat = fs.statSync(path.join(inputPath, file));
       } catch(err) {}
       if (stat && !stat.isDirectory()) {
         beginSection();
         this.concat.addFile(file);
       }
     }.bind(this));
-  },
-
-});
+}

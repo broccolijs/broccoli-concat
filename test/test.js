@@ -13,11 +13,11 @@ var builder;
 
 describe('sourcemap-concat', function() {
   it('concatenates files in one dir', function() {
-    var tree = concat(fixtures, {
+    var node = concat(fixtures, {
       outputFile: '/all-inner.js',
       inputFiles: ['inner/*.js']
     });
-    builder = new broccoli.Builder(tree);
+    builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
       expectFile('all-inner.js').in(result);
       expectFile('all-inner.map').in(result);
@@ -25,11 +25,11 @@ describe('sourcemap-concat', function() {
   });
 
   it('concatenates files across dirs', function() {
-    var tree = concat(fixtures, {
+    var node = concat(fixtures, {
       outputFile: '/all.js',
       inputFiles: ['**/*.js']
     });
-    builder = new broccoli.Builder(tree);
+    builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
       expectFile('all.js').in(result);
       expectFile('all.map').in(result);
@@ -37,12 +37,12 @@ describe('sourcemap-concat', function() {
   });
 
   it('inserts header', function() {
-    var tree = concat(fixtures, {
+    var node = concat(fixtures, {
       outputFile: '/all-with-header.js',
       inputFiles: ['**/*.js'],
       header: "/* This is my header. */"
     });
-    builder = new broccoli.Builder(tree);
+    builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
       expectFile('all-with-header.js').in(result);
       expectFile('all-with-header.map').in(result);
@@ -50,13 +50,13 @@ describe('sourcemap-concat', function() {
   });
 
   it('inserts header when sourcemaps are disabled', function() {
-    var tree = concat(fixtures, {
+    var node = concat(fixtures, {
       outputFile: '/all-with-header.js',
       inputFiles: ['**/*.js'],
       header: "/* This is my header. */",
       sourceMapConfig: { enabled: false }
     });
-    builder = new broccoli.Builder(tree);
+    builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
       expectFile('all-with-header.js').withoutSrcURL().in(result);
       expectFile('all-with-header.map').notIn(result);
@@ -64,13 +64,13 @@ describe('sourcemap-concat', function() {
   });
 
   it('disables sourcemaps when requested', function() {
-    var tree = concat(fixtures, {
+    var node = concat(fixtures, {
       outputFile: '/no-sourcemap.js',
       inputFiles: ['**/*.js'],
       header: "/* This is my header. */",
       sourceMapConfig: { extensions: [] }
     });
-    builder = new broccoli.Builder(tree);
+    builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
       expectFile('no-sourcemap.js').in(result);
       expectFile('no-sourcemap.map').notIn(result);
@@ -101,12 +101,12 @@ describe('sourcemap-concat', function() {
   });
 
   it('appends footer files', function() {
-    var tree = concat(fixtures, {
+    var node = concat(fixtures, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
       footerFiles: ['other/third.js', 'other/fourth.js']
     });
-    builder = new broccoli.Builder(tree);
+    builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
       expectFile('inner-with-footers.js').in(result);
       expectFile('inner-with-footers.map').in(result);
@@ -114,13 +114,13 @@ describe('sourcemap-concat', function() {
   });
 
   it('appends footer files when sourcemaps are disabled', function() {
-    var tree = concat(fixtures, {
+    var node = concat(fixtures, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
       footerFiles: ['other/third.js', 'other/fourth.js'],
       sourceMapConfig: { extensions: [] }
     });
-    builder = new broccoli.Builder(tree);
+    builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
       expectFile('inner-with-footers.js').withoutSrcURL().in(result);
       expectFile('inner-with-footers.map').notIn(result);
@@ -128,12 +128,12 @@ describe('sourcemap-concat', function() {
   });
 
   it('can ignore empty content', function() {
-    var tree = concat(fixtures, {
+    var node = concat(fixtures, {
       outputFile: '/nothing.js',
       inputFiles: ['nothing/*.js'],
       allowNone: true
     });
-    builder = new broccoli.Builder(tree);
+    builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
       expectFile('nothing.js').in(result);
       expectFile('nothing.map').in(result);
@@ -141,36 +141,36 @@ describe('sourcemap-concat', function() {
   });
 
   it('can ignore empty content when sourcemaps are disabled', function() {
-    var tree = concat(fixtures, {
+    var node = concat(fixtures, {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css'],
       allowNone: true
     });
-    builder = new broccoli.Builder(tree);
+    builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
       expectFile('nothing.css').in(result);
     });
   });
 
   it('does not ignore empty content when allowNone is not explicitly set', function() {
-    var tree = concat(fixtures, {
+    var node = concat(fixtures, {
       outputFile: '/nothing.js',
       inputFiles: ['nothing/*.js']
     });
     var failure = sinon.spy();
-    builder = new broccoli.Builder(tree);
+    builder = new broccoli.Builder(node);
     return builder.build().catch(failure).then(function(){
       expect(failure.called).to.be.true();
     });
   });
 
   it('does not ignore empty content when allowNone is not explicitly set and sourcemaps are disabled', function() {
-    var tree = concat(fixtures, {
+    var node = concat(fixtures, {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css']
     });
     var failure = sinon.spy();
-    builder = new broccoli.Builder(tree);
+    builder = new broccoli.Builder(node);
     return builder.build().catch(failure).then(function(){
       expect(failure.called).to.be.true();
     });

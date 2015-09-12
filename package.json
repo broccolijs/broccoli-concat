@@ -21,7 +21,7 @@
     "sinon": "^1.12.2"
   },
   "dependencies": {
-    "broccoli-caching-writer": "^1.0.0",
+    "broccoli-caching-writer": "^2.0.0",
     "broccoli-kitchen-sink-helpers": "^0.2.5",
     "fast-sourcemap-concat": " ^0.2.4",
     "lodash-node": "^2.4.1",

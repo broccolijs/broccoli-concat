@@ -4,90 +4,98 @@ var path = require('path');
 var fs = require('fs');
 var ConcatWithSourcemap = require('fast-sourcemap-concat');
 
-module.exports = CachingWriter.extend({
-  enforceSingleInputTree: true,
+module.exports = ConcatWithMaps;
+ConcatWithMaps.prototype = Object.create(CachingWriter.prototype);
+ConcatWithMaps.prototype.constructor = ConcatWithMaps;
+function ConcatWithMaps(inputNode, options) {
+  if (!(this instanceof ConcatWithMaps)) return new ConcatWithMaps(inputNode, options);
+  if (!options || !options.outputFile || !options.inputFiles) {
+    throw new Error('inputFiles and outputFile options ware required');
+  }
 
-  init: function() {
-    this._super.apply(this, arguments);
+  CachingWriter.call(this, [inputNode], {
+    inputFiles: options.inputFiles,
+    annotation: options.annotation
+  });
 
-    if (!this.separator) {
-      this.separator = '\n';
+  this.inputFiles = options.inputFiles;
+  this.outputFile = options.outputFile;
+  this.allowNone = options.allowNone;
+  this.header = options.header;
+  this.headerFiles = options.headerFiles;
+  this.footer = options.footer;
+  this.footerFiles = options.footerFiles;
+  this.separator = (options.separator != null) ? options.separator : '\n';
+
+  this.encoderCache = {};
+}
+
+ConcatWithMaps.prototype.build = function() {
+  var separator = this.separator;
+  var firstSection = true;
+
+  var concat = this.concat = new ConcatWithSourcemap({
+    outputFile: path.join(this.outputPath, this.outputFile),
+    sourceRoot: this.sourceRoot,
+    baseDir: this.inputPaths[0],
+    cache: this.encoderCache
+  });
+
+  function beginSection() {
+    if (firstSection) {
+      firstSection = false;
+    } else {
+      concat.addSpace(separator);
     }
-    if (!this.outputFile) {
-      throw new Error("outputFile is required");
-    }
-    this.encoderCache = {};
-  },
-  description: 'ConcatWithMaps',
+  }
 
-  updateCache: function(inDir, outDir) {
-    var separator = this.separator;
-    var firstSection = true;
+  if (this.header) {
+    beginSection();
+    concat.addSpace(this.header);
+  }
 
-    var concat = this.concat = new ConcatWithSourcemap({
-      outputFile: path.join(outDir, this.outputFile),
-      sourceRoot: this.sourceRoot,
-      baseDir: inDir,
-      cache: this.encoderCache
+  if (this.headerFiles) {
+    this.headerFiles.forEach(function(hf) {
+      beginSection();
+      concat.addFile(hf);
     });
+  }
 
-    function beginSection() {
-      if (firstSection) {
-        firstSection = false;
-      } else {
-        concat.addSpace(separator);
-      }
+  try {
+    this.addFiles(this.inputPaths[0], beginSection);
+  } catch(error) {
+    // multiGlob is obtuse.
+    if (!error.message.match("did not match any files") || !this.allowNone) {
+      throw error;
     }
+  }
 
-    if (this.header) {
+  if (this.footer) {
+    beginSection();
+    concat.addSpace(this.footer);
+  }
+  if (this.footerFiles) {
+    this.footerFiles.forEach(function(ff) {
       beginSection();
-      concat.addSpace(this.header);
-    }
+      concat.addFile(ff);
+    });
+  }
+  return this.concat.end();
+}
 
-    if (this.headerFiles) {
-      this.headerFiles.forEach(function(hf) {
-        beginSection();
-        concat.addFile(hf);
-      });
-    }
-
+ConcatWithMaps.prototype.addFiles = function(inputPath, beginSection) {
+  helpers.multiGlob(this.inputFiles, {
+    cwd: inputPath,
+    root: inputPath,
+    nomount: false
+  }).forEach(function(file) {
+    var stat;
     try {
-      this.addFiles(inDir, beginSection);
-    } catch(error) {
-      // multiGlob is obtuse.
-      if (!error.message.match("did not match any files") || !this.allowNone) {
-        throw error;
-      }
-    }
-
-    if (this.footer) {
+      stat = fs.statSync(path.join(inputPath, file));
+    } catch(err) {}
+    if (stat && !stat.isDirectory()) {
       beginSection();
-      concat.addSpace(this.footer);
+      this.concat.addFile(file);
     }
-    if (this.footerFiles) {
-      this.footerFiles.forEach(function(ff) {
-        beginSection();
-        concat.addFile(ff);
-      });
-    }
-    return this.concat.end();
-  },
-
-  addFiles: function(inDir, beginSection) {
-    helpers.multiGlob(this.inputFiles, {
-      cwd: inDir,
-      root: inDir,
-      nomount: false
-    }).forEach(function(file) {
-      var stat;
-      try {
-        stat = fs.statSync(path.join(inDir, file));
-      } catch(err) {}
-      if (stat && !stat.isDirectory()) {
-        beginSection();
-        this.concat.addFile(file);
-      }
-    }.bind(this));
-  },
-
-});
+  }.bind(this));
+}

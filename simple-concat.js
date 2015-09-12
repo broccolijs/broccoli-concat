@@ -66,7 +66,7 @@ SimpleConcat.prototype.build = function() {
     this.headerFiles.forEach(function(file) {
       beginSection();
       combined.append(fs.readFileSync(path.join(this.inputPaths[0], file), 'UTF-8'));
-    });
+    }, this);
   }
 
   try {
@@ -87,7 +87,7 @@ SimpleConcat.prototype.build = function() {
     this.footerFiles.forEach(function(file) {
       beginSection();
       combined.append(fs.readFileSync(path.join(this.inputPaths[0], file), 'UTF-8'));
-    }.bind(this));
+    }, this);
   }
 
   var filePath = path.join(this.outputPath, this.outputFile);

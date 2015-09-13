@@ -61,14 +61,7 @@ ConcatWithMaps.prototype.build = function() {
     });
   }
 
-  try {
-    this.addFiles(this.inputPaths[0], beginSection);
-  } catch(error) {
-    // multiGlob is obtuse.
-    if (!error.message.match("did not match any files") || !this.allowNone) {
-      throw error;
-    }
-  }
+  this.addFiles(this.inputPaths[0], beginSection);
 
   if (this.footer) {
     beginSection();
@@ -81,21 +74,18 @@ ConcatWithMaps.prototype.build = function() {
     });
   }
   return this.concat.end();
-}
+};
 
 ConcatWithMaps.prototype.addFiles = function(inputPath, beginSection) {
-  helpers.multiGlob(this.inputFiles, {
-    cwd: inputPath,
-    root: inputPath,
-    nomount: false
-  }).forEach(function(file) {
-    var stat;
-    try {
-      stat = fs.statSync(path.join(inputPath, file));
-    } catch(err) {}
-    if (stat && !stat.isDirectory()) {
-      beginSection();
-      this.concat.addFile(file);
-    }
+  var files = this.listFiles();
+
+  if (files.length === 0 && !this.allowNone) {
+    throw new Error('ConcatWithMaps: nothing matched [' + this.inputFiles + ']');
+  }
+
+  files.forEach(function(file) {
+    beginSection();
+
+    this.concat.addFile(file.replace(this.inputPaths[0] + '/', ''));
   }.bind(this));
-}
+};

@@ -69,14 +69,7 @@ SimpleConcat.prototype.build = function() {
     }, this);
   }
 
-  try {
-    this._addFiles(combined, this.inputPaths[0], beginSection);
-  } catch(error) {
-    // multiGlob is obtuse.
-    if (!error.message.match('did not match any files') || !this.allowNone) {
-      throw error;
-    }
-  }
+  this._addFiles(combined, this.inputPaths[0], beginSection);
 
   if (this.footer) {
     beginSection();
@@ -99,26 +92,19 @@ SimpleConcat.prototype.build = function() {
   }
 
   fs.writeFileSync(filePath, combined);
-}
+};
 
 SimpleConcat.prototype._addFiles = function(combined, inputPath, beginSection) {
-  helpers.multiGlob(this.inputFiles, {
-    cwd: inputPath,
-    root: inputPath,
-    nomount: false
-  }).forEach(function(file) {
-    var filePath = path.join(inputPath, file);
-    var stat;
+  var files = this.listFiles();
 
-    try {
-      stat = fs.statSync(filePath);
-    } catch(err) {}
+  if (files.length === 0 && !this.allowNone) {
+    throw new Error('SimpleConcat: nothing matched [' + this.inputFiles + ']');
+  }
 
-    if (stat && !stat.isDirectory()) {
-      beginSection();
-      combined.append(fs.readFileSync(filePath, 'UTF-8'));
-    }
+  files.forEach(function(filePath) {
+    beginSection();
+    combined.append(fs.readFileSync(filePath, 'UTF-8'));
   });
 
   return combined;
-}
+};

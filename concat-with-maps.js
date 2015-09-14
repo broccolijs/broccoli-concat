@@ -77,7 +77,13 @@ ConcatWithMaps.prototype.build = function() {
 };
 
 ConcatWithMaps.prototype.addFiles = function(inputPath, beginSection) {
-  var files = this.listFiles();
+  var files = this.listFiles().filter(function(file){
+    var stat;
+    try {
+      stat = fs.statSync(file);
+    } catch(err) {}
+    return stat && !stat.isDirectory();
+  });
 
   if (files.length === 0 && !this.allowNone) {
     throw new Error('ConcatWithMaps: nothing matched [' + this.inputFiles + ']');

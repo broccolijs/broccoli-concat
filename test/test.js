@@ -8,12 +8,13 @@ var path = require('path');
 var broccoli = require('broccoli');
 var merge = require('broccoli-merge-trees');
 
-var fixtures = path.join(__dirname, 'fixtures');
+var firstFixture = path.join(__dirname, 'fixtures', 'first');
+var secondFixture = path.join(__dirname, 'fixtures', 'second');
 var builder;
 
 describe('sourcemap-concat', function() {
   it('concatenates files in one dir', function() {
-    var node = concat(fixtures, {
+    var node = concat(firstFixture, {
       outputFile: '/all-inner.js',
       inputFiles: ['inner/*.js']
     });
@@ -25,7 +26,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('concatenates files across dirs', function() {
-    var node = concat(fixtures, {
+    var node = concat(firstFixture, {
       outputFile: '/all.js',
       inputFiles: ['**/*.js']
     });
@@ -37,7 +38,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('inserts header', function() {
-    var node = concat(fixtures, {
+    var node = concat(firstFixture, {
       outputFile: '/all-with-header.js',
       inputFiles: ['**/*.js'],
       header: "/* This is my header. */"
@@ -50,7 +51,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('inserts header when sourcemaps are disabled', function() {
-    var node = concat(fixtures, {
+    var node = concat(firstFixture, {
       outputFile: '/all-with-header.js',
       inputFiles: ['**/*.js'],
       header: "/* This is my header. */",
@@ -64,7 +65,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('disables sourcemaps when requested', function() {
-    var node = concat(fixtures, {
+    var node = concat(firstFixture, {
       outputFile: '/no-sourcemap.js',
       inputFiles: ['**/*.js'],
       header: "/* This is my header. */",
@@ -78,12 +79,12 @@ describe('sourcemap-concat', function() {
   });
 
   it('assimilates existing sourcemap', function() {
-    var inner = concat(fixtures, {
+    var inner = concat(firstFixture, {
       outputFile: '/all-inner.js',
       inputFiles: ['inner/*.js'],
       header: "/* This is my header. */"
     });
-    var other = concat(fixtures, {
+    var other = concat(firstFixture, {
       outputFile: '/all-other.js',
       inputFiles: ['other/*.js'],
       header: "/* Other header. */"
@@ -101,7 +102,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('appends footer files', function() {
-    var node = concat(fixtures, {
+    var node = concat(firstFixture, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
       footerFiles: ['other/third.js', 'other/fourth.js']
@@ -114,7 +115,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('appends footer files when sourcemaps are disabled', function() {
-    var node = concat(fixtures, {
+    var node = concat(firstFixture, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
       footerFiles: ['other/third.js', 'other/fourth.js'],
@@ -128,7 +129,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('can ignore empty content', function() {
-    var node = concat(fixtures, {
+    var node = concat(firstFixture, {
       outputFile: '/nothing.js',
       inputFiles: ['nothing/*.js'],
       allowNone: true
@@ -141,7 +142,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('can ignore empty content when sourcemaps are disabled', function() {
-    var node = concat(fixtures, {
+    var node = concat(firstFixture, {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css'],
       allowNone: true
@@ -153,7 +154,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('does not ignore empty content when allowNone is not explicitly set', function() {
-    var node = concat(fixtures, {
+    var node = concat(firstFixture, {
       outputFile: '/nothing.js',
       inputFiles: ['nothing/*.js']
     });
@@ -165,7 +166,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('does not ignore empty content when allowNone is not explicitly set and sourcemaps are disabled', function() {
-    var node = concat(fixtures, {
+    var node = concat(firstFixture, {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css']
     });
@@ -176,6 +177,17 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('is not fooled by directories named *.js', function() {
+    var node = concat(secondFixture, {
+      outputFile: '/sneaky.js',
+      inputFiles: ['**/*.js']
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('sneaky.js').in(result);
+      expectFile('sneaky.map').in(result);
+    });
+  });
 
   afterEach(function() {
     if (builder) {

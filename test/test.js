@@ -89,6 +89,7 @@ describe('sourcemap-concat', function() {
       inputFiles: ['other/*.js'],
       header: "/* Other header. */"
     });
+
     var final = concat(merge([inner, other]), {
       outputFile: '/staged.js',
       inputFiles: ['all-inner.js', 'all-other.js'],
@@ -98,6 +99,25 @@ describe('sourcemap-concat', function() {
     return builder.build().then(function(result) {
       expectFile('staged.js').in(result);
       expectFile('staged.map').in(result);
+    });
+  });
+
+  it('dedupe uniques in inputFiles', function() {
+    var final = concat(firstFixture, {
+      outputFile: '/staged.js',
+      inputFiles: ['inner/first.js', 'inner/second.js', 'inner/first.js']
+    });
+
+    builder = new broccoli.Builder(final);
+    return builder.build().then(function(result) {
+      var actual = fs.readFileSync(result.directory + '/staged.js', 'UTF-8');
+
+      var firstFixture = path.join(__dirname, 'fixtures', 'first');
+      var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+      var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+
+      var expected = first + '\n' +  second + '//# sourceMappingURL=staged.map';
+      assertFileEqual(actual, expected, 'output is wrong');
     });
   });
 
@@ -245,3 +265,24 @@ function expectSameFiles(actualContent, expectedContent, filename) {
     expect(actualContent).to.equal(expectedContent, 'discrepancy in ' + filename);
   }
 }
+
+function assertFileEqual(actual, expected, message) {
+  if (actual === expected) {
+    expect(true).to.be.true;
+  } else {
+    throw new EqualityError('output is wrong', actual, expected);
+  }
+}
+
+function EqualityError(message, actual, expected) {
+  this.message = message;
+  this.actual = actual;
+  this.expected = expected;
+  this.showDiff = true;
+  Error.captureStackTrace(this, module.exports);
+}
+
+EqualityError.prototype = Object.create(Error.prototype);
+EqualityError.prototype.name = 'EqualityError';
+EqualityError.prototype.constructor = EqualityError;
+

@@ -3,6 +3,7 @@ var CachingWriter = require('broccoli-caching-writer');
 var path = require('path');
 var fs = require('fs');
 var ConcatWithSourcemap = require('fast-sourcemap-concat');
+var uniq = require('lodash.uniq');
 
 module.exports = ConcatWithMaps;
 ConcatWithMaps.prototype = Object.create(CachingWriter.prototype);
@@ -77,7 +78,7 @@ ConcatWithMaps.prototype.build = function() {
 };
 
 ConcatWithMaps.prototype.addFiles = function(inputPath, beginSection) {
-  var files = this.listFiles().filter(function(file){
+  var files = uniq(this.listFiles()).filter(function(file){
     var stat;
     try {
       stat = fs.statSync(file);

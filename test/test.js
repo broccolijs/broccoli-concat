@@ -102,7 +102,29 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('dedupe uniques in inputFiles', function() {
+  it('dedupe uniques in inputFiles (with simpleconcat)', function() {
+    var final = concat(firstFixture, {
+      outputFile: '/staged.js',
+      inputFiles: ['inner/first.js', 'inner/second.js', 'inner/first.js'],
+      sourceMapConfig: {
+        enabled: false
+      }
+    });
+
+    builder = new broccoli.Builder(final);
+    return builder.build().then(function(result) {
+      var actual = fs.readFileSync(result.directory + '/staged.js', 'UTF-8');
+
+      var firstFixture = path.join(__dirname, 'fixtures', 'first');
+      var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+      var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+
+      var expected = first + '\n' +  second;
+      assertFileEqual(actual, expected, 'output is wrong');
+    });
+  });
+
+  it('dedupe uniques in inputFiles (with sourcemaps)', function() {
     var final = concat(firstFixture, {
       outputFile: '/staged.js',
       inputFiles: ['inner/first.js', 'inner/second.js', 'inner/first.js']

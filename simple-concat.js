@@ -3,6 +3,7 @@ var path = require('path');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
 var helpers = require('broccoli-kitchen-sink-helpers');
+var uniq = require('lodash.uniq');
 
 function Combined() {
   this._internal = '';
@@ -95,7 +96,7 @@ SimpleConcat.prototype.build = function() {
 };
 
 SimpleConcat.prototype._addFiles = function(combined, inputPath, beginSection) {
-  var files = this.listFiles();
+  var files = uniq(this.listFiles());
 
   if (files.length === 0 && !this.allowNone) {
     throw new Error('SimpleConcat: nothing matched [' + this.inputFiles + ']');

@@ -24,11 +24,22 @@ function ConcatWithMaps(inputNode, options) {
   this.allowNone = options.allowNone;
   this.header = options.header;
   this.headerFiles = options.headerFiles;
+  this._headerFooterFilesIndex = makeIndex(options.headerFiles, options.footerFiles);
   this.footer = options.footer;
   this.footerFiles = options.footerFiles;
   this.separator = (options.separator != null) ? options.separator : '\n';
 
   this.encoderCache = {};
+}
+
+function makeIndex(a, b) {
+  var index = Object.create(null);
+
+  ((a || []).concat(b ||[])).forEach(function(a) {
+    index[a] = true;
+  });
+
+  return index;
 }
 
 ConcatWithMaps.prototype.build = function() {
@@ -62,31 +73,51 @@ ConcatWithMaps.prototype.build = function() {
     });
   }
 
-  this.addFiles(this.inputPaths[0], beginSection);
+  this.addFiles(beginSection);
 
-  if (this.footer) {
-    beginSection();
-    concat.addSpace(this.footer);
-  }
   if (this.footerFiles) {
     this.footerFiles.forEach(function(ff) {
       beginSection();
       concat.addFile(ff);
     });
   }
+
+  if (this.footer) {
+    beginSection();
+    concat.addSpace(this.footer + '\n');
+  }
+
   return this.concat.end();
 };
 
-ConcatWithMaps.prototype.addFiles = function(inputPath, beginSection) {
+ConcatWithMaps.prototype.addFiles = function(beginSection) {
+  var headerFooterFileOverlap = false;
+
   var files = uniq(this.listFiles()).filter(function(file){
+    var relativePath = file.replace(this.inputPaths[0] + '/', '');
+
+    // * remove inputFiles that are already contained within headerFiles and footerFiles
+    // * alow duplicates between headerFiles and footerFiles
+
+    if (this._headerFooterFilesIndex[relativePath] === true) {
+      headerFooterFileOverlap = true;
+      return false;
+    }
+
     var stat;
+    // TODO: remove this extra stat
     try {
       stat = fs.statSync(file);
     } catch(err) {}
     return stat && !stat.isDirectory();
-  });
+  }, this);
 
-  if (files.length === 0 && !this.allowNone) {
+  // raise IFF:
+  //   * headerFiles or footerFiles overlapped with inputFiles
+  //   * nothing matched inputFiles
+  if (headerFooterFileOverlap === false &&
+      files.length === 0 &&
+      !this.allowNone) {
     throw new Error('ConcatWithMaps: nothing matched [' + this.inputFiles + ']');
   }
 
@@ -94,5 +125,5 @@ ConcatWithMaps.prototype.addFiles = function(inputPath, beginSection) {
     beginSection();
 
     this.concat.addFile(file.replace(this.inputPaths[0] + '/', ''));
-  }.bind(this));
+  }, this);
 };

@@ -52,9 +52,9 @@ describe('sourcemap-concat', function() {
 
   it('inserts header when sourcemaps are disabled', function() {
     var node = concat(firstFixture, {
-      outputFile: '/all-with-header.js',
-      inputFiles: ['**/*.js'],
       header: "/* This is my header. */",
+      inputFiles: ['**/*.js'],
+      outputFile: '/all-with-header.js',
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
@@ -64,11 +64,45 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('inserts header, headerFiles, footer and footerFiles - and overlaps with inputFiles', function() {
+    var node = concat(firstFixture, {
+      header: '/* This is my header.s*/',
+      headerFiles: ['inner/first.js', 'inner/second.js'],
+      inputFiles: ['**/*.js'],
+      footerFiles: ['other/third.js', 'other/fourth.js'],
+      footer: '/* This is my footer. */',
+      outputFile: '/all-the-things.js'
+    });
+
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('all-the-things.js').in(result);
+      expectFile('all-the-things.map').in(result);
+    });
+  });
+
+  it('inserts header, headerFiles, footer and footerFiles (reversed) - and overlaps with inputFiles', function() {
+    var node = concat(firstFixture, {
+      header: '/* This is my header.s*/',
+      headerFiles: ['inner/second.js', 'inner/first.js'],
+      inputFiles: ['**/*.js'],
+      footerFiles: ['other/fourth.js', 'other/third.js'],
+      footer: '/* This is my footer. */',
+      outputFile: '/all-the-things-reversed.js'
+    });
+
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('all-the-things-reversed.js').in(result);
+      expectFile('all-the-things-reversed.map').in(result);
+    });
+  });
+
   it('disables sourcemaps when requested', function() {
     var node = concat(firstFixture, {
-      outputFile: '/no-sourcemap.js',
-      inputFiles: ['**/*.js'],
       header: "/* This is my header. */",
+      inputFiles: ['**/*.js'],
+      outputFile: '/no-sourcemap.js',
       sourceMapConfig: { extensions: [] }
     });
     builder = new broccoli.Builder(node);
@@ -175,6 +209,7 @@ describe('sourcemap-concat', function() {
     var node = concat(firstFixture, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
+      footerFiles: ['inner/one.js', 'inner/two.js'],
       footerFiles: ['other/third.js', 'other/fourth.js']
     });
 

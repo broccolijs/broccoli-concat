@@ -143,13 +143,43 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('prepends headerFiles', function() {
+    var node = concat(firstFixture, {
+      outputFile: '/inner-with-headers.js',
+      inputFiles: ['inner/*.js'],
+      headerFiles: ['other/third.js', 'other/fourth.js']
+    });
+
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('inner-with-headers.js').in(result);
+      expectFile('inner-with-headers.map').in(result);
+    });
+  });
+
+  it('prepends headerFiles (order reversed)', function() {
+    var node = concat(firstFixture, {
+      outputFile: '/inner-with-headers-reversed.js',
+      inputFiles: ['inner/*.js'],
+      headerFiles: ['other/fourth.js', 'other/third.js']
+    });
+
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('inner-with-headers-reversed.js').in(result);
+      expectFile('inner-with-headers-reversed.map').in(result);
+    });
+  });
+
   it('appends footer files', function() {
     var node = concat(firstFixture, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
       footerFiles: ['other/third.js', 'other/fourth.js']
     });
+
     builder = new broccoli.Builder(node);
+
     return builder.build().then(function(result) {
       expectFile('inner-with-footers.js').in(result);
       expectFile('inner-with-footers.map').in(result);

@@ -4,10 +4,10 @@ var merge = require('lodash-node/modern/objects/merge');
 
 module.exports = function(inputNode, options) {
   if (!options || !options.outputFile) {
-    throw new Error("outputFile is required");
+    throw new Error('outputFile is required');
   }
 
-  var config = merge({ enabled: true}, options.sourceMapConfig);
+  var config = merge({ enabled: true }, options.sourceMapConfig);
   if (config.enabled) {
     var extensions = (config.extensions || ['js']);
     for (var i=0; i<extensions.length; i++) {

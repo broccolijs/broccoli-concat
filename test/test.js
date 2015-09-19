@@ -209,7 +209,6 @@ describe('sourcemap-concat', function() {
     var node = concat(firstFixture, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
-      footerFiles: ['inner/one.js', 'inner/two.js'],
       footerFiles: ['other/third.js', 'other/fourth.js']
     });
 
@@ -301,7 +300,52 @@ describe('sourcemap-concat', function() {
       return builder.cleanup();
     }
   });
+});
 
+describe('concat-without-maps', function() {
+  var Concat = require('../concat-without-source-maps');
+  var quickTemp = require('quick-temp');
+  var concat;
+  var outputFile;
+
+  beforeEach(function() {
+    outputFile = quickTemp.makeOrRemake(this, 'tmpDestDir') + '/' + 'foo.js';
+
+    concat = new Concat({
+      outputFile: outputFile,
+      baseDir: firstFixture
+    });
+  });
+
+  afterEach(function() {
+    quickTemp.remove(this, 'tmpDestDir');
+  });
+
+  it('addSpace', function() {
+    concat.addSpace('a');
+    concat.addSpace('b');
+    concat.addSpace('c');
+    concat.end();
+    assertFileEqual(fs.readFileSync(outputFile, 'UTF-8'), 'abc');
+  });
+
+  it('addFile', function() {
+    concat.addFile('inner/first.js');
+    concat.addFile('inner/second.js');
+    concat.addFile('other/third.js');
+    concat.end();
+    assertFileEqual(fs.readFileSync(outputFile, 'UTF-8'),  fs.readFileSync(__dirname + '/expected/concat-without-maps-1.js', 'UTF-8'));
+  });
+
+  it('addFile & addSpace', function() {
+    concat.addFile('inner/first.js');
+    concat.addSpace('"a";\n');
+    concat.addSpace('"b";\n');
+    concat.addSpace('"c";\n');
+    concat.addFile('inner/second.js');
+    concat.end();
+    assertFileEqual(fs.readFileSync(outputFile, 'UTF-8'), fs.readFileSync(__dirname + '/expected/concat-without-maps-2.js', 'UTF-8'));
+  });
 });
 
 function expectFile(filename) {

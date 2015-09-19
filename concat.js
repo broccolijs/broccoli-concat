@@ -1,15 +1,17 @@
-var helpers = require('broccoli-kitchen-sink-helpers');
 var CachingWriter = require('broccoli-caching-writer');
 var path = require('path');
 var fs = require('fs');
-var ConcatWithSourcemap = require('fast-sourcemap-concat');
 var uniq = require('lodash.uniq');
 
 module.exports = ConcatWithMaps;
 ConcatWithMaps.prototype = Object.create(CachingWriter.prototype);
 ConcatWithMaps.prototype.constructor = ConcatWithMaps;
-function ConcatWithMaps(inputNode, options) {
-  if (!(this instanceof ConcatWithMaps)) return new ConcatWithMaps(inputNode, options);
+
+function ConcatWithMaps(inputNode, options, Strategy) {
+  if (!(this instanceof ConcatWithMaps)) {
+    return new ConcatWithMaps(inputNode, options, Strategy);
+  }
+
   if (!options || !options.outputFile || !options.inputFiles) {
     throw new Error('inputFiles and outputFile options ware required');
   }
@@ -19,6 +21,11 @@ function ConcatWithMaps(inputNode, options) {
     annotation: options.annotation
   });
 
+  if (Strategy === undefined) {
+    throw new TypeError('ConcatWithMaps requires a concat Strategy');
+  }
+
+  this.Strategy = Strategy;
   this.inputFiles = options.inputFiles;
   this.outputFile = options.outputFile;
   this.allowNone = options.allowNone;
@@ -46,7 +53,7 @@ ConcatWithMaps.prototype.build = function() {
   var separator = this.separator;
   var firstSection = true;
 
-  var concat = this.concat = new ConcatWithSourcemap({
+  var concat = this.concat = new this.Strategy({
     outputFile: path.join(this.outputPath, this.outputFile),
     sourceRoot: this.sourceRoot,
     baseDir: this.inputPaths[0],
@@ -67,18 +74,18 @@ ConcatWithMaps.prototype.build = function() {
   }
 
   if (this.headerFiles) {
-    this.headerFiles.forEach(function(hf) {
+    this.headerFiles.forEach(function(file) {
       beginSection();
-      concat.addFile(hf);
+      concat.addFile(file);
     });
   }
 
   this.addFiles(beginSection);
 
   if (this.footerFiles) {
-    this.footerFiles.forEach(function(ff) {
+    this.footerFiles.forEach(function(file) {
       beginSection();
-      concat.addFile(ff);
+      concat.addFile(file);
     });
   }
 

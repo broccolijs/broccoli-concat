@@ -52,9 +52,9 @@ describe('sourcemap-concat', function() {
 
   it('inserts header when sourcemaps are disabled', function() {
     var node = concat(firstFixture, {
-      outputFile: '/all-with-header.js',
-      inputFiles: ['**/*.js'],
       header: "/* This is my header. */",
+      inputFiles: ['**/*.js'],
+      outputFile: '/all-with-header.js',
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
@@ -64,11 +64,65 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('inserts header, headerFiles, footer and footerFiles - and overlaps with inputFiles', function() {
+    var node = concat(firstFixture, {
+      header: '/* This is my header.s*/',
+      headerFiles: ['inner/first.js', 'inner/second.js'],
+      inputFiles: ['**/*.js'],
+      footerFiles: ['other/third.js', 'other/fourth.js'],
+      footer: '/* This is my footer. */',
+      outputFile: '/all-the-things.js'
+    });
+
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('all-the-things.js').in(result);
+      expectFile('all-the-things.map').in(result);
+    });
+  });
+
+  it('headerFiles, but with a glob', function() {
+    expect(function() {
+      concat(firstFixture, {
+        headerFiles: ['inner/*.js'],
+        inputFiles: ['**/*.js'],
+        outputFile: '/all-the-things.js'
+      });
+    }).to.throw('headerFiles cannot contain a glob,  `inner/*.js`');
+  });
+
+  it('footerFiles, but with a glob', function() {
+    expect(function() {
+      concat(firstFixture, {
+        footerFiles: ['inner/*.js'],
+        inputFiles: ['**/*.js'],
+        outputFile: '/all-the-things.js'
+      });
+    }).to.throw('footerFiles cannot contain a glob,  `inner/*.js`');
+  });
+
+  it('inserts header, headerFiles, footer and footerFiles (reversed) - and overlaps with inputFiles', function() {
+    var node = concat(firstFixture, {
+      header: '/* This is my header.s*/',
+      headerFiles: ['inner/second.js', 'inner/first.js'],
+      inputFiles: ['**/*.js'],
+      footerFiles: ['other/fourth.js', 'other/third.js'],
+      footer: '/* This is my footer. */',
+      outputFile: '/all-the-things-reversed.js'
+    });
+
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('all-the-things-reversed.js').in(result);
+      expectFile('all-the-things-reversed.map').in(result);
+    });
+  });
+
   it('disables sourcemaps when requested', function() {
     var node = concat(firstFixture, {
-      outputFile: '/no-sourcemap.js',
-      inputFiles: ['**/*.js'],
       header: "/* This is my header. */",
+      inputFiles: ['**/*.js'],
+      outputFile: '/no-sourcemap.js',
       sourceMapConfig: { extensions: [] }
     });
     builder = new broccoli.Builder(node);
@@ -143,13 +197,43 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('prepends headerFiles', function() {
+    var node = concat(firstFixture, {
+      outputFile: '/inner-with-headers.js',
+      inputFiles: ['inner/*.js'],
+      headerFiles: ['other/third.js', 'other/fourth.js']
+    });
+
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('inner-with-headers.js').in(result);
+      expectFile('inner-with-headers.map').in(result);
+    });
+  });
+
+  it('prepends headerFiles (order reversed)', function() {
+    var node = concat(firstFixture, {
+      outputFile: '/inner-with-headers-reversed.js',
+      inputFiles: ['inner/*.js'],
+      headerFiles: ['other/fourth.js', 'other/third.js']
+    });
+
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('inner-with-headers-reversed.js').in(result);
+      expectFile('inner-with-headers-reversed.map').in(result);
+    });
+  });
+
   it('appends footer files', function() {
     var node = concat(firstFixture, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
       footerFiles: ['other/third.js', 'other/fourth.js']
     });
+
     builder = new broccoli.Builder(node);
+
     return builder.build().then(function(result) {
       expectFile('inner-with-footers.js').in(result);
       expectFile('inner-with-footers.map').in(result);
@@ -236,7 +320,52 @@ describe('sourcemap-concat', function() {
       return builder.cleanup();
     }
   });
+});
 
+describe('concat-without-maps', function() {
+  var Concat = require('../concat-without-source-maps');
+  var quickTemp = require('quick-temp');
+  var concat;
+  var outputFile;
+
+  beforeEach(function() {
+    outputFile = quickTemp.makeOrRemake(this, 'tmpDestDir') + '/' + 'foo.js';
+
+    concat = new Concat({
+      outputFile: outputFile,
+      baseDir: firstFixture
+    });
+  });
+
+  afterEach(function() {
+    quickTemp.remove(this, 'tmpDestDir');
+  });
+
+  it('addSpace', function() {
+    concat.addSpace('a');
+    concat.addSpace('b');
+    concat.addSpace('c');
+    concat.end();
+    assertFileEqual(fs.readFileSync(outputFile, 'UTF-8'), 'abc');
+  });
+
+  it('addFile', function() {
+    concat.addFile('inner/first.js');
+    concat.addFile('inner/second.js');
+    concat.addFile('other/third.js');
+    concat.end();
+    assertFileEqual(fs.readFileSync(outputFile, 'UTF-8'),  fs.readFileSync(__dirname + '/expected/concat-without-maps-1.js', 'UTF-8'));
+  });
+
+  it('addFile & addSpace', function() {
+    concat.addFile('inner/first.js');
+    concat.addSpace('"a";\n');
+    concat.addSpace('"b";\n');
+    concat.addSpace('"c";\n');
+    concat.addFile('inner/second.js');
+    concat.end();
+    assertFileEqual(fs.readFileSync(outputFile, 'UTF-8'), fs.readFileSync(__dirname + '/expected/concat-without-maps-2.js', 'UTF-8'));
+  });
 });
 
 function expectFile(filename) {

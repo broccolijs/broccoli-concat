@@ -25,6 +25,7 @@ var node = concat(node, {
   inputFiles: ['**/*']
   footerFiles: ['auto-start.js'],
   footer: "}());",
+  sourceMapConfig: { enabled: true },
   allowNone: false | true // defaults to false, and will error if trying to concat but no files are found.
 });
 ```

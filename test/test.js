@@ -81,6 +81,26 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('headerFiles, but with a glob', function() {
+    expect(function() {
+      concat(firstFixture, {
+        headerFiles: ['inner/*.js'],
+        inputFiles: ['**/*.js'],
+        outputFile: '/all-the-things.js'
+      });
+    }).to.throw('headerFiles cannot contain a glob,  `inner/*.js`');
+  });
+
+  it('footerFiles, but with a glob', function() {
+    expect(function() {
+      concat(firstFixture, {
+        footerFiles: ['inner/*.js'],
+        inputFiles: ['**/*.js'],
+        outputFile: '/all-the-things.js'
+      });
+    }).to.throw('footerFiles cannot contain a glob,  `inner/*.js`');
+  });
+
   it('inserts header, headerFiles, footer and footerFiles (reversed) - and overlaps with inputFiles', function() {
     var node = concat(firstFixture, {
       header: '/* This is my header.s*/',

@@ -36,7 +36,20 @@ function ConcatWithMaps(inputNode, options, Strategy) {
   this.footerFiles = options.footerFiles;
   this.separator = (options.separator != null) ? options.separator : '\n';
 
+  ensureNoMagic('headerFiles', this.headerFiles);
+  ensureNoMagic('footerFiles', this.footerFiles);
+
   this.encoderCache = {};
+}
+
+var MAGIC = /[\{\}\*\[\]]/;
+
+function ensureNoMagic(name, list) {
+  (list || []).forEach(function(a) {
+    if (MAGIC.test(a)) {
+      throw new TypeError(name + ' cannot contain a glob,  `' + a + '`');
+    }
+  });
 }
 
 function makeIndex(a, b) {

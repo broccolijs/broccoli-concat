@@ -110,6 +110,13 @@ ConcatWithMaps.prototype.build = function() {
   return this.concat.end();
 };
 
+function isDirectory(fullPath) {
+  // files returned from listFiles are directories if they end in /
+  // see: https://github.com/joliss/node-walk-sync
+  // "Note that directories come before their contents, and have a trailing slash"
+  return fullPath.charAt(fullPath.length - 1) === '/';
+}
+
 ConcatWithMaps.prototype.addFiles = function(beginSection) {
   var headerFooterFileOverlap = false;
 
@@ -124,12 +131,7 @@ ConcatWithMaps.prototype.addFiles = function(beginSection) {
       return false;
     }
 
-    var stat;
-    // TODO: remove this extra stat
-    try {
-      stat = fs.statSync(file);
-    } catch(err) {}
-    return stat && !stat.isDirectory();
+    return !isDirectory(file);
   }, this);
 
   // raise IFF:

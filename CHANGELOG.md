@@ -1,3 +1,8 @@
+# 2.0.1
+
+ * Newer fast-sourcemap-concat for upstream bugfixes.
+ * Better perf due to reduced use of `stat` calls.
+
 # 2.0.0
 
   * structure of output file is now as follows: 

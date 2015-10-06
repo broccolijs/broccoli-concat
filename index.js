@@ -68,7 +68,11 @@ Concat.prototype.write = function (readTree, destDir) {
     var newCache = {}
 
     try {
-      var inputFiles = helpers.multiGlob(filterInputFiles(self, srcDir), {cwd: srcDir})
+      var globOptions = {cwd: srcDir};
+      if (self.ignore) {
+        globOptions.ignore = self.ignore;
+      }
+      var inputFiles = helpers.multiGlob(filterInputFiles(self, srcDir), globOptions);
       for (i = 0; i < inputFiles.length; i++) {
         var stat = getStat(srcDir + '/' + inputFiles[i]);
         if (stat && stat.isFile()) {

@@ -28,6 +28,6 @@
     "lodash-node": "^2.4.1",
     "lodash.uniq": "^3.2.2",
     "minimatch": "^2.0.10",
-    "mkdirp": "^0.5.0"
+    "mkdirp": "^0.5.1"
   }
 }

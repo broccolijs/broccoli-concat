@@ -1,6 +1,6 @@
 {
   "name": "broccoli-sourcemap-concat",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Fast, good-enough concatenation with source maps.",
   "main": "index.js",
   "scripts": {

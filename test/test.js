@@ -15,7 +15,7 @@ var builder;
 function readFileSync() {
   // babel doesn't support Windows newlines
   // https://github.com/babel/babel/pull/2290
-  return n(fs.readFileSync.apply(this, arguments));
+  return fs.readFileSync.apply(this, arguments).replace(/\r\n/g, '\n');
 }
 
 describe('sourcemap-concat', function() {
@@ -374,10 +374,6 @@ describe('concat-without-maps', function() {
   });
 });
 
-function n(string) {
-  return string.replace(/\r\n/g, '\n');
-}
-
 function expectFile(filename) {
   var stripURL = false;
 
@@ -402,7 +398,7 @@ function expectFile(filename) {
         console.warn('Missing expcted file: ' + path.join(__dirname, 'expected', filename));
       }
 
-      expectSameFiles(n(actualContent), n(expectedContent), filename);
+      expectSameFiles(actualContent, expectedContent, filename);
 
       return this;
     },

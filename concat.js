@@ -2,6 +2,7 @@ var CachingWriter = require('broccoli-caching-writer');
 var path = require('path');
 var fs = require('fs');
 var uniq = require('lodash.uniq');
+var mkdirp = require('mkdirp');
 
 module.exports = ConcatWithMaps;
 ConcatWithMaps.prototype = Object.create(CachingWriter.prototype);
@@ -65,9 +66,12 @@ function makeIndex(a, b) {
 ConcatWithMaps.prototype.build = function() {
   var separator = this.separator;
   var firstSection = true;
+  var outputFile = path.join(this.outputPath, this.outputFile);
+
+  mkdirp.sync(path.dirname(outputFile));
 
   var concat = this.concat = new this.Strategy({
-    outputFile: path.join(this.outputPath, this.outputFile),
+    outputFile: outputFile,
     sourceRoot: this.sourceRoot,
     baseDir: this.inputPaths[0],
     cache: this.encoderCache
@@ -119,9 +123,10 @@ function isDirectory(fullPath) {
 
 ConcatWithMaps.prototype.addFiles = function(beginSection) {
   var headerFooterFileOverlap = false;
+  var posixInputPath = ensurePosix(this.inputPaths[0]);
 
-  var files = uniq(this.listFiles()).filter(function(file){
-    var relativePath = file.replace(this.inputPaths[0] + '/', '');
+  var files = uniq(this.listFiles().map(ensurePosix)).filter(function(file){
+    var relativePath = file.replace(posixInputPath + '/', '');
 
     // * remove inputFiles that are already contained within headerFiles and footerFiles
     // * alow duplicates between headerFiles and footerFiles
@@ -145,7 +150,13 @@ ConcatWithMaps.prototype.addFiles = function(beginSection) {
 
   files.forEach(function(file) {
     beginSection();
-
-    this.concat.addFile(file.replace(this.inputPaths[0] + '/', ''));
+    this.concat.addFile(file.replace(posixInputPath + '/', ''));
   }, this);
 };
+
+function ensurePosix(filepath) {
+  if (path.sep !== '/') {
+    return filepath.split(path.sep).join('/');
+  }
+  return filepath;
+}

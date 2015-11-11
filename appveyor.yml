@@ -19,6 +19,7 @@ install:
   - ps: Install-Product node $env:nodejs_version
   - md C:\nc
   - npm config set cache C:\nc
+  - npm install
 
 # Post-install test scripts.
 test_script:

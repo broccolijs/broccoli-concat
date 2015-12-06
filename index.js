@@ -1,5 +1,5 @@
 var Concat = require('./concat');
-var merge = require('lodash-node/modern/objects/merge');
+var merge = require('lodash.merge');
 
 module.exports = function(inputNode, options) {
   if (!options || !options.outputFile) {

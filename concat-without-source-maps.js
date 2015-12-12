@@ -17,6 +17,11 @@ Concat.prototype.addSpace = function(space) {
   this._internal += space;
 };
 
-Concat.prototype.end = function() {
+Concat.prototype.end = function(cb, thisArg) {
+  var result;
+  if (cb) {
+    result = cb.call(thisArg, this);
+  }
   fs.writeFileSync(this.outputFile, this._internal);
+  return result;
 };

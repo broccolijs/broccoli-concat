@@ -292,8 +292,12 @@ describe('sourcemap-concat', function() {
     });
     var failure = sinon.spy();
     builder = new broccoli.Builder(node);
-    return builder.build().catch(failure).then(function(){
-      expect(failure.called).to.be.true();
+    var reason;
+    return builder.build().catch(function(rejectionReason) {
+      reason = rejectionReason;
+    }).then(function(){
+      expect(reason).to.be;
+      expect(reason.message).to.eql("ConcatWithMaps: nothing matched [nothing/*.js]");
     });
   });
 

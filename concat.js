@@ -19,7 +19,8 @@ function ConcatWithMaps(inputNode, options, Strategy) {
 
   CachingWriter.call(this, [inputNode], {
     inputFiles: options.inputFiles,
-    annotation: options.annotation
+    annotation: options.annotation,
+    name: (Strategy.name || 'Unknown') + 'Concat'
   });
 
   if (Strategy === undefined) {

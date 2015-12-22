@@ -2,22 +2,22 @@
 var fs = require('fs');
 var path = require('path');
 
-module.exports = Concat;
-function Concat(attrs) {
+module.exports = Simple;
+function Simple(attrs) {
   this._internal = '';
   this.outputFile = attrs.outputFile;
   this.baseDir = attrs.baseDir;
 }
 
-Concat.prototype.addFile = function(file) {
+Simple.prototype.addFile = function(file) {
   this._internal += fs.readFileSync(path.join(this.baseDir, file), 'UTF-8');
 };
 
-Concat.prototype.addSpace = function(space) {
+Simple.prototype.addSpace = function(space) {
   this._internal += space;
 };
 
-Concat.prototype.end = function(cb, thisArg) {
+Simple.prototype.end = function(cb, thisArg) {
   var result;
   if (cb) {
     result = cb.call(thisArg, this);

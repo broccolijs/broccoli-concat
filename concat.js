@@ -76,7 +76,6 @@ ConcatWithMaps.prototype.build = function() {
 
   this.concat = new this.Strategy(merge(this.sourceMapConfig, {
     outputFile: outputFile,
-    sourceRoot: this.sourceRoot,
     baseDir: this.inputPaths[0],
     cache: this.encoderCache
   }));

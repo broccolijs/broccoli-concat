@@ -27,6 +27,7 @@
     "broccoli-kitchen-sink-helpers": "^0.2.5",
     "fast-sourcemap-concat": "0.2.7",
     "lodash.merge": "^3.3.2",
+    "lodash.omit": "^3.1.0",
     "lodash.uniq": "^3.2.2",
     "minimatch": "^2.0.10",
     "mkdirp": "^0.5.1"

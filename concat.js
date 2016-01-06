@@ -1,6 +1,8 @@
 var CachingWriter = require('broccoli-caching-writer');
 var path = require('path');
 var fs = require('fs');
+var merge = require('lodash.merge');
+var omit = require('lodash.omit');
 var uniq = require('lodash.uniq');
 var mkdirp = require('mkdirp');
 
@@ -28,6 +30,7 @@ function ConcatWithMaps(inputNode, options, Strategy) {
   }
 
   this.Strategy = Strategy;
+  this.sourceMapConfig = omit(options.sourceMapConfig || {}, 'enabled');
   this.inputFiles = options.inputFiles;
   this.outputFile = options.outputFile;
   this.allowNone = options.allowNone;
@@ -71,12 +74,11 @@ ConcatWithMaps.prototype.build = function() {
 
   mkdirp.sync(path.dirname(outputFile));
 
-  this.concat = new this.Strategy({
+  this.concat = new this.Strategy(merge(this.sourceMapConfig, {
     outputFile: outputFile,
-    sourceRoot: this.sourceRoot,
     baseDir: this.inputPaths[0],
     cache: this.encoderCache
-  });
+  }));
 
   return this.concat.end(function(concat) {
     function beginSection() {

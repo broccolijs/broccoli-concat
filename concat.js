@@ -2,6 +2,7 @@ var CachingWriter = require('broccoli-caching-writer');
 var path = require('path');
 var fs = require('fs');
 var merge = require('lodash.merge');
+var omit = require('lodash.omit');
 var uniq = require('lodash.uniq');
 var mkdirp = require('mkdirp');
 
@@ -29,7 +30,7 @@ function ConcatWithMaps(inputNode, options, Strategy) {
   }
 
   this.Strategy = Strategy;
-  this.sourceMapConfig = options.sourceMapConfig || {};
+  this.sourceMapConfig = omit(options.sourceMapConfig || {}, 'enabled');
   this.inputFiles = options.inputFiles;
   this.outputFile = options.outputFile;
   this.allowNone = options.allowNone;
@@ -39,8 +40,6 @@ function ConcatWithMaps(inputNode, options, Strategy) {
   this.footer = options.footer;
   this.footerFiles = options.footerFiles;
   this.separator = (options.separator != null) ? options.separator : '\n';
-
-  delete this.sourceMapConfig.enabled;
 
   ensureNoMagic('headerFiles', this.headerFiles);
   ensureNoMagic('footerFiles', this.footerFiles);

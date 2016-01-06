@@ -129,12 +129,27 @@ describe('sourcemap-concat', function() {
       header: "/* This is my header. */",
       inputFiles: ['**/*.js'],
       outputFile: '/no-sourcemap.js',
-      sourceMapConfig: { extensions: [] }
+      sourceMapConfig: { enabled: false },
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
       expectFile('no-sourcemap.js').in(result);
       expectFile('no-sourcemap.map').notIn(result);
+    });
+  });
+
+  it('passes sourcemaps config to the sourcemaps engine', function() {
+    var node = concat(firstFixture, {
+      inputFiles: ['**/*.js'],
+      outputFile: '/all-with-source-root.js',
+      sourceMapConfig: { enabled: true, sourceRoot: "/foo" }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      var expected = path.join(__dirname, 'expected', 'all-with-source-root.map');
+      var actual = path.join(result.directory, 'all-with-source-root.map');
+
+      assertFileEqual(readFileSync(actual, 'UTF-8'), readFileSync(expected, 'UTF-8'));
     });
   });
 
@@ -251,7 +266,7 @@ describe('sourcemap-concat', function() {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
       footerFiles: ['other/third.js', 'other/fourth.js'],
-      sourceMapConfig: { extensions: [] }
+      sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
@@ -272,11 +287,11 @@ describe('sourcemap-concat', function() {
       expectFile('nothing.map').in(result);
     });
   });
-
   it('can ignore empty content when sourcemaps are disabled', function() {
     var node = concat(firstFixture, {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css'],
+      sourceMapConfig: { enabled: false },
       allowNone: true
     });
     builder = new broccoli.Builder(node);

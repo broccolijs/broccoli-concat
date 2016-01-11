@@ -16,7 +16,7 @@ function ConcatWithMaps(inputNode, options, Strategy) {
   }
 
   if (!options || !options.outputFile || !options.inputFiles) {
-    throw new Error('inputFiles and outputFile options ware required');
+    throw new Error('inputFiles and outputFile options are required');
   }
 
   CachingWriter.call(this, [inputNode], {

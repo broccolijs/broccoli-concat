@@ -15,12 +15,15 @@ function ConcatWithMaps(inputNode, options, Strategy) {
     return new ConcatWithMaps(inputNode, options, Strategy);
   }
 
-  if (!options || !options.outputFile || !options.inputFiles) {
-    throw new Error('inputFiles and outputFile options are required');
+  if (!options || !options.outputFile) {
+    throw new Error('the outputFile option is required');
   }
 
+  var defaultInputFiles = ['**/*'];
+  var inputFiles = options.inputFiles || defaultInputFiles;
+
   CachingWriter.call(this, [inputNode], {
-    inputFiles: options.inputFiles,
+    inputFiles: inputFiles,
     annotation: options.annotation,
     name: (Strategy.name || 'Unknown') + 'Concat'
   });
@@ -31,7 +34,7 @@ function ConcatWithMaps(inputNode, options, Strategy) {
 
   this.Strategy = Strategy;
   this.sourceMapConfig = omit(options.sourceMapConfig || {}, 'enabled');
-  this.inputFiles = options.inputFiles;
+  this.inputFiles = inputFiles;
   this.outputFile = options.outputFile;
   this.allowNone = options.allowNone;
   this.header = options.header;

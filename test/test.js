@@ -43,6 +43,17 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('concatenates all files across dirs when inputFiles is not specified', function() {
+    var node = concat(firstFixture, {
+      outputFile: '/all.js'
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('all.js').in(result);
+      expectFile('all.map').in(result);
+    });
+  });
+
   it('inserts header', function() {
     var node = concat(firstFixture, {
       outputFile: '/all-with-header.js',

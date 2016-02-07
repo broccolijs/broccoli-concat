@@ -651,25 +651,6 @@ describe('sourcemap-concat', function() {
   });
 });
 
-function expectValidSourcemap(filename) {
-  return {
-    in: function (result, subdir) {
-      if (!subdir) {
-        subdir = '.';
-      }
-
-      var mapFilename = filename.replace(/\.js$/, '.map');
-
-      expectFile(filename).in(result, subdir);
-      expectFile(mapFilename).in(result, subdir);
-
-      var actualMin = readFileSync(path.join(result.directory, subdir, filename), 'utf-8');
-      var actualMap = readFileSync(path.join(result.directory, subdir, mapFilename), 'utf-8');
-      validateSourcemap(actualMin, actualMap, {});
-    }
-  }
-}
-
 function expectFile(filename) {
   var stripURL = false;
 
@@ -731,6 +712,7 @@ function expectValidSourcemap(jsFilename, mapFilename) {
 
       var actualMin = fs.readFileSync(path.join(result.directory, subdir, jsFilename), 'utf-8');
       var actualMap = fs.readFileSync(path.join(result.directory, subdir, mapFilename), 'utf-8');
+
       validateSourcemap(actualMin, actualMap, {});
     }
   }

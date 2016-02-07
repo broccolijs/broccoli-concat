@@ -431,25 +431,6 @@ describe('concat-without-maps', function() {
   });
 });
 
-function expectValidSourcemap(filename) {
-  return {
-    in: function (result, subdir) {
-      if (!subdir) {
-        subdir = '.';
-      }
-
-      var mapFilename = filename.replace(/\.js$/, '.map');
-
-      expectFile(filename).in(result, subdir);
-      expectFile(mapFilename).in(result, subdir);
-
-      var actualMin = readFileSync(path.join(result.directory, subdir, filename), 'utf-8');
-      var actualMap = readFileSync(path.join(result.directory, subdir, mapFilename), 'utf-8');
-      validateSourcemap(actualMin, actualMap, {});
-    }
-  }
-}
-
 function expectFile(filename) {
   var stripURL = false;
 
@@ -519,3 +500,23 @@ EqualityError.prototype = Object.create(Error.prototype);
 EqualityError.prototype.name = 'EqualityError';
 EqualityError.prototype.constructor = EqualityError;
 
+function expectValidSourcemap(jsFilename, mapFilename) {
+  return {
+    in: function (result, subdir) {
+      if (!subdir) {
+        subdir = '.';
+      }
+
+      if (!mapFilename) {
+        mapFilename = jsFilename.replace(/\.js$/, '.map');
+      }
+
+      expectFile(jsFilename).in(result, subdir);
+      expectFile(mapFilename).in(result, subdir);
+
+      var actualMin = readFileSync(path.join(result.directory, subdir, jsFilename), 'utf-8');
+      var actualMap = readFileSync(path.join(result.directory, subdir, mapFilename), 'utf-8');
+      validateSourcemap(actualMin, actualMap, {});
+    }
+  }
+}

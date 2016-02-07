@@ -6,6 +6,7 @@ const expect = require('chai').expect;
 
 function expectSameFiles(actualContent, expectedContent, filename) {
   if (/\.map$/.test(filename)) {
+    fs.writeFileSync('foo', actualContent);
     expect(JSON.parse(actualContent)).to.deep.equal(expectedContent ? JSON.parse(expectedContent) : undefined, 'discrepancy in ' + filename);
   } else {
     expect(actualContent).to.equal(expectedContent, 'discrepancy in ' + filename);

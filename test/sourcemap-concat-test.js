@@ -23,6 +23,7 @@ const fixtures = path.join(__dirname, 'fixtures');
 const firstFixture = path.join(fixtures, 'first');
 const secondFixture = path.join(fixtures, 'second');
 const emptyFixture = path.join(fixtures, 'empty');
+const sprintfFixture = path.join(__dirname, 'fixtures', 'sprintf');
 const walkSync = require('walk-sync');
 
 describe('sourcemap-concat', function() {
@@ -34,6 +35,19 @@ describe('sourcemap-concat', function() {
     if (builder) {
       return builder.cleanup();
     }
+  });
+
+  it('concatenates sprintf correctly', function() {
+    var node = concat(sprintfFixture, {
+      outputFile: '/sprintf-build.js',
+      inputFiles: ['dist/*.js'],
+      sourceMapConfig: { enabled: true }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      // expectFile('sprintf-build.js').in(result);
+      expectFile('sprintf-build.map').in(result);
+    });
   });
 
   it('passes sourcemaps config to the sourcemaps engine', co.wrap(function *() {

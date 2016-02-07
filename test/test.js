@@ -7,6 +7,7 @@ var fs = require('fs');
 var path = require('path');
 var broccoli = require('broccoli');
 var merge = require('broccoli-merge-trees');
+var validateSourcemap = require('sourcemap-validator');
 
 var firstFixture = path.join(__dirname, 'fixtures', 'first');
 var secondFixture = path.join(__dirname, 'fixtures', 'second');
@@ -29,8 +30,7 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      //expectFile('sprintf-alone.js').in(result);
-      expectFile('sprintf-alone.map').in(result);
+      expectValidSourcemap('sprintf-alone.js').in(result);
     });
   });
 
@@ -42,8 +42,7 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      //expectFile('sprintf-multi.js').in(result);
-      expectFile('sprintf-multi.map').in(result);
+      expectValidSourcemap('sprintf-multi.js').in(result);
     });
   });
 
@@ -431,6 +430,25 @@ describe('concat-without-maps', function() {
     assertFileEqual(readFileSync(outputFile, 'UTF-8'), readFileSync(__dirname + '/expected/concat-without-maps-2.js', 'UTF-8'));
   });
 });
+
+function expectValidSourcemap(filename) {
+  return {
+    in: function (result, subdir) {
+      if (!subdir) {
+        subdir = '.';
+      }
+
+      var mapFilename = filename.replace(/\.js$/, '.map');
+
+      expectFile(filename).in(result, subdir);
+      expectFile(mapFilename).in(result, subdir);
+
+      var actualMin = readFileSync(path.join(result.directory, subdir, filename), 'utf-8');
+      var actualMap = readFileSync(path.join(result.directory, subdir, mapFilename), 'utf-8');
+      validateSourcemap(actualMin, actualMap, {});
+    }
+  }
+}
 
 function expectFile(filename) {
   var stripURL = false;

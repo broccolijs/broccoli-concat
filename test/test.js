@@ -45,8 +45,7 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      //expectFile('sprintf-alone.js').in(result);
-      expectFile('sprintf-alone.map').in(result);
+      expectValidSourcemap('sprintf-alone.js').in(result);
     });
   });
 
@@ -58,8 +57,7 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      //expectFile('sprintf-multi.js').in(result);
-      expectFile('sprintf-multi.map').in(result);
+      expectValidSourcemap('sprintf-multi.js').in(result);
     });
   });
 
@@ -652,6 +650,25 @@ describe('sourcemap-concat', function() {
     })
   });
 });
+
+function expectValidSourcemap(filename) {
+  return {
+    in: function (result, subdir) {
+      if (!subdir) {
+        subdir = '.';
+      }
+
+      var mapFilename = filename.replace(/\.js$/, '.map');
+
+      expectFile(filename).in(result, subdir);
+      expectFile(mapFilename).in(result, subdir);
+
+      var actualMin = readFileSync(path.join(result.directory, subdir, filename), 'utf-8');
+      var actualMap = readFileSync(path.join(result.directory, subdir, mapFilename), 'utf-8');
+      validateSourcemap(actualMin, actualMap, {});
+    }
+  }
+}
 
 function expectFile(filename) {
   var stripURL = false;

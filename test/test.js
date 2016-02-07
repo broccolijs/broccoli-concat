@@ -10,6 +10,7 @@ var merge = require('broccoli-merge-trees');
 
 var firstFixture = path.join(__dirname, 'fixtures', 'first');
 var secondFixture = path.join(__dirname, 'fixtures', 'second');
+var sprintfFixture = path.join(__dirname, 'fixtures', 'sprintf');
 var builder;
 
 function readFileSync() {
@@ -19,6 +20,20 @@ function readFileSync() {
 }
 
 describe('sourcemap-concat', function() {
+
+  it('concatenates sprintf correctly', function() {
+    var node = concat(sprintfFixture, {
+      outputFile: '/sprintf-build.js',
+      inputFiles: ['dist/*.js'],
+      sourceMapConfig: { enabled: true }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('sprintf-build.js').in(result);
+      expectFile('sprintf-build.map').in(result);
+    });
+  });
+
   it('concatenates files in one dir', function() {
     var node = concat(firstFixture, {
       outputFile: '/all-inner.js',

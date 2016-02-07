@@ -21,13 +21,33 @@ var firstFixture = path.join(__dirname, 'fixtures', 'first');
 var secondFixture = path.join(__dirname, 'fixtures', 'second');
 var walkSync = require('walk-sync');
 
+function readFileSync() {
+  // babel doesn't support Windows newlines
+  // https://github.com/babel/babel/pull/2290
+  return fs.readFileSync.apply(this, arguments).replace(/\r\n/g, '\n');
+}
+
 describe('sourcemap-concat', function() {
   var builder;
+  var sprintfFixture = path.join(__dirname, 'fixtures', 'sprintf');
 
   afterEach(function() {
     if (builder) {
       return builder.cleanup();
     }
+  });
+
+  it('concatenates sprintf correctly', function() {
+    var node = concat(sprintfFixture, {
+      outputFile: '/sprintf-build.js',
+      inputFiles: ['dist/*.js'],
+      sourceMapConfig: { enabled: true }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('sprintf-build.js').in(result);
+      expectFile('sprintf-build.map').in(result);
+    });
   });
 
   it('concatenates files in one dir', function() {

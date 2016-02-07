@@ -37,18 +37,34 @@ describe('sourcemap-concat', function() {
     }
   });
 
-  it('concatenates sprintf correctly', function() {
-    var node = concat(sprintfFixture, {
-      outputFile: '/sprintf-build.js',
+  it('concatenates sprintf alone', function() {
+    const node = concat(sprintfFixture, {
+      outputFile: '/sprintf-alone.js',
       inputFiles: ['dist/*.js'],
       sourceMapConfig: { enabled: true }
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      // expectFile('sprintf-build.js').in(result);
-      expectFile('sprintf-build.map').in(result);
+      expectFile('sprintf-alone.js').in(result);
+      expectFile('sprintf-alone.map').in(result);
+      expectValidSourcemap('sprintf-alone.js').in(result);
     });
   });
+
+  it('concatenates sprintf with another lib', function() {
+    const node = concat(sprintfFixture, {
+      outputFile: '/sprintf-multi.js',
+      inputFiles: ['dist/*.js', 'other/*.js'],
+      sourceMapConfig: { enabled: true }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('sprintf-multi.js').in(result);
+      expectFile('sprintf-multi.map').in(result);
+      expectValidSourcemap('sprintf-multi.js').in(result);
+    });
+  });
+
 
   it('passes sourcemaps config to the sourcemaps engine', co.wrap(function *() {
     let node = concat(firstFixture, {

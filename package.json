@@ -26,9 +26,9 @@
     "broccoli-caching-writer": "^2.0.0",
     "broccoli-kitchen-sink-helpers": "^0.2.5",
     "fast-sourcemap-concat": "0.2.7",
-    "lodash.merge": "^3.3.2",
-    "lodash.omit": "^3.1.0",
-    "lodash.uniq": "^3.2.2",
+    "lodash.merge": "^4.3.0",
+    "lodash.omit": "^4.1.0",
+    "lodash.uniq": "^4.2.0",
     "minimatch": "^2.0.10",
     "mkdirp": "^0.5.1"
   }

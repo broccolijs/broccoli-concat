@@ -335,7 +335,7 @@ describe('sourcemap-concat', function() {
     var failure = sinon.spy();
     builder = new broccoli.Builder(node);
     return builder.build().catch(failure).then(function(){
-      expect(failure.called).to.be.true();
+      expect(failure.called).to.be.true;
     });
   });
 

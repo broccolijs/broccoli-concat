@@ -316,7 +316,6 @@ describe('sourcemap-concat', function() {
       outputFile: '/nothing.js',
       inputFiles: ['nothing/*.js']
     });
-    var failure = sinon.spy();
     builder = new broccoli.Builder(node);
     var reason;
     return builder.build().catch(function(rejectionReason) {

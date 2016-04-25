@@ -7,9 +7,11 @@ var fs = require('fs');
 var path = require('path');
 var broccoli = require('broccoli');
 var merge = require('broccoli-merge-trees');
+var validateSourcemap = require('sourcemap-validator');
 
 var firstFixture = path.join(__dirname, 'fixtures', 'first');
 var secondFixture = path.join(__dirname, 'fixtures', 'second');
+var sprintfFixture = path.join(__dirname, 'fixtures', 'sprintf');
 var builder;
 
 function readFileSync() {
@@ -19,6 +21,31 @@ function readFileSync() {
 }
 
 describe('sourcemap-concat', function() {
+
+  it('concatenates sprintf alone', function() {
+    var node = concat(sprintfFixture, {
+      outputFile: '/sprintf-alone.js',
+      inputFiles: ['dist/*.js'],
+      sourceMapConfig: { enabled: true }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectValidSourcemap('sprintf-alone.js').in(result);
+    });
+  });
+
+  it('concatenates sprintf with another lib', function() {
+    var node = concat(sprintfFixture, {
+      outputFile: '/sprintf-multi.js',
+      inputFiles: ['dist/*.js', 'other/*.js'],
+      sourceMapConfig: { enabled: true }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectValidSourcemap('sprintf-multi.js').in(result);
+    });
+  });
+
   it('concatenates files in one dir', function() {
     var node = concat(firstFixture, {
       outputFile: '/all-inner.js',
@@ -472,3 +499,23 @@ EqualityError.prototype = Object.create(Error.prototype);
 EqualityError.prototype.name = 'EqualityError';
 EqualityError.prototype.constructor = EqualityError;
 
+function expectValidSourcemap(jsFilename, mapFilename) {
+  return {
+    in: function (result, subdir) {
+      if (!subdir) {
+        subdir = '.';
+      }
+
+      if (!mapFilename) {
+        mapFilename = jsFilename.replace(/\.js$/, '.map');
+      }
+
+      expectFile(jsFilename).in(result, subdir);
+      expectFile(mapFilename).in(result, subdir);
+
+      var actualMin = readFileSync(path.join(result.directory, subdir, jsFilename), 'utf-8');
+      var actualMap = readFileSync(path.join(result.directory, subdir, mapFilename), 'utf-8');
+      validateSourcemap(actualMin, actualMap, {});
+    }
+  }
+}

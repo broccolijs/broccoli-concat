@@ -1,6 +1,5 @@
 /* global describe, afterEach, beforeEach, it, expect */
 
-var sinon = require('sinon');
 var concat = require('..');
 var fs = require('fs');
 var path = require('path');
@@ -9,8 +8,10 @@ var merge = require('broccoli-merge-trees');
 
 var chai = require('chai');
 var chaiFiles = require('chai-files');
+var chaiAsPromised = require('chai-as-promised');
 
 chai.use(chaiFiles);
+chai.use(chaiAsPromised);
 
 var expect = chai.expect;
 var file = chaiFiles.file;
@@ -322,13 +323,7 @@ describe('sourcemap-concat', function() {
       inputFiles: ['nothing/*.js']
     });
     builder = new broccoli.Builder(node);
-    var reason;
-    return builder.build().catch(function(rejectionReason) {
-      reason = rejectionReason;
-    }).then(function(){
-      expect(reason).to.be;
-      expect(reason.message).to.eql("ConcatWithMaps: nothing matched [nothing/*.js]");
-    });
+    return expect(builder.build()).to.be.rejectedWith("ConcatWithMaps: nothing matched [nothing/*.js]");
   });
 
   it('does not ignore empty content when allowNone is not explicitly set and sourcemaps are disabled', function() {
@@ -336,11 +331,8 @@ describe('sourcemap-concat', function() {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css']
     });
-    var failure = sinon.spy();
     builder = new broccoli.Builder(node);
-    return builder.build().catch(failure).then(function(){
-      expect(failure.called).to.be.true;
-    });
+    return expect(builder.build()).to.be.rejected;
   });
 
   it('is not fooled by directories named *.js', function() {

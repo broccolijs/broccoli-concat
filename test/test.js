@@ -17,9 +17,16 @@ var file = chaiFiles.file;
 
 var firstFixture = path.join(__dirname, 'fixtures', 'first');
 var secondFixture = path.join(__dirname, 'fixtures', 'second');
-var builder;
 
 describe('sourcemap-concat', function() {
+  var builder;
+
+  afterEach(function() {
+    if (builder) {
+      return builder.cleanup();
+    }
+  });
+
   it('concatenates files in one dir', function() {
     var node = concat(firstFixture, {
       outputFile: '/all-inner.js',
@@ -346,12 +353,6 @@ describe('sourcemap-concat', function() {
       expectFile('sneaky.js').in(result);
       expectFile('sneaky.map').in(result);
     });
-  });
-
-  afterEach(function() {
-    if (builder) {
-      return builder.cleanup();
-    }
   });
 });
 

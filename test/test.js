@@ -1,12 +1,19 @@
 /* global describe, afterEach, it, expect */
 
-var expect = require('chai').expect;  // jshint ignore:line
 var sinon = require('sinon');
 var concat = require('..');
 var fs = require('fs');
 var path = require('path');
 var broccoli = require('broccoli');
 var merge = require('broccoli-merge-trees');
+
+var chai = require('chai');
+var chaiFiles = require('chai-files');
+
+chai.use(chaiFiles);
+
+var expect = chai.expect;
+var file = chaiFiles.file;
 
 var firstFixture = path.join(__dirname, 'fixtures', 'first');
 var secondFixture = path.join(__dirname, 'fixtures', 'second');
@@ -154,7 +161,7 @@ describe('sourcemap-concat', function() {
       var expected = path.join(__dirname, 'expected', 'all-with-source-root.map');
       var actual = path.join(result.directory, 'all-with-source-root.map');
 
-      expect(fs.readFileSync(actual, 'UTF-8')).to.equal(fs.readFileSync(expected, 'UTF-8'));
+      expect(file(actual)).to.equal(file(expected));
     });
   });
 
@@ -193,14 +200,13 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(final);
     return builder.build().then(function(result) {
-      var actual = fs.readFileSync(result.directory + '/staged.js', 'UTF-8');
 
       var firstFixture = path.join(__dirname, 'fixtures', 'first');
       var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
       var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
       var expected = first + '\n' +  second;
-      expect(actual).to.equal(expected, 'output is wrong');
+      expect(file(result.directory + '/staged.js')).to.equal(expected);
     });
   });
 
@@ -212,14 +218,12 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(final);
     return builder.build().then(function(result) {
-      var actual = fs.readFileSync(result.directory + '/staged.js', 'UTF-8');
-
       var firstFixture = path.join(__dirname, 'fixtures', 'first');
       var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
       var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
       var expected = first + '\n' +  second + '//# sourceMappingURL=staged.map';
-      expect(actual).to.equal(expected, 'output is wrong');
+      expect(file(result.directory + '/staged.js')).to.equal(expected, 'output is wrong');
     });
   });
 
@@ -375,7 +379,7 @@ describe('concat-without-maps', function() {
     concat.addSpace('b');
     concat.addSpace('c');
     concat.end();
-    expect(fs.readFileSync(outputFile, 'UTF-8')).to.equal('abc');
+    expect(file(outputFile)).to.equal('abc');
   });
 
   it('addFile', function() {
@@ -383,8 +387,7 @@ describe('concat-without-maps', function() {
     concat.addFile('inner/second.js');
     concat.addFile('other/third.js');
     concat.end();
-    expect(fs.readFileSync(outputFile, 'UTF-8'))
-      .to.equal(fs.readFileSync(__dirname + '/expected/concat-without-maps-1.js', 'UTF-8'));
+    expect(file(outputFile)).to.equal(file(__dirname + '/expected/concat-without-maps-1.js'));
   });
 
   it('addFile & addSpace', function() {
@@ -394,8 +397,7 @@ describe('concat-without-maps', function() {
     concat.addSpace('"c";\n');
     concat.addFile('inner/second.js');
     concat.end();
-    expect(fs.readFileSync(outputFile, 'UTF-8'))
-      .to.equal(fs.readFileSync(__dirname + '/expected/concat-without-maps-2.js', 'UTF-8'));
+    expect(file(outputFile)).to.equal(file(__dirname + '/expected/concat-without-maps-2.js'));
   });
 });
 

@@ -408,7 +408,7 @@ function expectFile(filename) {
         }
 
       } catch (err) {
-        console.warn('Missing expcted file: ' + path.join(__dirname, 'expected', filename));
+        console.warn('Missing expected file: ' + path.join(__dirname, 'expected', filename));
       }
 
       expectSameFiles(actualContent, expectedContent, filename);

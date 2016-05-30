@@ -1,4 +1,4 @@
-/* global describe, afterEach, it, expect */
+/* global describe, afterEach, beforeEach, it, expect */
 
 var sinon = require('sinon');
 var concat = require('..');

@@ -208,8 +208,6 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(final);
     return builder.build().then(function(result) {
-
-      var firstFixture = path.join(__dirname, 'fixtures', 'first');
       var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
       var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
@@ -226,7 +224,6 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(final);
     return builder.build().then(function(result) {
-      var firstFixture = path.join(__dirname, 'fixtures', 'first');
       var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
       var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 

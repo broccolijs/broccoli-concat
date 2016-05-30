@@ -395,12 +395,8 @@ function expectFile(filename) {
   var stripURL = false;
 
   return {
-    in: function(result, subdir) {
-      if (!subdir) {
-        subdir = '.';
-      }
-
-      var actualContent = fs.readFileSync(path.join(result.directory, subdir, filename), 'utf-8');
+    in: function(result) {
+      var actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
       fs.writeFileSync(path.join(__dirname, 'actual', filename), actualContent);
 
       var expectedContent;

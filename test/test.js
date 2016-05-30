@@ -160,7 +160,7 @@ describe('sourcemap-concat', function() {
       var expected = path.join(__dirname, 'expected', 'all-with-source-root.map');
       var actual = path.join(result.directory, 'all-with-source-root.map');
 
-      assertFileEqual(readFileSync(actual, 'UTF-8'), readFileSync(expected, 'UTF-8'));
+      expect(readFileSync(actual, 'UTF-8')).to.equal(readFileSync(expected, 'UTF-8'));
     });
   });
 
@@ -206,7 +206,7 @@ describe('sourcemap-concat', function() {
       var second = readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
       var expected = first + '\n' +  second;
-      assertFileEqual(actual, expected, 'output is wrong');
+      expect(actual).to.equal(expected, 'output is wrong');
     });
   });
 
@@ -225,7 +225,7 @@ describe('sourcemap-concat', function() {
       var second = readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
       var expected = first + '\n' +  second + '//# sourceMappingURL=staged.map';
-      assertFileEqual(actual, expected, 'output is wrong');
+      expect(actual).to.equal(expected, 'output is wrong');
     });
   });
 
@@ -381,7 +381,7 @@ describe('concat-without-maps', function() {
     concat.addSpace('b');
     concat.addSpace('c');
     concat.end();
-    assertFileEqual(readFileSync(outputFile, 'UTF-8'), 'abc');
+    expect(readFileSync(outputFile, 'UTF-8')).to.equal('abc');
   });
 
   it('addFile', function() {
@@ -389,7 +389,8 @@ describe('concat-without-maps', function() {
     concat.addFile('inner/second.js');
     concat.addFile('other/third.js');
     concat.end();
-    assertFileEqual(readFileSync(outputFile, 'UTF-8'), readFileSync(__dirname + '/expected/concat-without-maps-1.js', 'UTF-8'));
+    expect(readFileSync(outputFile, 'UTF-8'))
+      .to.equal(readFileSync(__dirname + '/expected/concat-without-maps-1.js', 'UTF-8'));
   });
 
   it('addFile & addSpace', function() {
@@ -399,7 +400,8 @@ describe('concat-without-maps', function() {
     concat.addSpace('"c";\n');
     concat.addFile('inner/second.js');
     concat.end();
-    assertFileEqual(readFileSync(outputFile, 'UTF-8'), readFileSync(__dirname + '/expected/concat-without-maps-2.js', 'UTF-8'));
+    expect(readFileSync(outputFile, 'UTF-8'))
+      .to.equal(readFileSync(__dirname + '/expected/concat-without-maps-2.js', 'UTF-8'));
   });
 });
 
@@ -451,24 +453,3 @@ function expectSameFiles(actualContent, expectedContent, filename) {
     expect(actualContent).to.equal(expectedContent, 'discrepancy in ' + filename);
   }
 }
-
-function assertFileEqual(actual, expected, message) {
-  if (actual === expected) {
-    expect(true).to.be.true;
-  } else {
-    throw new EqualityError('output is wrong', actual, expected);
-  }
-}
-
-function EqualityError(message, actual, expected) {
-  this.message = message;
-  this.actual = actual;
-  this.expected = expected;
-  this.showDiff = true;
-  Error.captureStackTrace(this, module.exports);
-}
-
-EqualityError.prototype = Object.create(Error.prototype);
-EqualityError.prototype.name = 'EqualityError';
-EqualityError.prototype.constructor = EqualityError;
-

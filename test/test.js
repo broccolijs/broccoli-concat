@@ -12,12 +12,6 @@ var firstFixture = path.join(__dirname, 'fixtures', 'first');
 var secondFixture = path.join(__dirname, 'fixtures', 'second');
 var builder;
 
-function readFileSync() {
-  // babel doesn't support Windows newlines
-  // https://github.com/babel/babel/pull/2290
-  return fs.readFileSync.apply(this, arguments).replace(/\r\n/g, '\n');
-}
-
 describe('sourcemap-concat', function() {
   it('concatenates files in one dir', function() {
     var node = concat(firstFixture, {
@@ -160,7 +154,7 @@ describe('sourcemap-concat', function() {
       var expected = path.join(__dirname, 'expected', 'all-with-source-root.map');
       var actual = path.join(result.directory, 'all-with-source-root.map');
 
-      expect(readFileSync(actual, 'UTF-8')).to.equal(readFileSync(expected, 'UTF-8'));
+      expect(fs.readFileSync(actual, 'UTF-8')).to.equal(fs.readFileSync(expected, 'UTF-8'));
     });
   });
 
@@ -199,11 +193,11 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(final);
     return builder.build().then(function(result) {
-      var actual = readFileSync(result.directory + '/staged.js', 'UTF-8');
+      var actual = fs.readFileSync(result.directory + '/staged.js', 'UTF-8');
 
       var firstFixture = path.join(__dirname, 'fixtures', 'first');
-      var first = readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
-      var second = readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+      var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+      var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
       var expected = first + '\n' +  second;
       expect(actual).to.equal(expected, 'output is wrong');
@@ -218,11 +212,11 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(final);
     return builder.build().then(function(result) {
-      var actual = readFileSync(result.directory + '/staged.js', 'UTF-8');
+      var actual = fs.readFileSync(result.directory + '/staged.js', 'UTF-8');
 
       var firstFixture = path.join(__dirname, 'fixtures', 'first');
-      var first = readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
-      var second = readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+      var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+      var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
       var expected = first + '\n' +  second + '//# sourceMappingURL=staged.map';
       expect(actual).to.equal(expected, 'output is wrong');
@@ -381,7 +375,7 @@ describe('concat-without-maps', function() {
     concat.addSpace('b');
     concat.addSpace('c');
     concat.end();
-    expect(readFileSync(outputFile, 'UTF-8')).to.equal('abc');
+    expect(fs.readFileSync(outputFile, 'UTF-8')).to.equal('abc');
   });
 
   it('addFile', function() {
@@ -389,8 +383,8 @@ describe('concat-without-maps', function() {
     concat.addFile('inner/second.js');
     concat.addFile('other/third.js');
     concat.end();
-    expect(readFileSync(outputFile, 'UTF-8'))
-      .to.equal(readFileSync(__dirname + '/expected/concat-without-maps-1.js', 'UTF-8'));
+    expect(fs.readFileSync(outputFile, 'UTF-8'))
+      .to.equal(fs.readFileSync(__dirname + '/expected/concat-without-maps-1.js', 'UTF-8'));
   });
 
   it('addFile & addSpace', function() {
@@ -400,8 +394,8 @@ describe('concat-without-maps', function() {
     concat.addSpace('"c";\n');
     concat.addFile('inner/second.js');
     concat.end();
-    expect(readFileSync(outputFile, 'UTF-8'))
-      .to.equal(readFileSync(__dirname + '/expected/concat-without-maps-2.js', 'UTF-8'));
+    expect(fs.readFileSync(outputFile, 'UTF-8'))
+      .to.equal(fs.readFileSync(__dirname + '/expected/concat-without-maps-2.js', 'UTF-8'));
   });
 });
 
@@ -414,13 +408,13 @@ function expectFile(filename) {
         subdir = '.';
       }
 
-      var actualContent = readFileSync(path.join(result.directory, subdir, filename), 'utf-8');
+      var actualContent = fs.readFileSync(path.join(result.directory, subdir, filename), 'utf-8');
       fs.writeFileSync(path.join(__dirname, 'actual', filename), actualContent);
 
       var expectedContent;
 
       try {
-        expectedContent = readFileSync(path.join(__dirname, 'expected', filename), 'utf-8');
+        expectedContent = fs.readFileSync(path.join(__dirname, 'expected', filename), 'utf-8');
         if (stripURL) {
           expectedContent = expectedContent.replace(/\/\/# sourceMappingURL=.*$/, '');
         }

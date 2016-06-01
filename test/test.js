@@ -1,24 +1,33 @@
-/* global describe, afterEach, it, expect */
+/* global describe, afterEach, beforeEach, it, expect */
 
-var expect = require('chai').expect;  // jshint ignore:line
-var sinon = require('sinon');
 var concat = require('..');
 var fs = require('fs');
 var path = require('path');
 var broccoli = require('broccoli');
 var merge = require('broccoli-merge-trees');
 
+var chai = require('chai');
+var chaiFiles = require('chai-files');
+var chaiAsPromised = require('chai-as-promised');
+
+chai.use(chaiFiles);
+chai.use(chaiAsPromised);
+
+var expect = chai.expect;
+var file = chaiFiles.file;
+
 var firstFixture = path.join(__dirname, 'fixtures', 'first');
 var secondFixture = path.join(__dirname, 'fixtures', 'second');
-var builder;
-
-function readFileSync() {
-  // babel doesn't support Windows newlines
-  // https://github.com/babel/babel/pull/2290
-  return fs.readFileSync.apply(this, arguments).replace(/\r\n/g, '\n');
-}
 
 describe('sourcemap-concat', function() {
+  var builder;
+
+  afterEach(function() {
+    if (builder) {
+      return builder.cleanup();
+    }
+  });
+
   it('concatenates files in one dir', function() {
     var node = concat(firstFixture, {
       outputFile: '/all-inner.js',
@@ -160,7 +169,7 @@ describe('sourcemap-concat', function() {
       var expected = path.join(__dirname, 'expected', 'all-with-source-root.map');
       var actual = path.join(result.directory, 'all-with-source-root.map');
 
-      assertFileEqual(readFileSync(actual, 'UTF-8'), readFileSync(expected, 'UTF-8'));
+      expect(file(actual)).to.equal(file(expected));
     });
   });
 
@@ -199,14 +208,11 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(final);
     return builder.build().then(function(result) {
-      var actual = readFileSync(result.directory + '/staged.js', 'UTF-8');
-
-      var firstFixture = path.join(__dirname, 'fixtures', 'first');
-      var first = readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
-      var second = readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+      var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+      var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
       var expected = first + '\n' +  second;
-      assertFileEqual(actual, expected, 'output is wrong');
+      expect(file(result.directory + '/staged.js')).to.equal(expected);
     });
   });
 
@@ -218,14 +224,11 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(final);
     return builder.build().then(function(result) {
-      var actual = readFileSync(result.directory + '/staged.js', 'UTF-8');
-
-      var firstFixture = path.join(__dirname, 'fixtures', 'first');
-      var first = readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
-      var second = readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+      var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+      var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
       var expected = first + '\n' +  second + '//# sourceMappingURL=staged.map';
-      assertFileEqual(actual, expected, 'output is wrong');
+      expect(file(result.directory + '/staged.js')).to.equal(expected, 'output is wrong');
     });
   });
 
@@ -317,13 +320,7 @@ describe('sourcemap-concat', function() {
       inputFiles: ['nothing/*.js']
     });
     builder = new broccoli.Builder(node);
-    var reason;
-    return builder.build().catch(function(rejectionReason) {
-      reason = rejectionReason;
-    }).then(function(){
-      expect(reason).to.be;
-      expect(reason.message).to.eql("ConcatWithMaps: nothing matched [nothing/*.js]");
-    });
+    return expect(builder.build()).to.be.rejectedWith("ConcatWithMaps: nothing matched [nothing/*.js]");
   });
 
   it('does not ignore empty content when allowNone is not explicitly set and sourcemaps are disabled', function() {
@@ -331,11 +328,8 @@ describe('sourcemap-concat', function() {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css']
     });
-    var failure = sinon.spy();
     builder = new broccoli.Builder(node);
-    return builder.build().catch(failure).then(function(){
-      expect(failure.called).to.be.true;
-    });
+    return expect(builder.build()).to.be.rejected;
   });
 
   it('is not fooled by directories named *.js', function() {
@@ -348,12 +342,6 @@ describe('sourcemap-concat', function() {
       expectFile('sneaky.js').in(result);
       expectFile('sneaky.map').in(result);
     });
-  });
-
-  afterEach(function() {
-    if (builder) {
-      return builder.cleanup();
-    }
   });
 });
 
@@ -381,7 +369,7 @@ describe('concat-without-maps', function() {
     concat.addSpace('b');
     concat.addSpace('c');
     concat.end();
-    assertFileEqual(readFileSync(outputFile, 'UTF-8'), 'abc');
+    expect(file(outputFile)).to.equal('abc');
   });
 
   it('addFile', function() {
@@ -389,7 +377,7 @@ describe('concat-without-maps', function() {
     concat.addFile('inner/second.js');
     concat.addFile('other/third.js');
     concat.end();
-    assertFileEqual(readFileSync(outputFile, 'UTF-8'), readFileSync(__dirname + '/expected/concat-without-maps-1.js', 'UTF-8'));
+    expect(file(outputFile)).to.equal(file(__dirname + '/expected/concat-without-maps-1.js'));
   });
 
   it('addFile & addSpace', function() {
@@ -399,7 +387,7 @@ describe('concat-without-maps', function() {
     concat.addSpace('"c";\n');
     concat.addFile('inner/second.js');
     concat.end();
-    assertFileEqual(readFileSync(outputFile, 'UTF-8'), readFileSync(__dirname + '/expected/concat-without-maps-2.js', 'UTF-8'));
+    expect(file(outputFile)).to.equal(file(__dirname + '/expected/concat-without-maps-2.js'));
   });
 });
 
@@ -407,24 +395,20 @@ function expectFile(filename) {
   var stripURL = false;
 
   return {
-    in: function(result, subdir) {
-      if (!subdir) {
-        subdir = '.';
-      }
-
-      var actualContent = readFileSync(path.join(result.directory, subdir, filename), 'utf-8');
+    in: function(result) {
+      var actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
       fs.writeFileSync(path.join(__dirname, 'actual', filename), actualContent);
 
       var expectedContent;
 
       try {
-        expectedContent = readFileSync(path.join(__dirname, 'expected', filename), 'utf-8');
+        expectedContent = fs.readFileSync(path.join(__dirname, 'expected', filename), 'utf-8');
         if (stripURL) {
           expectedContent = expectedContent.replace(/\/\/# sourceMappingURL=.*$/, '');
         }
 
       } catch (err) {
-        console.warn('Missing expcted file: ' + path.join(__dirname, 'expected', filename));
+        console.warn('Missing expected file: ' + path.join(__dirname, 'expected', filename));
       }
 
       expectSameFiles(actualContent, expectedContent, filename);
@@ -451,24 +435,3 @@ function expectSameFiles(actualContent, expectedContent, filename) {
     expect(actualContent).to.equal(expectedContent, 'discrepancy in ' + filename);
   }
 }
-
-function assertFileEqual(actual, expected, message) {
-  if (actual === expected) {
-    expect(true).to.be.true;
-  } else {
-    throw new EqualityError('output is wrong', actual, expected);
-  }
-}
-
-function EqualityError(message, actual, expected) {
-  this.message = message;
-  this.actual = actual;
-  this.expected = expected;
-  this.showDiff = true;
-  Error.captureStackTrace(this, module.exports);
-}
-
-EqualityError.prototype = Object.create(Error.prototype);
-EqualityError.prototype.name = 'EqualityError';
-EqualityError.prototype.constructor = EqualityError;
-

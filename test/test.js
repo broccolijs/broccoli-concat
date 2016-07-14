@@ -197,6 +197,25 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('inputFiles are sorted lexicographically (improve stability of build output)', function() {
+    var final = concat(firstFixture, {
+      outputFile: '/staged.js',
+      inputFiles: ['inner/second.js', 'inner/first.js'],
+      sourceMapConfig: {
+        enabled: false
+      }
+    });
+
+    builder = new broccoli.Builder(final);
+    return builder.build().then(function(result) {
+      var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+      var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+
+      var expected = first + '\n' +  second;
+      expect(file(result.directory + '/staged.js')).to.equal(expected);
+    });
+  });
+
   it('dedupe uniques in inputFiles (with simpleconcat)', function() {
     var final = concat(firstFixture, {
       outputFile: '/staged.js',

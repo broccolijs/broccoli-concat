@@ -1,3 +1,5 @@
+# 3.0.0
+
  * inputFiles are now sorted lexicographically, this should improve stability of output
   ember-cli wasn't following the instructions and relied on undefined (brittle) behavior.
 

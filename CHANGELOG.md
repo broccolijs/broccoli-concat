@@ -1,3 +1,7 @@
+
+
+ * remove minimatch (unused dep)
+
 # 2.3.0
 
  * inputFiles are now sorted lexicographically, this should improve stability of output

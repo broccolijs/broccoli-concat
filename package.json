@@ -7,7 +7,7 @@
     "test": "mocha",
     "test:debug": "mocha debug"
   },
-  "repository": "https://github.com/ef4/broccoli-sourcemap-concat",
+  "repository": "https://github.com/ember-cli/broccoli-concat",
   "author": "Edward Faulkner <ef@alum.mit.edu>",
   "license": "MIT",
   "keywords": [

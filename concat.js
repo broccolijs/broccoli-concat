@@ -19,8 +19,10 @@ function ConcatWithMaps(inputNode, options, Strategy) {
     throw new Error('the outputFile option is required');
   }
 
+  var allInputFiles = uniq([].concat(options.headerFiles || [], options.inputFiles || [], options.footerFiles || []));
+
   CachingWriter.call(this, [inputNode], {
-    inputFiles: options.inputFiles,
+    inputFiles: allInputFiles.length === 0 ? undefined : allInputFiles,
     annotation: options.annotation,
     name: (Strategy.name || 'Unknown') + 'Concat'
   });

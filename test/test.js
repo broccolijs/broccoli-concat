@@ -362,6 +362,201 @@ describe('sourcemap-concat', function() {
       expectFile('sneaky.map').in(result);
     });
   });
+
+  describe('rebuild', function() {
+    var inputDir;
+    var quickTemp = require('quick-temp');
+    beforeEach(function() {
+      inputDir = quickTemp.makeOrRemake(this, 'rebuild-tests');
+    });
+
+    // write/unlink in inputDir
+    function write(file, content) { fs.writeFileSync(inputDir + '/' + file, content); }
+    function unlink(file)         { fs.unlinkSync(inputDir + '/' + file); }
+
+    // other helper
+    function read(fullPath)       { return fs.readFileSync(fullPath, 'UTF8'); }
+
+    it('add/remove inputFile', function() {
+      var node = concat(inputDir, {
+        outputFile: '/rebuild.js',
+        inputFiles: ['**/*.js'],
+        allowNone: true,
+      });
+
+      builder = new broccoli.Builder(node);
+      return builder.build().then(function(result) {
+        expect(fs.readFileSync(result.directory + '/rebuild.js', 'UTF8')).to.eql('//# sourceMappingURL=rebuild.map');
+
+        write('omg.js', 'hi');
+
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('hi//# sourceMappingURL=rebuild.map');
+        unlink('omg.js')
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('//# sourceMappingURL=rebuild.map');
+        return builder.build();
+      });
+    });
+
+    it('inputFile ordering', function() {
+      var node = concat(inputDir, {
+        outputFile: '/rebuild.js',
+        inputFiles: ['**/*.js'],
+        allowNone: true,
+      });
+      builder = new broccoli.Builder(node);
+      return builder.build().then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('//# sourceMappingURL=rebuild.map');
+
+        write('z.js', 'z');
+        write('a.js', 'a');
+        write('b.js', 'b');
+
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('a\nb\nz//# sourceMappingURL=rebuild.map');
+        unlink('a.js')
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz//# sourceMappingURL=rebuild.map');
+        write('a.js', 'a');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('a\nb\nz//# sourceMappingURL=rebuild.map');
+        return builder.build();
+      });
+    });
+
+    it('headerFiles', function() {
+      var node = concat(inputDir, {
+        outputFile: '/rebuild.js',
+        headerFiles: ['b.js', 'a.js'],
+      });
+
+      write('z.js', 'z');
+      write('a.js', 'a');
+      write('b.js', 'b');
+
+      builder = new broccoli.Builder(node);
+      return builder.build().then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        write('a.js', 'a-updated');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated//# sourceMappingURL=rebuild.map');
+        write('a.js', 'a');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        write('z.js', 'z-updated');
+        return builder.build();
+      }).then(function(result){
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        return builder.build();
+      });
+    });
+
+    it('footerFiles', function() {
+      var node = concat(inputDir, {
+        outputFile: '/rebuild.js',
+        footerFiles: ['b.js', 'a.js'],
+      });
+
+      write('z.js', 'z');
+      write('a.js', 'a');
+      write('b.js', 'b');
+
+      builder = new broccoli.Builder(node);
+      return builder.build().then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        write('a.js', 'a-updated');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated//# sourceMappingURL=rebuild.map');
+        write('a.js', 'a');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        write('z.js', 'z-updated');
+        return builder.build();
+      }).then(function(result){
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        return builder.build();
+      });
+    });
+
+    it('footerFiles + headerFiles', function() {
+      var node = concat(inputDir, {
+        outputFile: '/rebuild.js',
+        headerFiles: ['b.js'],
+        footerFiles: ['a.js'],
+      });
+
+      write('z.js', 'z');
+      write('a.js', 'a');
+      write('b.js', 'b');
+
+      builder = new broccoli.Builder(node);
+      return builder.build().then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        write('a.js', 'a-updated');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated//# sourceMappingURL=rebuild.map');
+        write('a.js', 'a');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        write('z.js', 'z-updated');
+        return builder.build();
+      }).then(function(result){
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        return builder.build();
+      });
+    });
+
+    it('footerFiles + inputFiles (glob) + headerFiles', function() {
+      var node = concat(inputDir, {
+        outputFile: '/rebuild.js',
+        headerFiles: ['b.js'],
+        footerFiles: ['a.js'],
+        inputFiles: [ '**/*.js'],
+      });
+
+      write('z.js', 'z');
+      write('a.js', 'a');
+      write('b.js', 'b');
+
+      builder = new broccoli.Builder(node);
+      return builder.build().then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na//# sourceMappingURL=rebuild.map');
+        write('a.js', 'a-updated');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na-updated//# sourceMappingURL=rebuild.map');
+        write('a.js', 'a');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na//# sourceMappingURL=rebuild.map');
+        write('z.js', 'z-updated');
+        return builder.build();
+      }).then(function(result){
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz-updated\na//# sourceMappingURL=rebuild.map');
+        unlink('z.js');
+        return builder.build();
+      }).then(function(result){
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        write('z.js', 'z');
+        return builder.build();
+      }).then(function(result){
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na//# sourceMappingURL=rebuild.map');
+        return builder.build();
+      });
+    });
+  });
 });
 
 describe('concat-without-maps', function() {

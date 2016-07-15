@@ -1,3 +1,8 @@
+
+# 2.3.3
+
+ * [BUGFIX] ensure headerFiles / inputFiles / footerFiles are included in inputFiles passed to BCW, this prevents stale reads when only a headerFile or footerFile changed but nothing else.
+
 # 2.3.2
 
  * [REVERT] inputFiles are now sorted lexicographically, this should improve stability of output

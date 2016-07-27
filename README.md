@@ -25,7 +25,7 @@ var node = concat(node, {
   outputFile: '/output.js',
   header: ";(function() {",
   headerFiles: ['loader.js'],
-  inputFiles: ['**/*']
+  inputFiles: ['**/*'],
   footerFiles: ['auto-start.js'],
   footer: "}());",
   sourceMapConfig: { enabled: true },

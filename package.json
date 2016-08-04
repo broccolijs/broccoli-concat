@@ -30,7 +30,7 @@
   "dependencies": {
     "broccoli-caching-writer": "^3.0.0",
     "broccoli-kitchen-sink-helpers": "^0.3.1",
-    "fast-sourcemap-concat": "^1.0.0",
+    "fast-sourcemap-concat": "^1.0.1",
     "lodash.merge": "^4.3.0",
     "lodash.omit": "^4.1.0",
     "lodash.uniq": "^4.2.0",

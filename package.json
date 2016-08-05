@@ -3,6 +3,11 @@
   "version": "2.3.3",
   "description": "Fast, good-enough concatenation with source maps.",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "concat.js",
+    "concat-without-source-maps.js"
+  ],
   "scripts": {
     "test": "mocha",
     "test:debug": "mocha debug"

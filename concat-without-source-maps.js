@@ -22,7 +22,7 @@ Simple.prototype.addSpace = function(space) {
 };
 
 Simple.prototype.writeConcatStatsSync = function(outputPath, content) {
-  fs.writeFileSync(outputPath, content);
+  fs.writeFileSync(outputPath, JSON.stringify(content, null, 2));
 };
 
 Simple.prototype.end = function(cb, thisArg) {
@@ -36,10 +36,10 @@ Simple.prototype.end = function(cb, thisArg) {
 
     this.writeConcatStatsSync(
       outputPath,
-      JSON.stringify({
+      {
         outputFile: this.outputFile,
         sizes: this._sizes
-      }, null, 2)
+      }
     )
   }
 

@@ -57,4 +57,43 @@ describe('concat-without-maps', function() {
     concat.end();
     expect(file(outputFile)).to.equal(file(__dirname + '/expected/concat-without-maps-2.js'));
   });
+
+  describe('CONCAT_STATS', function() {
+    var outputs;
+
+    beforeEach(function() {
+      process.env.CONCAT_STATS = true;
+      outputs = [];
+
+      concat.writeConcatStatsSync = function(outputPath, content) {
+        outputs.push({
+          outputPath: outputPath,
+          content: content
+        });
+      };
+    });
+
+    afterEach(function() {
+      delete process.env.CONCAT_STATS;
+    });
+
+    it('correctly emits file for given concat', function() {
+      concat.addFile('inner/first.js');
+      concat.addFile('inner/second.js');
+
+      expect(outputs.length).to.eql(0);
+      concat.end();
+      expect(outputs.length).to.eql(1);
+
+    var outputPath = process.cwd() + '/concat-stats-for-' + concat.id + '-' + path.basename(concat.outputFile) + '.json';
+      expect(outputs[0].outputPath).to.eql(outputPath);
+      expect(outputs[0].content).to.eql({
+        outputFile: concat.outputFile,
+        sizes: {
+          'inner/first.js': 100,
+          'inner/second.js': 66
+        }
+      });
+    })
+  });
 });

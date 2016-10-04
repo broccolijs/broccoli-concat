@@ -1,5 +1,5 @@
 'use strict';
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
 
 module.exports = Simple;
@@ -22,6 +22,7 @@ Simple.prototype.addSpace = function(space) {
 };
 
 Simple.prototype.writeConcatStatsSync = function(outputPath, content) {
+  mkdirp.sync(path.dirname(outputPath));
   fs.writeFileSync(outputPath, JSON.stringify(content, null, 2));
 };
 
@@ -32,7 +33,7 @@ Simple.prototype.end = function(cb, thisArg) {
   }
 
   if (process.env.CONCAT_STATS) {
-    var outputPath = process.cwd() + '/concat-stats-for-' + this.id + '-' + path.basename(this.outputFile) + '.json';
+    var outputPath = process.cwd() + '/concat-stats-for/' + this.id + '-' + path.basename(this.outputFile) + '.json';
 
     this.writeConcatStatsSync(
       outputPath,

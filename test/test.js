@@ -339,7 +339,7 @@ describe('sourcemap-concat', function() {
       inputFiles: ['nothing/*.js']
     });
     builder = new broccoli.Builder(node);
-    return expect(builder.build()).to.be.rejectedWith("ConcatWithMaps: nothing matched [nothing/*.js]");
+    return expect(builder.build()).to.be.rejectedWith("Concat: nothing matched [nothing/*.js]");
   });
 
   it('does not ignore empty content when allowNone is not explicitly set and sourcemaps are disabled', function() {

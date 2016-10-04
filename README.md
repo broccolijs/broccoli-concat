@@ -53,6 +53,8 @@ Each file within that directory represents a different contenation, and will con
 * outputFile – the output file that was created
 * sizes – a summary of each input file, and the associated pre-minified pre-gziped byte size.
 
+Want more details? like uglified or compressed sizes? (or have more ideas) go checkout: https://github.com/stefanpenner/broccoli-concat-analyser
+
 ##### Example:
 
 concat-stats-for/<id>-file.json

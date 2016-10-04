@@ -42,3 +42,31 @@ The structure of `output.js` will be as follows:
 // - ordered content of the files in footerFiles
 // - footer
 ```
+
+#### Debug Usage
+
+Setting the environment variable `CONCAT_STATS=true` will result a summary of
+each concatention being output to `process.cwd() + 'concat-stats-for/*.json'`
+
+Each file within that directory represents a different contenation, and will contain:
+
+* outputFile – the output file that was created
+* sizes – a summary of each input file, and the associated pre-minified pre-gziped byte size.
+
+##### Example:
+
+concat-stats-for/<id>-file.json
+```json
+{
+  "outputFile": "path/to/output/File",
+  "sizes": {
+    "a.js": 5,
+    "b.js": 10,
+  }
+}
+```
+
+other files:
+
+* concat-stats-for/<id>-file/a.js
+* concat-stats-for/<id>-file/b.js

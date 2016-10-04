@@ -22,7 +22,7 @@ Simple.prototype.addSpace = function(space) {
 };
 
 Simple.prototype.writeConcatStatsSync = function(outputPath, content) {
-  mkdirp.sync(path.dirname(outputPath));
+  fs.mkdirpSync(path.dirname(outputPath));
   fs.writeFileSync(outputPath, JSON.stringify(content, null, 2));
 };
 

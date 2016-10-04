@@ -6,14 +6,14 @@ var omit = require('lodash.omit');
 var uniq = require('lodash.uniq');
 var mkdirp = require('mkdirp');
 
-module.exports = ConcatWithMaps;
-ConcatWithMaps.prototype = Object.create(CachingWriter.prototype);
-ConcatWithMaps.prototype.constructor = ConcatWithMaps;
+module.exports = Concat;
+Concat.prototype = Object.create(CachingWriter.prototype);
+Concat.prototype.constructor = Concat;
 
 var id = 0;
-function ConcatWithMaps(inputNode, options, Strategy) {
-  if (!(this instanceof ConcatWithMaps)) {
-    return new ConcatWithMaps(inputNode, options, Strategy);
+function Concat(inputNode, options, Strategy) {
+  if (!(this instanceof Concat)) {
+    return new Concat(inputNode, options, Strategy);
   }
 
   if (!options || !options.outputFile) {
@@ -31,7 +31,7 @@ function ConcatWithMaps(inputNode, options, Strategy) {
   this.id = (id++);
 
   if (Strategy === undefined) {
-    throw new TypeError('ConcatWithMaps requires a concat Strategy');
+    throw new TypeError('Concat requires a concat Strategy');
   }
 
   this.Strategy = Strategy;
@@ -72,7 +72,7 @@ function makeIndex(a, b) {
   return index;
 }
 
-ConcatWithMaps.prototype.build = function() {
+Concat.prototype.build = function() {
   var separator = this.separator;
   var firstSection = true;
   var outputFile = path.join(this.outputPath, this.outputFile);
@@ -130,7 +130,7 @@ function isDirectory(fullPath) {
   return fullPath.charAt(fullPath.length - 1) === '/';
 }
 
-ConcatWithMaps.prototype.addFiles = function(beginSection) {
+Concat.prototype.addFiles = function(beginSection) {
   var headerFooterFileOverlap = false;
   var posixInputPath = ensurePosix(this.inputPaths[0]);
 
@@ -154,7 +154,7 @@ ConcatWithMaps.prototype.addFiles = function(beginSection) {
   if (headerFooterFileOverlap === false &&
       files.length === 0 &&
       !this.allowNone) {
-    throw new Error('ConcatWithMaps: nothing matched [' + this.inputFiles + ']');
+    throw new Error('Concat: nothing matched [' + this.inputFiles + ']');
   }
 
   files.forEach(function(file) {

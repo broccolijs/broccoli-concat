@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "test": "mocha",
-    "test:debug": "mocha debug"
+    "test:debug": "mocha --no-timeouts debug"
   },
   "repository": "https://github.com/ember-cli/broccoli-concat",
   "author": "Edward Faulkner <ef@alum.mit.edu>",
@@ -24,6 +24,7 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-files": "^1.2.0",
+    "fs-extra": "^0.30.0",
     "mocha": "^3.0.0",
     "quick-temp": "^0.1.3"
   },

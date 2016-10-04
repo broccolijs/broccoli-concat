@@ -10,6 +10,7 @@ module.exports = ConcatWithMaps;
 ConcatWithMaps.prototype = Object.create(CachingWriter.prototype);
 ConcatWithMaps.prototype.constructor = ConcatWithMaps;
 
+var id = 0;
 function ConcatWithMaps(inputNode, options, Strategy) {
   if (!(this instanceof ConcatWithMaps)) {
     return new ConcatWithMaps(inputNode, options, Strategy);
@@ -26,6 +27,8 @@ function ConcatWithMaps(inputNode, options, Strategy) {
     annotation: options.annotation,
     name: (Strategy.name || 'Unknown') + 'Concat'
   });
+
+  this.id = (id++);
 
   if (Strategy === undefined) {
     throw new TypeError('ConcatWithMaps requires a concat Strategy');
@@ -79,7 +82,8 @@ ConcatWithMaps.prototype.build = function() {
   this.concat = new this.Strategy(merge(this.sourceMapConfig, {
     outputFile: outputFile,
     baseDir: this.inputPaths[0],
-    cache: this.encoderCache
+    cache: this.encoderCache,
+    pluginId: this.id
   }));
 
   return this.concat.end(function(concat) {

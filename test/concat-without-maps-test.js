@@ -85,7 +85,7 @@ describe('concat-without-maps', function() {
       concat.end();
       expect(outputs.length).to.eql(1);
 
-    var outputPath = process.cwd() + '/concat-stats-for-' + concat.id + '-' + path.basename(concat.outputFile) + '.json';
+    var outputPath = process.cwd() + '/concat-stats-for/' + concat.id + '-' + path.basename(concat.outputFile) + '.json';
       expect(outputs[0].outputPath).to.eql(outputPath);
       expect(outputs[0].content).to.eql({
         outputFile: concat.outputFile,

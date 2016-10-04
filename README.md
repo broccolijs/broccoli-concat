@@ -55,6 +55,7 @@ Each file within that directory represents a different contenation, and will con
 
 ##### Example:
 
+concat-stats-for/<id>-file.json
 ```json
 {
   "outputFile": "path/to/output/File",
@@ -64,3 +65,8 @@ Each file within that directory represents a different contenation, and will con
   }
 }
 ```
+
+other files:
+
+* concat-stats-for/<id>-file/a.js
+* concat-stats-for/<id>-file/b.js

@@ -1,6 +1,6 @@
 var CachingWriter = require('broccoli-caching-writer');
 var path = require('path');
-var fs = require('fs');
+var fs = require('fs-extra');
 var merge = require('lodash.merge');
 var omit = require('lodash.omit');
 var uniq = require('lodash.uniq');
@@ -22,13 +22,21 @@ function Concat(inputNode, options, Strategy) {
 
   var allInputFiles = uniq([].concat(options.headerFiles || [], options.inputFiles || [], options.footerFiles || []));
 
-  CachingWriter.call(this, [inputNode], {
+  var inputNodes;
+  id++;
+
+  if (process.env.CONCAT_STATS) {
+    inputNodes = Concat.inputNodesForConcatStats(inputNode, id, options.outputFile);
+  } else {
+    inputNodes = [inputNode];
+  }
+  CachingWriter.call(this, inputNodes, {
     inputFiles: allInputFiles.length === 0 ? undefined : allInputFiles,
     annotation: options.annotation,
     name: (Strategy.name || 'Unknown') + 'Concat'
   });
 
-  this.id = (id++);
+  this.id = id;
 
   if (Strategy === undefined) {
     throw new TypeError('Concat requires a concat Strategy');
@@ -51,6 +59,18 @@ function Concat(inputNode, options, Strategy) {
 
   this.encoderCache = {};
 }
+
+Concat.inputNodesForConcatStats = function(inputNode, id, outputFile) {
+  var dir = process.cwd() + '/concat-stats-for';
+  fs.mkdirpSync(dir);
+
+  return [
+    require('broccoli-stew').debug(inputNode, {
+      dir: dir,
+      name: id + '-' + path.basename(outputFile)
+    })
+  ];
+};
 
 var MAGIC = /[\{\}\*\[\]]/;
 

@@ -1,3 +1,7 @@
+# 2.3.7
+
+* [BUGFIX] fs-extra as dependencies
+
 # 2.3.6
 
 * [BUGFIX] fix mkdirp reference

@@ -1,3 +1,7 @@
+# 3.0.2
+
+* [FEATURE] added CONCAT_STATS env var, which enables each conat to output a summary of itself (files and sizes that where included)
+
 # 3.0.1
 
  * [BUGFIX] ensure headerFiles / inputFiles / footerFiles are included in inputFiles passed to BCW, this prevents stale reads when only a headerFile or footerFile changed but nothing else.

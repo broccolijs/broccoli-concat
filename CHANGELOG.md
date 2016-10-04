@@ -1,3 +1,7 @@
+# 2.3.6
+
+* [BUGFIX] fix mkdirp reference
+
 # 2.3.5
 
 * [FEATURE] added CONCAT_STATS env var, which enables each conat to output a summary of itself (files and sizes that where included)

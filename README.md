@@ -45,6 +45,8 @@ The structure of `output.js` will be as follows:
 
 #### Debug Usage
 
+*note: this is intended for debugging purposes only, and will most likely negatively affect your build performace is left enabled*
+
 Setting the environment variable `CONCAT_STATS=true` will result a summary of
 each concatention being output to `process.cwd() + 'concat-stats-for/*.json'`
 

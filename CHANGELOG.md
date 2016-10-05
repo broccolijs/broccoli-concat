@@ -1,6 +1,17 @@
-# 3.0.2
+
+# 3.0.4
+
+* [FEATURE] added CONCAT_STATS now includes more:
+  * inputs of a given concat (raw files)
+  * enables more advanced tooling such as: https://github.com/stefanpenner/broccoli-concat-analyser
+
+# 3.0.3
 
 * [FEATURE] added CONCAT_STATS env var, which enables each conat to output a summary of itself (files and sizes that where included)
+
+# 3.0.2
+
+* only publish files that are required for tooling
 
 # 3.0.1
 

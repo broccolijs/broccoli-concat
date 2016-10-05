@@ -1,7 +1,7 @@
 /* global describe, afterEach, beforeEach, it, expect */
 
 var concat = require('..');
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
 var broccoli = require('broccoli');
 var merge = require('broccoli-merge-trees');
@@ -18,6 +18,7 @@ var file = chaiFiles.file;
 
 var firstFixture = path.join(__dirname, 'fixtures', 'first');
 var secondFixture = path.join(__dirname, 'fixtures', 'second');
+var walkSync = require('walk-sync');
 
 describe('sourcemap-concat', function() {
   var builder;
@@ -556,6 +557,54 @@ describe('sourcemap-concat', function() {
         return builder.build();
       });
     });
+  });
+
+  describe('CONCAT_STATS', function() {
+    var node;
+    var dirPath = process.cwd() + '/concat-stats-for';
+
+    beforeEach(function() {
+      fs.removeSync(dirPath);
+      inputNodesOutput = [];
+      process.env.CONCAT_STATS = true;
+
+      node = concat(firstFixture, {
+        outputFile: '/rebuild.js',
+        inputFiles: ['inner/first.js', 'inner/second.js']
+      });
+    });
+
+    afterEach(function() {
+      fs.removeSync(dirPath);
+      inputNodesOutput.length = 0;
+      delete process.env.CONCAT_STATS;
+      builder.cleanup();
+    });
+
+    it('emits files', function() {
+      var dir = fs.statSync(dirPath);
+
+      expect(dir.isDirectory()).to.eql(true);
+      expect(walkSync(dirPath)).to.eql([]);
+
+      var builder = new broccoli.Builder(node);
+
+      return builder.build().then(function(results) {
+        var dir = fs.statSync(dirPath);
+
+        expect(dir.isDirectory()).to.eql(true);
+        expect(walkSync(dirPath)).to.eql([
+          node.id + '-rebuild.js.json',
+          node.id + '-rebuild.js/',
+          node.id + '-rebuild.js/inner/',
+          node.id + '-rebuild.js/inner/first.js',
+          node.id + '-rebuild.js/inner/second.js',
+          node.id + '-rebuild.js/other/',
+          node.id + '-rebuild.js/other/fourth.js',
+          node.id + '-rebuild.js/other/third.js',
+        ]);
+      })
+    })
   });
 });
 

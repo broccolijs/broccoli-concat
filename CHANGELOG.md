@@ -1,3 +1,7 @@
+# 2.3.8
+
+* [FEATURE] Add more details to CONCAT_STATS, enabling usage of https://github.com/stefanpenner/broccoli-concat-analyser
+
 # 2.3.7
 
 * [BUGFIX] fs-extra as dependencies

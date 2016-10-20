@@ -1,4 +1,9 @@
 
+# 3.0.5
+
+* trailing newlines after sourcemap comments, so other concat tools that don't handle that case don't have issues
+* move fs-extra to dependencies (instead of devDependencies)
+
 # 3.0.4
 
 * [FEATURE] added CONCAT_STATS now includes more:

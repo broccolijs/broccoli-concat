@@ -247,7 +247,7 @@ describe('sourcemap-concat', function() {
       var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
       var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
-      var expected = first + '\n' +  second + '//# sourceMappingURL=staged.map';
+      var expected = first + '\n' +  second + '//# sourceMappingURL=staged.map\n';
       expect(file(result.directory + '/staged.js')).to.equal(expected, 'output is wrong');
     });
   });
@@ -387,17 +387,17 @@ describe('sourcemap-concat', function() {
 
       builder = new broccoli.Builder(node);
       return builder.build().then(function(result) {
-        expect(fs.readFileSync(result.directory + '/rebuild.js', 'UTF8')).to.eql('//# sourceMappingURL=rebuild.map');
+        expect(fs.readFileSync(result.directory + '/rebuild.js', 'UTF8')).to.eql('//# sourceMappingURL=rebuild.map\n');
 
         write('omg.js', 'hi');
 
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('hi//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('hi//# sourceMappingURL=rebuild.map\n');
         unlink('omg.js')
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('//# sourceMappingURL=rebuild.map\n');
         return builder.build();
       });
     });
@@ -410,7 +410,7 @@ describe('sourcemap-concat', function() {
       });
       builder = new broccoli.Builder(node);
       return builder.build().then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('//# sourceMappingURL=rebuild.map\n');
 
         write('z.js', 'z');
         write('a.js', 'a');
@@ -418,15 +418,15 @@ describe('sourcemap-concat', function() {
 
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('a\nb\nz//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('a\nb\nz//# sourceMappingURL=rebuild.map\n');
         unlink('a.js')
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz//# sourceMappingURL=rebuild.map\n');
         write('a.js', 'a');
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('a\nb\nz//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('a\nb\nz//# sourceMappingURL=rebuild.map\n');
         return builder.build();
       });
     });
@@ -443,19 +443,19 @@ describe('sourcemap-concat', function() {
 
       builder = new broccoli.Builder(node);
       return builder.build().then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map\n');
         write('a.js', 'a-updated');
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated//# sourceMappingURL=rebuild.map\n');
         write('a.js', 'a');
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map\n');
         write('z.js', 'z-updated');
         return builder.build();
       }).then(function(result){
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map\n');
         return builder.build();
       });
     });
@@ -472,19 +472,19 @@ describe('sourcemap-concat', function() {
 
       builder = new broccoli.Builder(node);
       return builder.build().then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map\n');
         write('a.js', 'a-updated');
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated//# sourceMappingURL=rebuild.map\n');
         write('a.js', 'a');
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map\n');
         write('z.js', 'z-updated');
         return builder.build();
       }).then(function(result){
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map\n');
         return builder.build();
       });
     });
@@ -502,19 +502,19 @@ describe('sourcemap-concat', function() {
 
       builder = new broccoli.Builder(node);
       return builder.build().then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map\n');
         write('a.js', 'a-updated');
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated//# sourceMappingURL=rebuild.map\n');
         write('a.js', 'a');
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map\n');
         write('z.js', 'z-updated');
         return builder.build();
       }).then(function(result){
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map\n');
         return builder.build();
       });
     });
@@ -533,27 +533,27 @@ describe('sourcemap-concat', function() {
 
       builder = new broccoli.Builder(node);
       return builder.build().then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na//# sourceMappingURL=rebuild.map\n');
         write('a.js', 'a-updated');
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na-updated//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na-updated//# sourceMappingURL=rebuild.map\n');
         write('a.js', 'a');
         return builder.build();
       }).then(function(result) {
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na//# sourceMappingURL=rebuild.map\n');
         write('z.js', 'z-updated');
         return builder.build();
       }).then(function(result){
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz-updated\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz-updated\na//# sourceMappingURL=rebuild.map\n');
         unlink('z.js');
         return builder.build();
       }).then(function(result){
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\na//# sourceMappingURL=rebuild.map\n');
         write('z.js', 'z');
         return builder.build();
       }).then(function(result){
-        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na//# sourceMappingURL=rebuild.map');
+        expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na//# sourceMappingURL=rebuild.map\n');
         return builder.build();
       });
     });
@@ -587,7 +587,7 @@ describe('sourcemap-concat', function() {
       expect(dir.isDirectory()).to.eql(true);
       expect(walkSync(dirPath)).to.eql([]);
 
-      var builder = new broccoli.Builder(node);
+      builder = new broccoli.Builder(node);
 
       return builder.build().then(function(results) {
         var dir = fs.statSync(dirPath);
@@ -621,7 +621,7 @@ function expectFile(filename) {
       try {
         expectedContent = fs.readFileSync(path.join(__dirname, 'expected', filename), 'utf-8');
         if (stripURL) {
-          expectedContent = expectedContent.replace(/\/\/# sourceMappingURL=.*$/, '');
+          expectedContent = expectedContent.replace(/\/\/# sourceMappingURL=.*\n$/, '');
         }
 
       } catch (err) {

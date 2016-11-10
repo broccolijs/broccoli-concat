@@ -38,7 +38,7 @@ The structure of `output.js` will be as follows:
 ```
 // - header
 // - ordered content of the files in headerFiles
-// - un-ordered content of files matched by inputFiles, but not in headerFiles or footerFiles
+// - ordered content of files matched by inputFiles, but not in headerFiles or footerFiles
 // - ordered content of the files in footerFiles
 // - footer
 ```

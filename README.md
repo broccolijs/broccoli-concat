@@ -43,6 +43,48 @@ The structure of `output.js` will be as follows:
 // - footer
 ```
 
+##### Ordering of inputFiles
+
+Sevaral orderings may be appropriate for inputFiles. Some are slightly more
+expensive then others, and others are specific to certain scenarios.
+
+By default files matched within `inputFiles` will sorted lexicographically.
+This is to ensure that between multiple concats, the output remain stable and
+also as files are added and removed, that the output file change in predictable
+(diff friendly) ways.
+
+A common alternative is to sort these files based on the matcher precedent.
+
+Given:
+
+```
+inputFiles: ['foo/*.global.css', 'foo/*.overides.css']
+```
+
+One may want, want all global css files to proceed overide css files, while
+within each glob preserving lexicographical order
+
+To accomplish this, broccoli-concat provides an alternative comparator.
+
+```js
+var concat = require('broccoli-concat');
+var matchComparator = require('broccoli-concat/comparators/match');
+
+concat(input, {
+  outputFile: 'styles.css',
+  inputFiles: ['foo/*.global.css', 'foo/*.overides.css'],
+  inputFilesComparator: matchComparator
+})
+```
+
+If an alternative ordering strategy is required, the signature of inputFilesComparator is:
+
+* firstFile: {String} fileName
+* secondFile: {String} fileName
+* matchers: {Array} matching the inputFiles argument, but where each entry has been converted into a minimatch instance
+
+For an example see: [comparators/match](comparators/match)
+
 #### Debug Usage
 
 *note: this is intended for debugging purposes only, and will most likely negatively affect your build performace is left enabled*

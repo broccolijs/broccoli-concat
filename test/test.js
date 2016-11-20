@@ -6,8 +6,10 @@ var path = require('path');
 var broccoli = require('broccoli');
 var merge = require('broccoli-merge-trees');
 var validateSourcemap = require('sourcemap-validator');
+var Minimatch = require('minimatch').Minimatch;
 
 var chai = require('chai');
+chai.config.truncateThreshold = 0;
 var chaiFiles = require('chai-files');
 var chaiAsPromised = require('chai-as-promised');
 
@@ -270,6 +272,79 @@ describe('sourcemap-concat', function() {
       expectFile('inner-with-headers.js').in(result);
       expectFile('inner-with-headers.map').in(result);
       expectValidSourcemap('inner-with-headers.js').in(result);
+    });
+  });
+
+  describe('inputFiles optional postProcessing', function() {
+    var matchComparator = require('../comparators/match');
+
+    describe('inputFiles matcher matchComparator', function() {
+
+      it('scenario 1', function() {
+        var globs = [
+          new Minimatch('a*'),
+          new Minimatch('b*')
+        ];
+
+        var files = ['zasdf', 'asdf', 'basdf'].sort(function(a, b) {
+          return matchComparator(a,b, globs);
+        });
+
+        expect(files).to.eql(['asdf', 'basdf', 'zasdf']);
+      });
+
+      it('scenario 2', function() {
+        var globs = [
+          new Minimatch('b*'),
+          new Minimatch('a*')
+        ];
+
+        var files = ['zasdf', 'asdf', 'basdf'].sort(function(a, b) {
+          return matchComparator(a,b, globs);
+        });
+
+        expect(files).to.eql(['basdf', 'asdf', 'zasdf']);
+      });
+    });
+
+    it('response order first -> second', function() {
+      var firstMatcher  = new Minimatch('**/first*');
+      var secondMatcher = new Minimatch('**/second*');
+
+      var node = concat(firstFixture, {
+        inputFiles: ['inner/**/*.js'],
+        outputFile: 'inner-first-second.js',
+        inputFilesComparator: function(x, y) {
+          return matchComparator(x,y, [firstMatcher, secondMatcher]);
+        }
+      });
+
+      builder = new broccoli.Builder(node);
+      return builder.build().then(function(result) {
+        expectFile('inner-first-second.js').in(result);
+        expectFile('inner-first-second.map').in(result);
+        expectValidSourcemap('inner-first-second.js').in(result);
+      });
+    });
+
+    it('response order second -> first', function() {
+      var firstMatcher  = new Minimatch('**/first*');
+      var secondMatcher = new Minimatch('**/second*');
+
+      var node = concat(firstFixture, {
+        inputFiles: ['inner/**/*.js'],
+        outputFile: 'inner-second-first.js',
+        inputFilesComparator: function(x, y) {
+          return matchComparator(x, y, [secondMatcher, firstMatcher]);
+        }
+      });
+
+      builder = new broccoli.Builder(node);
+      return builder.build().then(function(result) {
+        expectFile('inner-second-first.js').in(result);
+        expectFile('inner-second-first.map').in(result);
+        expectValidSourcemap('inner-second-first.js').in(result);
+      });
     });
   });
 

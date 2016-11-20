@@ -5,6 +5,7 @@ var merge = require('lodash.merge');
 var omit = require('lodash.omit');
 var uniq = require('lodash.uniq');
 var mkdirp = require('mkdirp');
+var Minimatch = require('minimatch').Minimatch;
 
 module.exports = Concat;
 Concat.prototype = Object.create(CachingWriter.prototype);
@@ -45,6 +46,9 @@ function Concat(inputNode, options, Strategy) {
   this.Strategy = Strategy;
   this.sourceMapConfig = omit(options.sourceMapConfig || {}, 'enabled');
   this.inputFiles = options.inputFiles;
+  this.inputFilesMatchers = (options.inputFiles || []).map(function(string) {
+    return new Minimatch(string);
+  });
   this.outputFile = options.outputFile;
   this.allowNone = options.allowNone;
   this.header = options.header;
@@ -53,6 +57,7 @@ function Concat(inputNode, options, Strategy) {
   this.footer = options.footer;
   this.footerFiles = options.footerFiles;
   this.separator = (options.separator != null) ? options.separator : '\n';
+  this.inputFilesComparator = options.inputFilesComparator;
 
   ensureNoMagic('headerFiles', this.headerFiles);
   ensureNoMagic('footerFiles', this.footerFiles);
@@ -175,6 +180,15 @@ Concat.prototype.addFiles = function(beginSection) {
       files.length === 0 &&
       !this.allowNone) {
     throw new Error('Concat: nothing matched [' + this.inputFiles + ']');
+  }
+
+  var inputFilesComparator = this.inputFilesComparator;
+  if (inputFilesComparator) {
+    var inputFilesMatchers = this.inputFilesMatchers;
+
+    files = files.slice().sort(function(x, y) {
+      return inputFilesComparator(x, y, inputFilesMatchers);
+    });
   }
 
   files.forEach(function(file) {

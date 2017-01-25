@@ -1,9 +1,10 @@
-var CachingWriter = require('broccoli-caching-writer');
+var Plugin = require('broccoli-plugin');
 var path = require('path');
 var fs = require('fs-extra');
 var merge = require('lodash.merge');
 var omit = require('lodash.omit');
 var uniq = require('lodash.uniq');
+var walkSync = require('walk-sync');
 
 var ensureNoGlob = require('./lib/utils/ensure-no-glob');
 var ensurePosix = require('./lib/utils/ensure-posix');
@@ -11,7 +12,7 @@ var isDirectory = require('./lib/utils/is-directory');
 var makeIndex = require('./lib/utils/make-index');
 
 module.exports = Concat;
-Concat.prototype = Object.create(CachingWriter.prototype);
+Concat.prototype = Object.create(Plugin.prototype);
 Concat.prototype.constructor = Concat;
 
 var id = 0;
@@ -24,8 +25,6 @@ function Concat(inputNode, options, Strategy) {
     throw new Error('the outputFile option is required');
   }
 
-  var allInputFiles = uniq([].concat(options.headerFiles || [], options.inputFiles || [], options.footerFiles || []));
-
   var inputNodes;
   id++;
 
@@ -35,8 +34,7 @@ function Concat(inputNode, options, Strategy) {
     inputNodes = [inputNode];
   }
 
-  CachingWriter.call(this, inputNodes, {
-    inputFiles: allInputFiles.length === 0 ? undefined : allInputFiles,
+  Plugin.call(this, inputNodes, {
     annotation: options.annotation,
     name: (Strategy.name || 'Unknown') + 'Concat'
   });
@@ -49,6 +47,7 @@ function Concat(inputNode, options, Strategy) {
 
   this.Strategy = Strategy;
   this.sourceMapConfig = omit(options.sourceMapConfig || {}, 'enabled');
+  this.allInputFiles = uniq([].concat(options.headerFiles || [], options.inputFiles || [], options.footerFiles || []));
   this.inputFiles = options.inputFiles;
   this.outputFile = options.outputFile;
   this.allowNone = options.allowNone;
@@ -128,15 +127,28 @@ Concat.prototype.build = function() {
   }, this);
 };
 
+/**
+ * Returns the full paths for any matching inputFiles.
+ */
+Concat.prototype.listFiles = function() {
+  // If we have no inputFiles at all, use undefined as the filter to return
+  // all files in the inputDir.
+  var filter = this.allInputFiles.length ? this.allInputFiles : undefined;
+  var inputDir = this.inputPaths[0];
+  return walkSync(inputDir, filter).map(function(relativePath) {
+    return ensurePosix(path.join(inputDir, relativePath));
+  });
+};
+
 Concat.prototype.addFiles = function(beginSection) {
   var headerFooterFileOverlap = false;
   var posixInputPath = ensurePosix(this.inputPaths[0]);
 
-  var files = uniq(this.listFiles().map(ensurePosix)).filter(function(file){
+  var files = this.listFiles().filter(function(file) {
     var relativePath = file.replace(posixInputPath + '/', '');
 
     // * remove inputFiles that are already contained within headerFiles and footerFiles
-    // * alow duplicates between headerFiles and footerFiles
+    // * allow duplicates between headerFiles and footerFiles
 
     if (this._headerFooterFilesIndex[relativePath] === true) {
       headerFooterFileOverlap = true;

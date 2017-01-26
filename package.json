@@ -37,7 +37,6 @@
     "fs-extra": "^1.0.0",
     "lodash.merge": "^4.3.0",
     "lodash.omit": "^4.1.0",
-    "lodash.uniq": "^4.2.0",
-    "mkdirp": "^0.5.1"
+    "lodash.uniq": "^4.2.0"
   }
 }

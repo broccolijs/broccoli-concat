@@ -1,4 +1,5 @@
 var Plugin = require('broccoli-plugin');
+var FSTree = require('fs-tree-diff');
 var path = require('path');
 var fs = require('fs-extra');
 var merge = require('lodash.merge');
@@ -36,7 +37,8 @@ function Concat(inputNode, options, Strategy) {
 
   Plugin.call(this, inputNodes, {
     annotation: options.annotation,
-    name: (Strategy.name || 'Unknown') + 'Concat'
+    name: (Strategy.name || 'Unknown') + 'Concat',
+    persistentOutput: true
   });
 
   this.id = id;
@@ -61,6 +63,8 @@ function Concat(inputNode, options, Strategy) {
   ensureNoGlob('headerFiles', this.headerFiles);
   ensureNoGlob('footerFiles', this.footerFiles);
 
+  this._lastTree = null;
+
   this.encoderCache = {};
 }
 
@@ -76,7 +80,27 @@ Concat.inputNodesForConcatStats = function(inputNode, id, outputFile) {
   ];
 };
 
+Concat.prototype.shouldBuild = function() {
+  var currentTree = this.getCurrentFSTree();
+  var isRebuild = !!this._lastTree;
+  var patch;
+
+  if (isRebuild) {
+    patch = this._lastTree.calculatePatch(currentTree);
+  }
+
+  this._lastTree = currentTree;
+
+  // We build if this is an initial build (not a rebuild)
+  // or if the patch has non-zero length
+  return !isRebuild || patch.length !== 0;
+};
+
 Concat.prototype.build = function() {
+  if (!this.shouldBuild()) {
+    return;
+  }
+
   var separator = this.separator;
   var firstSection = true;
   var outputFile = path.join(this.outputPath, this.outputFile);
@@ -127,16 +151,25 @@ Concat.prototype.build = function() {
   }, this);
 };
 
-/**
- * Returns the full paths for any matching inputFiles.
- */
-Concat.prototype.listFiles = function() {
+Concat.prototype.getCurrentFSTree = function() {
+  return FSTree.fromEntries(this.listEntries());
+}
+
+Concat.prototype.listEntries = function() {
   // If we have no inputFiles at all, use undefined as the filter to return
   // all files in the inputDir.
   var filter = this.allInputFiles.length ? this.allInputFiles : undefined;
   var inputDir = this.inputPaths[0];
-  return walkSync(inputDir, filter).map(function(relativePath) {
-    return ensurePosix(path.join(inputDir, relativePath));
+  return walkSync.entries(inputDir, filter);
+};
+
+/**
+ * Returns the full paths for any matching inputFiles.
+ */
+Concat.prototype.listFiles = function() {
+  var inputDir = this.inputPaths[0];
+  return this.listEntries().map(function(entry) {
+    return ensurePosix(path.join(inputDir, entry.relativePath));
   });
 };
 

@@ -364,6 +364,12 @@ findup-sync@^0.2.1:
   dependencies:
     glob "~4.3.0"
 
+fixturify@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/fixturify/-/fixturify-0.3.2.tgz#5dc6bb921105069f1ae682d50f09dcf653c8a6f5"
+  dependencies:
+    fs-extra "^0.30.0"
+
 fs-extra@^0.30.0:
   version "0.30.0"
   resolved "https://registry.npmjs.org/fs-extra/-/fs-extra-0.30.0.tgz#f233ffcc08d4da7d432daa449776989db1df93f0"

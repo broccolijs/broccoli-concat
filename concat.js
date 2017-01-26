@@ -5,6 +5,11 @@ var merge = require('lodash.merge');
 var omit = require('lodash.omit');
 var uniq = require('lodash.uniq');
 
+var ensureNoGlob = require('./lib/utils/ensure-no-glob');
+var ensurePosix = require('./lib/utils/ensure-posix');
+var isDirectory = require('./lib/utils/is-directory');
+var makeIndex = require('./lib/utils/make-index');
+
 module.exports = Concat;
 Concat.prototype = Object.create(CachingWriter.prototype);
 Concat.prototype.constructor = Concat;
@@ -29,6 +34,7 @@ function Concat(inputNode, options, Strategy) {
   } else {
     inputNodes = [inputNode];
   }
+
   CachingWriter.call(this, inputNodes, {
     inputFiles: allInputFiles.length === 0 ? undefined : allInputFiles,
     annotation: options.annotation,
@@ -53,8 +59,8 @@ function Concat(inputNode, options, Strategy) {
   this.footerFiles = options.footerFiles;
   this.separator = (options.separator != null) ? options.separator : '\n';
 
-  ensureNoMagic('headerFiles', this.headerFiles);
-  ensureNoMagic('footerFiles', this.footerFiles);
+  ensureNoGlob('headerFiles', this.headerFiles);
+  ensureNoGlob('footerFiles', this.footerFiles);
 
   this.encoderCache = {};
 }
@@ -70,26 +76,6 @@ Concat.inputNodesForConcatStats = function(inputNode, id, outputFile) {
     })
   ];
 };
-
-var MAGIC = /[\{\}\*\[\]]/;
-
-function ensureNoMagic(name, list) {
-  (list || []).forEach(function(a) {
-    if (MAGIC.test(a)) {
-      throw new TypeError(name + ' cannot contain a glob,  `' + a + '`');
-    }
-  });
-}
-
-function makeIndex(a, b) {
-  var index = Object.create(null);
-
-  ((a || []).concat(b ||[])).forEach(function(a) {
-    index[a] = true;
-  });
-
-  return index;
-}
 
 Concat.prototype.build = function() {
   var separator = this.separator;
@@ -142,13 +128,6 @@ Concat.prototype.build = function() {
   }, this);
 };
 
-function isDirectory(fullPath) {
-  // files returned from listFiles are directories if they end in /
-  // see: https://github.com/joliss/node-walk-sync
-  // "Note that directories come before their contents, and have a trailing slash"
-  return fullPath.charAt(fullPath.length - 1) === '/';
-}
-
 Concat.prototype.addFiles = function(beginSection) {
   var headerFooterFileOverlap = false;
   var posixInputPath = ensurePosix(this.inputPaths[0]);
@@ -181,10 +160,3 @@ Concat.prototype.addFiles = function(beginSection) {
     this.concat.addFile(file.replace(posixInputPath + '/', ''));
   }, this);
 };
-
-function ensurePosix(filepath) {
-  if (path.sep !== '/') {
-    return filepath.split(path.sep).join('/');
-  }
-  return filepath;
-}

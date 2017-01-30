@@ -1,4 +1,8 @@
 
+# 3.1.0
+
+* Change base class to `broccoli-plugin` and make output persistent.
+
 # 3.0.5
 
 * trailing newlines after sourcemap comments, so other concat tools that don't handle that case don't have issues

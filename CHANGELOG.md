@@ -1,4 +1,8 @@
 
+# 3.1.1
+
+* Fix `package.json`'s `files` array to include all files in `lib/`.
+
 # 3.1.0
 
 * Change base class to `broccoli-plugin` and make output persistent.

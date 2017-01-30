@@ -4,9 +4,10 @@
   "description": "Fast, good-enough concatenation with source maps.",
   "main": "index.js",
   "files": [
-    "index.js",
     "concat.js",
-    "concat-without-source-maps.js"
+    "concat-without-source-maps.js",
+    "index.js",
+    "lib/"
   ],
   "scripts": {
     "test": "mocha",

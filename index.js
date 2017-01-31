@@ -23,5 +23,5 @@ module.exports = function(inputNode, options) {
     }
   }
 
-  return new Concat(inputNode, options, Strategy || require('./concat-without-source-maps'));
+  return new Concat(inputNode, options, Strategy || require('./lib/strategies/simple'));
 };

@@ -6,9 +6,9 @@ var merge = require('lodash.merge');
 var omit = require('lodash.omit');
 var uniq = require('lodash.uniq');
 var walkSync = require('walk-sync');
+var ensurePosix = require('ensure-posix-path');
 
 var ensureNoGlob = require('./lib/utils/ensure-no-glob');
-var ensurePosix = require('./lib/utils/ensure-posix');
 var isDirectory = require('./lib/utils/is-directory');
 var makeIndex = require('./lib/utils/make-index');
 

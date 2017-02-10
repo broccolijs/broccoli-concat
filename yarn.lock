@@ -60,6 +60,13 @@ balanced-match@^0.4.1:
   version "0.4.2"
   resolved "https://registry.npmjs.org/balanced-match/-/balanced-match-0.4.2.tgz#cb3f3e3c732dc0f01ee70b403f302e61d7709838"
 
+bench-cli@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/bench-cli/-/bench-cli-0.0.1.tgz#b95e38f9e2a6f6629e893f41715a6571838cc270"
+  dependencies:
+    commander "^2.9.0"
+    walk-sync "^0.3.1"
+
 "binaryextensions@1 || 2":
   version "2.0.0"
   resolved "https://registry.npmjs.org/binaryextensions/-/binaryextensions-2.0.0.tgz#e597d1a7a6a3558a2d1c7241a16c99965e6aa40f"
@@ -258,7 +265,7 @@ cliui@^2.1.0:
     right-align "^0.1.1"
     wordwrap "0.0.2"
 
-commander@2.9.0, commander@^2.5.0:
+commander@2.9.0, commander@^2.5.0, commander@^2.9.0:
   version "2.9.0"
   resolved "https://registry.npmjs.org/commander/-/commander-2.9.0.tgz#9c99094176e12240cb22d6c5146098400fe0f7d4"
   dependencies:

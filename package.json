@@ -12,7 +12,7 @@
   "scripts": {
     "test": "mocha",
     "test:debug": "mocha --no-timeouts debug",
-    "bench": "node ./bench"
+    "bench": "node bench/info && bench bench/suites -i 10"
   },
   "repository": "https://github.com/ember-cli/broccoli-concat",
   "author": "Edward Faulkner <ef@alum.mit.edu>",
@@ -21,6 +21,7 @@
     "broccoli-plugin"
   ],
   "devDependencies": {
+    "bench-cli": "^0.1.0",
     "broccoli": "^0.16.9",
     "broccoli-merge-trees": "^1.1.1",
     "chai": "^3.5.0",

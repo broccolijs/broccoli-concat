@@ -8,9 +8,9 @@ By default, `broccoli-concat` ships with [`SimpleConcat`](./lib/strategies/simpl
 
 To provide a custom `Strategy`, you must provide a class that includes the following methods:
 
-- `addFile(file)`: Receives a path to a file to include in the concatenated output.
-- `updateFile(file)`: Receives a path to a file that needs to be updated in the previously concatenated output.
+- `addFile(file, content)`: Receives a path to a file and its contents to include in the concatenated output.
+- `updateFile(file, content)`: Receives a path to a file and its contents that need to be updated in the previously concatenated output.
 - `removeFile(file)`: Receives a path to a file that needs to be removed in the previously concatenated output.
-- `write(outputFile)`: Receives a path to a location for which to write the concatenated result of the above operations.
+- `result()`: Is expected to return the concatenated result of the above operations as a string.
 
 The above methods are intended to represent a "patch-based" approach to concatenating files.

@@ -361,7 +361,7 @@ describe('sourcemap-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    return expect(builder.build()).to.be.rejectedWith("Concatenation result is empty");
+    return expect(builder.build()).to.be.rejectedWith("Concat: Result is empty and allowNone is falsy");
   });
 
   it('is not fooled by directories named *.js', function() {

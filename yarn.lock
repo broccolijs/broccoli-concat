@@ -60,9 +60,9 @@ balanced-match@^0.4.1:
   version "0.4.2"
   resolved "https://registry.npmjs.org/balanced-match/-/balanced-match-0.4.2.tgz#cb3f3e3c732dc0f01ee70b403f302e61d7709838"
 
-bench-cli@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/bench-cli/-/bench-cli-0.0.1.tgz#b95e38f9e2a6f6629e893f41715a6571838cc270"
+bench-cli@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/bench-cli/-/bench-cli-0.1.0.tgz#e6f67eea67d10953b9234a83011af5a8816bf15e"
   dependencies:
     commander "^2.9.0"
     walk-sync "^0.3.1"

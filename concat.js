@@ -111,12 +111,10 @@ Concat.prototype._doPatchBasedBuild = function(patch) {
   if (!this.concat) {
     this.concat = new this.Strategy(merge(this.sourceMapConfig, {
       separator: this.separator,
-      inputDir: this.inputPaths[0],
       header: this.header,
       headerFiles: this.headerFiles,
       footerFiles: this.footerFiles,
-      footer: this.footer,
-      allowNone: !!this.allowNone
+      footer: this.footer
     }));
   }
 
@@ -127,18 +125,29 @@ Concat.prototype._doPatchBasedBuild = function(patch) {
 
     switch (method) {
       case 'create':
-        this.concat.addFile(file);
+        this.concat.addFile(file, this._readFile(file));
+        break;
+      case 'change':
+        this.concat.updateFile(file, this._readFile(file));
         break;
       case 'unlink':
         this.concat.removeFile(file);
         break;
-      case 'change':
-        this.concat.updateFile(file);
-        break;
     }
   }
 
-  this.concat.write(path.join(this.outputPath, this.outputFile));
+  var outputFile = path.join(this.outputPath, this.outputFile);
+  var content = this.concat.result();
+
+  if (!content && !this.allowNone) {
+    throw new Error('Concat: Result is empty and allowNone is falsy.');
+  }
+
+  fs.outputFileSync(outputFile, content);
+};
+
+Concat.prototype._readFile = function(file) {
+  return fs.readFileSync(path.join(this.inputPaths[0], file), 'UTF-8');
 };
 
 Concat.prototype._doLegacyBuild = function() {

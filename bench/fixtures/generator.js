@@ -43,7 +43,9 @@ module.exports = class FixtureGenerator {
    */
   touch() {
     this.fixture['0.js'] += '.';
-    fixturify.writeSync(this.directory, this.fixture);
+    fixturify.writeSync(this.directory, {
+      '0.js': this.fixture['0.js']
+    });
   }
 
   _generateFixture(fileCount, depth, contents) {

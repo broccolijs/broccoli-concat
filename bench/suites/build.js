@@ -21,7 +21,10 @@ module.exports = {
 
   beforeScenario() {
     let node = concat(this.fixture.directory, {
-      outputFile: '/result.js'
+      outputFile: '/result.js',
+      sourceMapConfig: {
+        enabled: process.env.SOURCE_MAPS !== 'false'
+      }
     });
 
     this.builder = new Builder(node);

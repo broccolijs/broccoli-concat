@@ -63,7 +63,8 @@ function Concat(inputNode, options, Strategy) {
   ensureNoGlob('headerFiles', this.headerFiles);
   ensureNoGlob('footerFiles', this.footerFiles);
 
-  this._lastTree = null;
+  this._lastTree = FSTree.fromEntries([]);
+  this._hasBuilt = false;
 
   this.encoderCache = {};
 }
@@ -80,27 +81,87 @@ Concat.inputNodesForConcatStats = function(inputNode, id, outputFile) {
   ];
 };
 
-Concat.prototype.shouldBuild = function() {
+Concat.prototype.calculatePatch = function() {
   var currentTree = this.getCurrentFSTree();
-  var isRebuild = !!this._lastTree;
-  var patch;
-
-  if (isRebuild) {
-    patch = this._lastTree.calculatePatch(currentTree);
-  }
+  var patch = this._lastTree.calculatePatch(currentTree);
 
   this._lastTree = currentTree;
 
-  // We build if this is an initial build (not a rebuild)
-  // or if the patch has non-zero length
-  return !isRebuild || patch.length !== 0;
+  return patch;
 };
 
 Concat.prototype.build = function() {
-  if (!this.shouldBuild()) {
+  var patch = this.calculatePatch();
+
+  // We skip building if this is a rebuild with a zero-length patch
+  if (patch.length === 0 && this._hasBuilt) {
     return;
   }
 
+  this._hasBuilt = true;
+
+  if (this.Strategy.isPatchBased) {
+    return this._doPatchBasedBuild(patch);
+  } else {
+    return this._doLegacyBuild();
+  }
+};
+
+Concat.prototype._doPatchBasedBuild = function(patch) {
+  if (!this.concat) {
+    this.concat = new this.Strategy(merge(this.sourceMapConfig, {
+      separator: this.separator,
+      header: this.header,
+      headerFiles: this.headerFiles,
+      footerFiles: this.footerFiles,
+      footer: this.footer
+    }));
+  }
+
+  for (var i = 0; i < patch.length; i++) {
+    var operation = patch[i];
+    var method = operation[0];
+    var file = operation[1];
+
+    switch (method) {
+      case 'create':
+        this.concat.addFile(file, this._readFile(file));
+        break;
+      case 'change':
+        this.concat.updateFile(file, this._readFile(file));
+        break;
+      case 'unlink':
+        this.concat.removeFile(file);
+        break;
+    }
+  }
+
+  var outputFile = path.join(this.outputPath, this.outputFile);
+  var content = this.concat.result();
+
+  if (!content && !this.allowNone) {
+    throw new Error('Concat: Result is empty and allowNone is falsy.');
+  }
+
+  if (process.env.CONCAT_STATS) {
+    var fileSizes = this.concat.fileSizes();
+    var outputPath = process.cwd() + '/concat-stats-for/' + this.id + '-' + path.basename(this.outputFile) + '.json';
+
+    fs.mkdirpSync(path.dirname(outputPath));
+    fs.writeFileSync(outputPath, JSON.stringify({
+      outputFile: this.outputFile,
+      sizes: fileSizes
+    }, null, 2));
+  }
+
+  fs.outputFileSync(outputFile, content);
+};
+
+Concat.prototype._readFile = function(file) {
+  return fs.readFileSync(path.join(this.inputPaths[0], file), 'UTF-8');
+};
+
+Concat.prototype._doLegacyBuild = function() {
   var separator = this.separator;
   var firstSection = true;
   var outputFile = path.join(this.outputPath, this.outputFile);

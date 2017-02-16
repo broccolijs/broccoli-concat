@@ -1,3 +1,6 @@
+# 3.2.0
+
+* [Rebuild PERF] move from broccoli-caching-writer to fs-tree-diff + patch based approach (@trentmwillis)
 
 # 3.1.1
 

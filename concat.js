@@ -143,6 +143,17 @@ Concat.prototype._doPatchBasedBuild = function(patch) {
     throw new Error('Concat: Result is empty and allowNone is falsy.');
   }
 
+  if (process.env.CONCAT_STATS) {
+    var fileSizes = this.concat.fileSizes();
+    var outputPath = process.cwd() + '/concat-stats-for/' + this.id + '-' + path.basename(this.outputFile) + '.json';
+
+    fs.mkdirpSync(path.dirname(outputPath));
+    fs.writeFileSync(outputPath, JSON.stringify({
+      outputFile: this.outputFile,
+      sizes: fileSizes
+    }, null, 2));
+  }
+
   fs.outputFileSync(outputFile, content);
 };
 

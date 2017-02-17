@@ -19,6 +19,7 @@ var file = chaiFiles.file;
 
 var firstFixture = path.join(__dirname, 'fixtures', 'first');
 var secondFixture = path.join(__dirname, 'fixtures', 'second');
+var emptyFixture = path.join(__dirname, 'fixtures', 'empty');
 var walkSync = require('walk-sync');
 
 describe('sourcemap-concat', function() {
@@ -318,7 +319,31 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('can ignore empty content', function() {
+  it('can build empty files with allowNone disabled', function() {
+    var node = concat(emptyFixture, {
+      outputFile: '/empty.js',
+      inputFiles: ['*.js']
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('empty.js').in(result);
+      expectFile('empty.map').in(result);
+    });
+  });
+
+  it('can build empty files with allowNone disabled and no source-maps', function() {
+    var node = concat(emptyFixture, {
+      outputFile: '/empty-no-sourcemap.js',
+      inputFiles: ['*.js'],
+      sourceMapConfig: { enabled: false }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('empty-no-sourcemap.js').in(result);
+    });
+  });
+
+  it('can ignore non-existent input', function() {
     var node = concat(firstFixture, {
       outputFile: '/nothing.js',
       inputFiles: ['nothing/*.js'],
@@ -332,7 +357,7 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('can ignore empty content when sourcemaps are disabled', function() {
+  it('can ignore non-existent input when sourcemaps are disabled', function() {
     var node = concat(firstFixture, {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css'],
@@ -345,7 +370,7 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('does not ignore empty content when allowNone is not explicitly set', function() {
+  it('does not ignore non-existent input when allowNone is not explicitly set', function() {
     var node = concat(firstFixture, {
       outputFile: '/nothing.js',
       inputFiles: ['nothing/*.js']
@@ -354,14 +379,14 @@ describe('sourcemap-concat', function() {
     return expect(builder.build()).to.be.rejectedWith("Concat: nothing matched [nothing/*.js]");
   });
 
-  it('does not ignore empty content when allowNone is not explicitly set and sourcemaps are disabled', function() {
+  it('does not ignore non-existent input when allowNone is not explicitly set and sourcemaps are disabled', function() {
     var node = concat(firstFixture, {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css'],
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    return expect(builder.build()).to.be.rejectedWith("Concat: Result is empty and allowNone is falsy");
+    return expect(builder.build()).to.be.rejectedWith("Concat: nothing matched [nothing/*.css]");
   });
 
   it('is not fooled by directories named *.js', function() {

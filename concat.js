@@ -139,8 +139,13 @@ Concat.prototype._doPatchBasedBuild = function(patch) {
   var outputFile = path.join(this.outputPath, this.outputFile);
   var content = this.concat.result();
 
-  if (!content && !this.allowNone) {
-    throw new Error('Concat: Result is empty and allowNone is falsy.');
+  // If content is undefined, then we the concat had no input files
+  if (content === undefined) {
+    if (!this.allowNone) {
+      throw new Error('Concat: nothing matched [' + this.inputFiles + ']');
+    } else {
+      content = '';
+    }
   }
 
   if (process.env.CONCAT_STATS) {

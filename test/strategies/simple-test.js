@@ -6,8 +6,14 @@ describe('SimpleConcat', function() {
     expect(SimpleConcat.isPatchBased).to.be.ok;
   });
 
-  it('can handle empty scenarios', function() {
+  it('can handle no input scenarios', function() {
     var concat = new SimpleConcat({});
+    expect(concat.result()).to.equal(undefined);
+  });
+
+  it('can handle empty input scenarios', function() {
+    var concat = new SimpleConcat({});
+    concat.addFile('foo.js', '');
     expect(concat.result()).to.equal('');
   });
 

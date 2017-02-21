@@ -1,5 +1,3 @@
-/* global describe, afterEach, beforeEach, it, expect */
-
 var concat = require('..');
 var fs = require('fs-extra');
 var path = require('path');
@@ -598,7 +596,7 @@ describe('sourcemap-concat', function() {
   });
 
   describe('CONCAT_STATS', function() {
-    var node;
+    var node, inputNodesOutput;
     var dirPath = process.cwd() + '/concat-stats-for';
 
     beforeEach(function() {
@@ -627,7 +625,7 @@ describe('sourcemap-concat', function() {
 
       builder = new broccoli.Builder(node);
 
-      return builder.build().then(function(results) {
+      return builder.build().then(function() {
         var dir = fs.statSync(dirPath);
 
         expect(dir.isDirectory()).to.eql(true);

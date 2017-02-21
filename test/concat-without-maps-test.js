@@ -1,7 +1,3 @@
-/* global describe, afterEach, beforeEach, it, expect */
-
-var concat = require('..');
-var fs = require('fs');
 var path = require('path');
 
 var chai = require('chai');

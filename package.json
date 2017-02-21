@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "test": "mocha --recursive",
+    "test:lint": "mocha lint.js",
     "test:debug": "mocha --no-timeouts debug",
     "bench": "node bench/info && bench bench/suites -i 10"
   },

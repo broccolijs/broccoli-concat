@@ -20,13 +20,44 @@ var secondFixture = path.join(__dirname, 'fixtures', 'second');
 var emptyFixture = path.join(__dirname, 'fixtures', 'empty');
 var walkSync = require('walk-sync');
 
+function readFileSync() {
+  // babel doesn't support Windows newlines
+  // https://github.com/babel/babel/pull/2290
+  return fs.readFileSync.apply(this, arguments).replace(/\r\n/g, '\n');
+}
+
 describe('sourcemap-concat', function() {
   var builder;
+  var sprintfFixture = path.join(__dirname, 'fixtures', 'sprintf');
 
   afterEach(function() {
     if (builder) {
       return builder.cleanup();
     }
+  });
+
+  it('concatenates sprintf alone', function() {
+    var node = concat(sprintfFixture, {
+      outputFile: '/sprintf-alone.js',
+      inputFiles: ['dist/*.js'],
+      sourceMapConfig: { enabled: true }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectValidSourcemap('sprintf-alone.js').in(result);
+    });
+  });
+
+  it('concatenates sprintf with another lib', function() {
+    var node = concat(sprintfFixture, {
+      outputFile: '/sprintf-multi.js',
+      inputFiles: ['dist/*.js', 'other/*.js'],
+      sourceMapConfig: { enabled: true }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectValidSourcemap('sprintf-multi.js').in(result);
+    });
   });
 
   it('concatenates files in one dir', function() {
@@ -705,6 +736,7 @@ function expectValidSourcemap(jsFilename, mapFilename) {
 
       var actualMin = fs.readFileSync(path.join(result.directory, subdir, jsFilename), 'utf-8');
       var actualMap = fs.readFileSync(path.join(result.directory, subdir, mapFilename), 'utf-8');
+
       validateSourcemap(actualMin, actualMap, {});
     }
   }

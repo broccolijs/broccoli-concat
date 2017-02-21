@@ -4,6 +4,7 @@ var path = require('path');
 var broccoli = require('broccoli');
 var merge = require('broccoli-merge-trees');
 var validateSourcemap = require('sourcemap-validator');
+var expectFile = require('./helpers/expect-file');
 
 var chai = require('chai');
 var chaiFiles = require('chai-files');
@@ -79,20 +80,6 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('inserts header when sourcemaps are disabled', function() {
-    var node = concat(firstFixture, {
-      header: "/* This is my header. */",
-      inputFiles: ['**/*.js'],
-      outputFile: '/all-with-header.js',
-      sourceMapConfig: { enabled: false }
-    });
-    builder = new broccoli.Builder(node);
-    return builder.build().then(function(result) {
-      expectFile('all-with-header.js').withoutSrcURL().in(result);
-      expectFile('all-with-header.map').notIn(result);
-    });
-  });
-
   it('inserts header, headerFiles, footer and footerFiles - and overlaps with inputFiles', function() {
     var node = concat(firstFixture, {
       header: '/* This is my header.s*/',
@@ -149,20 +136,6 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('disables sourcemaps when requested', function() {
-    var node = concat(firstFixture, {
-      header: "/* This is my header. */",
-      inputFiles: ['**/*.js'],
-      outputFile: '/no-sourcemap.js',
-      sourceMapConfig: { enabled: false },
-    });
-    builder = new broccoli.Builder(node);
-    return builder.build().then(function(result) {
-      expectFile('no-sourcemap.js').in(result);
-      expectFile('no-sourcemap.map').notIn(result);
-    });
-  });
-
   it('passes sourcemaps config to the sourcemaps engine', function() {
     var node = concat(firstFixture, {
       inputFiles: ['**/*.js'],
@@ -200,44 +173,6 @@ describe('sourcemap-concat', function() {
       expectFile('staged.js').in(result);
       expectFile('staged.map').in(result);
       expectValidSourcemap('staged.js').in(result);
-    });
-  });
-
-  it('inputFiles are sorted lexicographically (improve stability of build output)', function() {
-    var final = concat(firstFixture, {
-      outputFile: '/staged.js',
-      inputFiles: ['inner/second.js', 'inner/first.js'],
-      sourceMapConfig: {
-        enabled: false
-      }
-    });
-
-    builder = new broccoli.Builder(final);
-    return builder.build().then(function(result) {
-      var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
-      var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
-
-      var expected = first + '\n' +  second;
-      expect(file(result.directory + '/staged.js')).to.equal(expected);
-    });
-  });
-
-  it('dedupe uniques in inputFiles (with simpleconcat)', function() {
-    var final = concat(firstFixture, {
-      outputFile: '/staged.js',
-      inputFiles: ['inner/first.js', 'inner/second.js', 'inner/first.js'],
-      sourceMapConfig: {
-        enabled: false
-      }
-    });
-
-    builder = new broccoli.Builder(final);
-    return builder.build().then(function(result) {
-      var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
-      var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
-
-      var expected = first + '\n' +  second;
-      expect(file(result.directory + '/staged.js')).to.equal(expected);
     });
   });
 
@@ -303,20 +238,6 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('appends footer files when sourcemaps are disabled', function() {
-    var node = concat(firstFixture, {
-      outputFile: '/inner-with-footers.js',
-      inputFiles: ['inner/*.js'],
-      footerFiles: ['other/third.js', 'other/fourth.js'],
-      sourceMapConfig: { enabled: false }
-    });
-    builder = new broccoli.Builder(node);
-    return builder.build().then(function(result) {
-      expectFile('inner-with-footers.js').withoutSrcURL().in(result);
-      expectFile('inner-with-footers.map').notIn(result);
-    });
-  });
-
   it('can build empty files with allowNone disabled', function() {
     var node = concat(emptyFixture, {
       outputFile: '/empty.js',
@@ -326,18 +247,6 @@ describe('sourcemap-concat', function() {
     return builder.build().then(function(result) {
       expectFile('empty.js').in(result);
       expectFile('empty.map').in(result);
-    });
-  });
-
-  it('can build empty files with allowNone disabled and no source-maps', function() {
-    var node = concat(emptyFixture, {
-      outputFile: '/empty-no-sourcemap.js',
-      inputFiles: ['*.js'],
-      sourceMapConfig: { enabled: false }
-    });
-    builder = new broccoli.Builder(node);
-    return builder.build().then(function(result) {
-      expectFile('empty-no-sourcemap.js').in(result);
     });
   });
 
@@ -355,19 +264,6 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('can ignore non-existent input when sourcemaps are disabled', function() {
-    var node = concat(firstFixture, {
-      outputFile: '/nothing.css',
-      inputFiles: ['nothing/*.css'],
-      sourceMapConfig: { enabled: false },
-      allowNone: true
-    });
-    builder = new broccoli.Builder(node);
-    return builder.build().then(function(result) {
-      expectFile('nothing.css').in(result);
-    });
-  });
-
   it('does not ignore non-existent input when allowNone is not explicitly set', function() {
     var node = concat(firstFixture, {
       outputFile: '/nothing.js',
@@ -375,16 +271,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return expect(builder.build()).to.be.rejectedWith("Concat: nothing matched [nothing/*.js]");
-  });
-
-  it('does not ignore non-existent input when allowNone is not explicitly set and sourcemaps are disabled', function() {
-    var node = concat(firstFixture, {
-      outputFile: '/nothing.css',
-      inputFiles: ['nothing/*.css'],
-      sourceMapConfig: { enabled: false }
-    });
-    builder = new broccoli.Builder(node);
-    return expect(builder.build()).to.be.rejectedWith("Concat: nothing matched [nothing/*.css]");
   });
 
   it('is not fooled by directories named *.js', function() {
@@ -643,51 +529,6 @@ describe('sourcemap-concat', function() {
     })
   });
 });
-
-function expectFile(filename) {
-  var stripURL = false;
-
-  return {
-    in: function(result) {
-      var actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
-      fs.writeFileSync(path.join(__dirname, 'actual', filename), actualContent);
-
-      var expectedContent;
-
-      try {
-        expectedContent = fs.readFileSync(path.join(__dirname, 'expected', filename), 'utf-8');
-        if (stripURL) {
-          expectedContent = expectedContent.replace(/\/\/# sourceMappingURL=.*\n$/, '');
-        }
-
-      } catch (err) {
-        console.warn('Missing expected file: ' + path.join(__dirname, 'expected', filename));
-      }
-
-      expectSameFiles(actualContent, expectedContent, filename);
-
-      return this;
-    },
-
-    notIn: function(result) {
-      expect(fs.existsSync(path.join(result.directory, filename))).to.equal(false, filename + ' should not have been present');
-      return this;
-    },
-
-    withoutSrcURL: function() {
-      stripURL = true;
-      return this;
-    }
-  };
-}
-
-function expectSameFiles(actualContent, expectedContent, filename) {
-  if (/\.map$/.test(filename)) {
-    expect(JSON.parse(actualContent)).to.deep.equal(expectedContent ? JSON.parse(expectedContent) : undefined, 'discrepancy in ' + filename);
-  } else {
-    expect(actualContent).to.equal(expectedContent, 'discrepancy in ' + filename);
-  }
-}
 
 function expectValidSourcemap(jsFilename, mapFilename) {
   return {

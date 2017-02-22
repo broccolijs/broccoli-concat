@@ -219,7 +219,7 @@ Concat.prototype._doLegacyBuild = function() {
 
 Concat.prototype.getCurrentFSTree = function() {
   return FSTree.fromEntries(this.listEntries());
-}
+};
 
 Concat.prototype.listEntries = function() {
   // If we have no inputFiles at all, use undefined as the filter to return

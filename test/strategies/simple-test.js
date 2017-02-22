@@ -125,7 +125,7 @@ describe('SimpleConcat', function() {
       var concat = new SimpleConcat({});
 
       expect(function() {
-        concat.updateFile('a.js', '')
+        concat.updateFile('a.js', '');
       }).to.throw('Trying to update a.js but it has not been read before');
     });
   });
@@ -188,7 +188,7 @@ describe('SimpleConcat', function() {
       var concat = new SimpleConcat({});
 
       expect(function() {
-        concat.removeFile('a.js')
+        concat.removeFile('a.js');
       }).to.throw('Trying to remove a.js but it did not previously exist');
     });
   });

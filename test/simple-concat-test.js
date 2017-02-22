@@ -309,7 +309,7 @@ describe('simple-concat', function() {
         return builder.build();
       }).then(function(result) {
         expect(read(result.directory + '/rebuild.js')).to.eql('hi');
-        unlink('omg.js')
+        unlink('omg.js');
         return builder.build();
       }).then(function(result) {
         expect(read(result.directory + '/rebuild.js')).to.eql('');
@@ -335,7 +335,7 @@ describe('simple-concat', function() {
         return builder.build();
       }).then(function(result) {
         expect(read(result.directory + '/rebuild.js')).to.eql('a\nb\nz');
-        unlink('a.js')
+        unlink('a.js');
         return builder.build();
       }).then(function(result) {
         expect(read(result.directory + '/rebuild.js')).to.eql('b\nz');
@@ -524,7 +524,7 @@ describe('simple-concat', function() {
           node.id + '-rebuild.js/other/fourth.js',
           node.id + '-rebuild.js/other/third.js',
         ]);
-      })
+      });
     });
   });
 });

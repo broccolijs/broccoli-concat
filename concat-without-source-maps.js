@@ -41,7 +41,7 @@ Simple.prototype.end = function(cb, thisArg) {
         outputFile: this.outputFile,
         sizes: this._sizes
       }
-    )
+    );
   }
 
   fs.writeFileSync(this.outputFile, this._internal);

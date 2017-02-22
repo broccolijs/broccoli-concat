@@ -92,6 +92,6 @@ describe('concat-without-maps', function() {
           'inner/second.js': 66
         }
       });
-    })
+    });
   });
 });

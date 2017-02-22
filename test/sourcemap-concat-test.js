@@ -187,6 +187,21 @@ describe('sourcemap-concat', function() {
     });
   });
 
+  it('correctly maps multiline header and footer', function() {
+    var node = concat(firstFixture, {
+      outputFile: '/all-inner-multiline.js',
+      inputFiles: ['inner/*.js'],
+      header: '\n\/\/the best\n\n',
+      footer: '\n\/\/around\n'
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('all-inner-multiline.js').in(result);
+      expectFile('all-inner-multiline.map').in(result);
+      expectValidSourcemap('all-inner-multiline.js').in(result);
+    });
+  });
+
   /**
    * Tests below here should appear for both simple-concat and sourcemap-concat.
    */

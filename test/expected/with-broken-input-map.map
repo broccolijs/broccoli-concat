@@ -1,0 +1,1 @@
+{"version":3,"sources":["broken-sourcemap-url.js"],"sourcesContent":["function meaningOfLife() {\n  throw new Error(42);\n}\n\nfunction boom() {\n  throw new Error('boom');\n}\n\nfunction somethingElse() {\n  throw new Error(\"somethign else\");\n}\n"],"names":[],"mappings":"AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;","file":"with-broken-input-map.js"}

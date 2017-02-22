@@ -16,9 +16,10 @@ chai.use(chaiAsPromised);
 var expect = chai.expect;
 var file = chaiFiles.file;
 
-var firstFixture = path.join(__dirname, 'fixtures', 'first');
-var secondFixture = path.join(__dirname, 'fixtures', 'second');
-var emptyFixture = path.join(__dirname, 'fixtures', 'empty');
+var fixtures = path.join(__dirname, 'fixtures');
+var firstFixture = path.join(fixtures, 'first');
+var secondFixture = path.join(fixtures, 'second');
+var emptyFixture = path.join(fixtures, 'empty');
 var walkSync = require('walk-sync');
 
 describe('sourcemap-concat', function() {
@@ -67,6 +68,142 @@ describe('sourcemap-concat', function() {
       expectFile('staged.js').in(result);
       expectFile('staged.map').in(result);
       expectValidSourcemap('staged.js').in(result);
+    });
+  });
+
+  it('should accept inline sourcemaps', function() {
+    var node = concat(fixtures, {
+      inputFiles: ['inline-mapped/*.js', 'first/**/*.js'],
+      outputFile: '/inline-mapped.js'
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('inline-mapped.js').in(result);
+      expectFile('inline-mapped.map').in(result);
+      expectValidSourcemap('inline-mapped.js').in(result);
+    });
+  });
+
+  it('should correctly concatenate a sourcemapped coffeescript example', function() {
+    var node = concat(fixtures, {
+      inputFiles: ['coffee/*.js'],
+      outputFile: '/coffee.js'
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('coffee.js').in(result);
+      expectFile('coffee.map').in(result);
+      expectValidSourcemap('coffee.js').in(result);
+    });
+  });
+
+  it('should discover external sources', function() {
+    var node = concat(fixtures, {
+      headerFiles: ['first/inner/first.js'],
+      footerFiles: ['first/inner/second.js'],
+      inputFiles: ['external-content/all-inner.js'],
+      outputFile: '/external-content.js'
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('external-content.js').in(result);
+      expectFile('external-content.map').in(result);
+      expectValidSourcemap('external-content.js').in(result);
+    });
+  });
+
+  it('supports custom "mapURL"', function() {
+    var node = concat(firstFixture, {
+      outputFile: '/all-inner-with-custom-map.js',
+      inputFiles: ['inner/*.js'],
+      sourceMapConfig: {
+        mapURL: 'maps/custom.map'
+      }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('all-inner-with-custom-map.js').in(result);
+      expectFile('all-inner-with-custom-map.map').in(result);
+      expectValidSourcemap('all-inner-with-custom-map.js').in(result);
+    });
+  });
+
+  it('outputs block comments when "mapCommentType" is "block"', function() {
+    var node = concat(firstFixture, {
+      outputFile: '/all-inner-block-comment.js',
+      inputFiles: ['inner/*.js'],
+      sourceMapConfig: { mapCommentType: 'block' }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('all-inner-block-comment.js').in(result);
+      expectFile('all-inner-block-comment.map').in(result);
+      expectValidSourcemap('all-inner-block-comment.js').in(result);
+    });
+  });
+
+  it('should warn but tolerate broken sourcemap URL', function() {
+    var node = concat(fixtures, {
+      outputFile: '/with-broken-input-map.js',
+      inputFiles: ['broken-sourcemap-url.js']
+    });
+    var originalLog = console.log;
+    var logCount = 0;
+    console.log = function() {
+      logCount++;
+    };
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('with-broken-input-map.js').in(result);
+      expectFile('with-broken-input-map.map').in(result);
+      expectValidSourcemap('with-broken-input-map.js').in(result);
+
+      expect(logCount).to.equal(1);
+
+      console.log = originalLog;
+    });
+  });
+
+  it('corrects sourcemap that is too short', function() {
+    var node = concat(fixtures, {
+      inputFiles: ['short/*.js'],
+      outputFile: '/short.js'
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('short.js').in(result);
+      expectFile('short.map').in(result);
+      expectValidSourcemap('short.js').in(result);
+    });
+  });
+
+  it('should correctly concat input sourcemaps with fewer sourcesContent than sources', function() {
+    var node = concat(fixtures, {
+      headerFiles: ['first/inner/first.js'],
+      footerFiles: ['first/inner/second.js'],
+      inputFiles: ['sources/too-few.js'],
+      outputFile: '/too-few-sources.js'
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('too-few-sources.js').in(result);
+      expectFile('too-few-sources.map').in(result);
+      expectValidSourcemap('too-few-sources.js').in(result);
+    });
+  });
+
+  it('should correctly concat input sourcemaps with more sourcesContent than sources', function() {
+    var node = concat(fixtures, {
+      headerFiles: ['first/inner/first.js'],
+      footerFiles: ['first/inner/second.js'],
+      inputFiles: ['sources/too-many.js'],
+      outputFile: '/too-many-sources.js'
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('too-many-sources.js').in(result);
+      expectFile('too-many-sources.map').in(result);
+      expectValidSourcemap('too-many-sources.js').in(result);
     });
   });
 

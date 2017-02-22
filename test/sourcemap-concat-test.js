@@ -30,6 +30,50 @@ describe('sourcemap-concat', function() {
     }
   });
 
+  it('passes sourcemaps config to the sourcemaps engine', function() {
+    var node = concat(firstFixture, {
+      inputFiles: ['**/*.js'],
+      outputFile: '/all-with-source-root.js',
+      sourceMapConfig: { enabled: true, sourceRoot: "/foo" }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      var expected = path.join(__dirname, 'expected', 'all-with-source-root.map');
+      var actual = path.join(result.directory, 'all-with-source-root.map');
+
+      expect(file(actual)).to.equal(file(expected));
+    });
+  });
+
+  it('assimilates existing sourcemap', function() {
+    var inner = concat(firstFixture, {
+      outputFile: '/all-inner.js',
+      inputFiles: ['inner/*.js'],
+      header: "/* This is my header. */"
+    });
+    var other = concat(firstFixture, {
+      outputFile: '/all-other.js',
+      inputFiles: ['other/*.js'],
+      header: "/* Other header. */"
+    });
+
+    var final = concat(merge([inner, other]), {
+      outputFile: '/staged.js',
+      inputFiles: ['all-inner.js', 'all-other.js'],
+    });
+
+    builder = new broccoli.Builder(final);
+    return builder.build().then(function(result) {
+      expectFile('staged.js').in(result);
+      expectFile('staged.map').in(result);
+      expectValidSourcemap('staged.js').in(result);
+    });
+  });
+
+  /**
+   * Tests below here should appear for both simple-concat and sourcemap-concat.
+   */
+
   it('concatenates files in one dir', function() {
     var node = concat(firstFixture, {
       outputFile: '/all-inner.js',
@@ -136,47 +180,23 @@ describe('sourcemap-concat', function() {
     });
   });
 
-  it('passes sourcemaps config to the sourcemaps engine', function() {
-    var node = concat(firstFixture, {
-      inputFiles: ['**/*.js'],
-      outputFile: '/all-with-source-root.js',
-      sourceMapConfig: { enabled: true, sourceRoot: "/foo" }
-    });
-    builder = new broccoli.Builder(node);
-    return builder.build().then(function(result) {
-      var expected = path.join(__dirname, 'expected', 'all-with-source-root.map');
-      var actual = path.join(result.directory, 'all-with-source-root.map');
-
-      expect(file(actual)).to.equal(file(expected));
-    });
-  });
-
-  it('assimilates existing sourcemap', function() {
-    var inner = concat(firstFixture, {
-      outputFile: '/all-inner.js',
-      inputFiles: ['inner/*.js'],
-      header: "/* This is my header. */"
-    });
-    var other = concat(firstFixture, {
-      outputFile: '/all-other.js',
-      inputFiles: ['other/*.js'],
-      header: "/* Other header. */"
-    });
-
-    var final = concat(merge([inner, other]), {
+  it('inputFiles are sorted lexicographically (improve stability of build output)', function() {
+    var final = concat(firstFixture, {
       outputFile: '/staged.js',
-      inputFiles: ['all-inner.js', 'all-other.js'],
+      inputFiles: ['inner/second.js', 'inner/first.js']
     });
 
     builder = new broccoli.Builder(final);
     return builder.build().then(function(result) {
-      expectFile('staged.js').in(result);
-      expectFile('staged.map').in(result);
-      expectValidSourcemap('staged.js').in(result);
+      var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+      var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+
+      var expected = first + '\n' + second + '//# sourceMappingURL=staged.map\n';
+      expect(file(result.directory + '/staged.js')).to.equal(expected);
     });
   });
 
-  it('dedupe uniques in inputFiles (with sourcemaps)', function() {
+  it('dedupe uniques in inputFiles', function() {
     var final = concat(firstFixture, {
       outputFile: '/staged.js',
       inputFiles: ['inner/first.js', 'inner/second.js', 'inner/first.js']
@@ -316,7 +336,7 @@ describe('sourcemap-concat', function() {
         return builder.build();
       }).then(function(result) {
         expect(read(result.directory + '/rebuild.js')).to.eql('hi//# sourceMappingURL=rebuild.map\n');
-        unlink('omg.js')
+        unlink('omg.js');
         return builder.build();
       }).then(function(result) {
         expect(read(result.directory + '/rebuild.js')).to.eql('//# sourceMappingURL=rebuild.map\n');
@@ -341,7 +361,7 @@ describe('sourcemap-concat', function() {
         return builder.build();
       }).then(function(result) {
         expect(read(result.directory + '/rebuild.js')).to.eql('a\nb\nz//# sourceMappingURL=rebuild.map\n');
-        unlink('a.js')
+        unlink('a.js');
         return builder.build();
       }).then(function(result) {
         expect(read(result.directory + '/rebuild.js')).to.eql('b\nz//# sourceMappingURL=rebuild.map\n');
@@ -525,8 +545,8 @@ describe('sourcemap-concat', function() {
           node.id + '-rebuild.js/other/fourth.js',
           node.id + '-rebuild.js/other/third.js',
         ]);
-      })
-    })
+      });
+    });
   });
 });
 
@@ -548,5 +568,5 @@ function expectValidSourcemap(jsFilename, mapFilename) {
       var actualMap = fs.readFileSync(path.join(result.directory, subdir, mapFilename), 'utf-8');
       validateSourcemap(actualMin, actualMap, {});
     }
-  }
+  };
 }

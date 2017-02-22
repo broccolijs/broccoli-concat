@@ -30,7 +30,7 @@ describe('SimpleConcat', function() {
       footer: 'should be last'
     });
     concat.addFile('a.js', '//a');
-    expect(concat.result()).to.equal('//ashould be last');
+    expect(concat.result()).to.equal('//ashould be last\n');
   });
 
   it('prepends header and appends footer to the output', function() {
@@ -39,7 +39,7 @@ describe('SimpleConcat', function() {
       footer: 'should be last'
     });
     concat.addFile('a.js', '//a');
-    expect(concat.result()).to.equal('should be first//ashould be last');
+    expect(concat.result()).to.equal('should be first//ashould be last\n');
   });
 
   describe('addFile', function() {
@@ -125,7 +125,7 @@ describe('SimpleConcat', function() {
       var concat = new SimpleConcat({});
 
       expect(function() {
-        concat.updateFile('a.js', '')
+        concat.updateFile('a.js', '');
       }).to.throw('Trying to update a.js but it has not been read before');
     });
   });
@@ -188,7 +188,7 @@ describe('SimpleConcat', function() {
       var concat = new SimpleConcat({});
 
       expect(function() {
-        concat.removeFile('a.js')
+        concat.removeFile('a.js');
       }).to.throw('Trying to remove a.js but it did not previously exist');
     });
   });

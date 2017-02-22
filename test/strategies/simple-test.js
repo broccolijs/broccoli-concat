@@ -30,7 +30,7 @@ describe('SimpleConcat', function() {
       footer: 'should be last'
     });
     concat.addFile('a.js', '//a');
-    expect(concat.result()).to.equal('//ashould be last');
+    expect(concat.result()).to.equal('//ashould be last\n');
   });
 
   it('prepends header and appends footer to the output', function() {
@@ -39,7 +39,7 @@ describe('SimpleConcat', function() {
       footer: 'should be last'
     });
     concat.addFile('a.js', '//a');
-    expect(concat.result()).to.equal('should be first//ashould be last');
+    expect(concat.result()).to.equal('should be first//ashould be last\n');
   });
 
   describe('addFile', function() {

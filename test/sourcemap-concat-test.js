@@ -65,8 +65,6 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(final);
     return builder.build().then(function(result) {
-      expectFile('staged.js').in(result);
-      expectFile('staged.map').in(result);
       expectValidSourcemap('staged.js').in(result);
     });
   });
@@ -78,8 +76,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('inline-mapped.js').in(result);
-      expectFile('inline-mapped.map').in(result);
       expectValidSourcemap('inline-mapped.js').in(result);
     });
   });
@@ -91,8 +87,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('coffee.js').in(result);
-      expectFile('coffee.map').in(result);
       expectValidSourcemap('coffee.js').in(result);
     });
   });
@@ -106,8 +100,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('external-content.js').in(result);
-      expectFile('external-content.map').in(result);
       expectValidSourcemap('external-content.js').in(result);
     });
   });
@@ -122,8 +114,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('all-inner-with-custom-map.js').in(result);
-      expectFile('all-inner-with-custom-map.map').in(result);
       expectValidSourcemap('all-inner-with-custom-map.js').in(result);
     });
   });
@@ -136,8 +126,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('all-inner-block-comment.js').in(result);
-      expectFile('all-inner-block-comment.map').in(result);
       expectValidSourcemap('all-inner-block-comment.js').in(result);
     });
   });
@@ -154,8 +142,6 @@ describe('sourcemap-concat', function() {
     };
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('with-broken-input-map.js').in(result);
-      expectFile('with-broken-input-map.map').in(result);
       expectValidSourcemap('with-broken-input-map.js').in(result);
 
       expect(logCount).to.equal(1);
@@ -171,8 +157,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('short.js').in(result);
-      expectFile('short.map').in(result);
       expectValidSourcemap('short.js').in(result);
     });
   });
@@ -186,8 +170,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('too-few-sources.js').in(result);
-      expectFile('too-few-sources.map').in(result);
       expectValidSourcemap('too-few-sources.js').in(result);
     });
   });
@@ -201,8 +183,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('too-many-sources.js').in(result);
-      expectFile('too-many-sources.map').in(result);
       expectValidSourcemap('too-many-sources.js').in(result);
     });
   });
@@ -218,8 +198,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('all-inner.js').in(result);
-      expectFile('all-inner.map').in(result);
       expectValidSourcemap('all-inner.js').in(result);
     });
   });
@@ -231,8 +209,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('all.js').in(result);
-      expectFile('all.map').in(result);
       expectValidSourcemap('all.js').in(result);
     });
   });
@@ -255,8 +231,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('all-with-header.js').in(result);
-      expectFile('all-with-header.map').in(result);
       expectValidSourcemap('all-with-header.js').in(result);
     });
   });
@@ -273,8 +247,6 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('all-the-things.js').in(result);
-      expectFile('all-the-things.map').in(result);
       expectValidSourcemap('all-the-things.js').in(result);
     });
   });
@@ -311,8 +283,6 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('all-the-things-reversed.js').in(result);
-      expectFile('all-the-things-reversed.map').in(result);
       expectValidSourcemap('all-the-things-reversed.js').in(result);
     });
   });
@@ -358,8 +328,6 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('inner-with-headers.js').in(result);
-      expectFile('inner-with-headers.map').in(result);
       expectValidSourcemap('inner-with-headers.js').in(result);
     });
   });
@@ -373,8 +341,6 @@ describe('sourcemap-concat', function() {
 
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('inner-with-headers-reversed.js').in(result);
-      expectFile('inner-with-headers-reversed.map').in(result);
       expectValidSourcemap('inner-with-headers-reversed.js').in(result);
     });
   });
@@ -389,8 +355,6 @@ describe('sourcemap-concat', function() {
     builder = new broccoli.Builder(node);
 
     return builder.build().then(function(result) {
-      expectFile('inner-with-footers.js').in(result);
-      expectFile('inner-with-footers.map').in(result);
       expectValidSourcemap('inner-with-footers.js').in(result);
     });
   });
@@ -437,8 +401,6 @@ describe('sourcemap-concat', function() {
     });
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
-      expectFile('sneaky.js').in(result);
-      expectFile('sneaky.map').in(result);
       expectValidSourcemap('sneaky.js').in(result);
     });
   });

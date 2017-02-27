@@ -17,7 +17,7 @@ module.exports = function(inputNode, options) {
     for (var i=0; i < extensions.length; i++) {
       var ext = '.' + extensions[i].replace(/^\./,'');
       if (options.outputFile.slice(-1 * ext.length) === ext) {
-        Strategy = require('fast-sourcemap-concat');
+        Strategy = require('./lib/strategies/source-map');
         break;
       }
     }

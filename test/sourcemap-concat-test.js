@@ -434,7 +434,39 @@ describe('sourcemap-concat', function() {
     // other helper
     function read(fullPath)       { return fs.readFileSync(fullPath, 'UTF8'); }
 
-    it('add/remove inputFile', function() {
+    it('add/remove/update inputFile with sourcemap', function() {
+      var inputNode = concat(inputDir, {
+        outputFile: '/omg.js',
+        inputFiles: ['**/*.js'],
+        allowNone: true,
+      });
+
+      var node = concat(inputNode, {
+        outputFile: '/rebuild.js',
+        inputFiles: ['omg.js'],
+        allowNone: true,
+      });
+
+      builder = new broccoli.Builder(node);
+      write('gmo.js', 'hi');
+      return builder.build().then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('hi//# sourceMappingURL=rebuild.map\n');
+        expect(read(result.directory + '/rebuild.map')).to.eql('{"version":3,"sources":["gmo.js"],"sourcesContent":["hi"],"names":[],"mappings":"AAAA","file":"rebuild.js"}');
+        write('gmo.js', 'hii');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('hii//# sourceMappingURL=rebuild.map\n');
+        expect(read(result.directory + '/rebuild.map')).to.eql('{"version":3,"sources":["gmo.js"],"sourcesContent":["hii"],"names":[],"mappings":"AAAA","file":"rebuild.js"}');
+        unlink('gmo.js');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('//# sourceMappingURL=rebuild.map\n');
+        expect(read(result.directory + '/rebuild.map')).to.eql('{"version":3,"sources":[],"sourcesContent":[],"names":[],"mappings":"","file":"rebuild.js"}');
+        return builder.build();
+      });
+    });
+
+    it('add/remove/update inputFile', function() {
       var node = concat(inputDir, {
         outputFile: '/rebuild.js',
         inputFiles: ['**/*.js'],
@@ -444,16 +476,21 @@ describe('sourcemap-concat', function() {
       builder = new broccoli.Builder(node);
       return builder.build().then(function(result) {
         expect(fs.readFileSync(result.directory + '/rebuild.js', 'UTF8')).to.eql('//# sourceMappingURL=rebuild.map\n');
-
         write('omg.js', 'hi');
-
         return builder.build();
       }).then(function(result) {
         expect(read(result.directory + '/rebuild.js')).to.eql('hi//# sourceMappingURL=rebuild.map\n');
+        expect(read(result.directory + '/rebuild.map')).to.eql('{"version":3,"sources":["omg.js"],"sourcesContent":["hi"],"names":[],"mappings":"AAAA","file":"rebuild.js"}');
+        write('omg.js', 'hii');
+        return builder.build();
+      }).then(function(result) {
+        expect(read(result.directory + '/rebuild.js')).to.eql('hii//# sourceMappingURL=rebuild.map\n');
+        expect(read(result.directory + '/rebuild.map')).to.eql('{"version":3,"sources":["omg.js"],"sourcesContent":["hii"],"names":[],"mappings":"AAAA","file":"rebuild.js"}');
         unlink('omg.js');
         return builder.build();
       }).then(function(result) {
         expect(read(result.directory + '/rebuild.js')).to.eql('//# sourceMappingURL=rebuild.map\n');
+        expect(read(result.directory + '/rebuild.map')).to.eql('{"version":3,"sources":[],"sourcesContent":[],"names":[],"mappings":"","file":"rebuild.js"}');
         return builder.build();
       });
     });

@@ -108,8 +108,13 @@ Concat.prototype.build = function() {
 };
 
 Concat.prototype._doPatchBasedBuild = function(patch) {
+  var outputFile = path.join(this.outputPath, this.outputFile);
+
   if (!this.concat) {
     this.concat = new this.Strategy(merge(this.sourceMapConfig, {
+      allowNone: this.allowNone,
+      inputPath: this.inputPaths[0],
+      outputFile: outputFile,
       separator: this.separator,
       header: this.header,
       headerFiles: this.headerFiles,
@@ -136,7 +141,6 @@ Concat.prototype._doPatchBasedBuild = function(patch) {
     }
   }
 
-  var outputFile = path.join(this.outputPath, this.outputFile);
   var content = this.concat.result();
 
   // If content is undefined, then we the concat had no input files
@@ -160,6 +164,11 @@ Concat.prototype._doPatchBasedBuild = function(patch) {
   }
 
   fs.outputFileSync(outputFile, content);
+
+  if (this.concat.resultSourceMap) {
+    var sourceMapContent = this.concat.resultSourceMap();
+    fs.outputFileSync(this.concat.mapFile, sourceMapContent);
+  }
 };
 
 Concat.prototype._readFile = function(file) {

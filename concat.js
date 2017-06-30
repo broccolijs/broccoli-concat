@@ -38,7 +38,8 @@ function Concat(inputNode, options, Strategy) {
   Plugin.call(this, inputNodes, {
     annotation: options.annotation,
     name: (Strategy.name || 'Unknown') + 'Concat',
-    persistentOutput: true
+    persistentOutput: true,
+    sideEffectFree: true,
   });
 
   this.id = id;
@@ -92,6 +93,9 @@ Concat.prototype.calculatePatch = function() {
 
 Concat.prototype.build = function() {
   var patch = this.calculatePatch();
+  if (patch.length) {
+    this.revised();
+  }
 
   // We skip building if this is a rebuild with a zero-length patch
   if (patch.length === 0 && this._hasBuilt) {

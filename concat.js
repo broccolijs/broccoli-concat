@@ -1,3 +1,5 @@
+'use strict';
+
 var Plugin = require('broccoli-plugin');
 var FSTree = require('fs-tree-diff');
 var path = require('path');

@@ -617,9 +617,9 @@ fast-ordered-set@^1.0.0, fast-ordered-set@^1.0.2:
   dependencies:
     blank-object "^1.0.1"
 
-fast-sourcemap-concat@^1.0.1:
+fast-sourcemap-concat@~1.1.0:
   version "1.1.0"
-  resolved "https://registry.npmjs.org/fast-sourcemap-concat/-/fast-sourcemap-concat-1.1.0.tgz#a800767abed5eda02e67238ec063a709be61f9d4"
+  resolved "https://registry.yarnpkg.com/fast-sourcemap-concat/-/fast-sourcemap-concat-1.1.0.tgz#a800767abed5eda02e67238ec063a709be61f9d4"
   dependencies:
     chalk "^0.5.1"
     debug "^2.2.0"

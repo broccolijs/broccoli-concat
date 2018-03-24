@@ -1,3 +1,5 @@
+'use strict';
+
 var concat = require('..');
 var co = require('co');
 var fs = require('fs-extra');

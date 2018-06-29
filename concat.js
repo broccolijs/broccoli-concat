@@ -9,6 +9,7 @@ var omit = require('lodash.omit');
 var uniq = require('lodash.uniq');
 var walkSync = require('walk-sync');
 var ensurePosix = require('ensure-posix-path');
+var Minimatch = require('minimatch').Minimatch;
 
 var ensureNoGlob = require('./lib/utils/ensure-no-glob');
 var isDirectory = require('./lib/utils/is-directory');
@@ -47,6 +48,9 @@ class Concat extends Plugin {
     this.sourceMapConfig = omit(options.sourceMapConfig || {}, 'enabled');
     this.allInputFiles = uniq([].concat(options.headerFiles || [], options.inputFiles || [], options.footerFiles || []));
     this.inputFiles = options.inputFiles;
+    this.inputFilesMatchers = (options.inputFiles || []).map(function(string) {
+      return new Minimatch(string);
+    });
     this.outputFile = options.outputFile;
     this.allowNone = options.allowNone;
     this.header = options.header;
@@ -55,6 +59,7 @@ class Concat extends Plugin {
     this.footer = options.footer;
     this.footerFiles = options.footerFiles;
     this.separator = (options.separator != null) ? options.separator : '\n';
+    this.inputFilesComparator = options.inputFilesComparator;
 
     ensureNoGlob('headerFiles', this.headerFiles);
     ensureNoGlob('footerFiles', this.footerFiles);
@@ -260,6 +265,15 @@ class Concat extends Plugin {
         files.length === 0 &&
         !this.allowNone) {
       throw new Error('Concat: nothing matched [' + this.inputFiles + ']');
+    }
+
+    var inputFilesComparator = this.inputFilesComparator;
+    if (inputFilesComparator) {
+      var inputFilesMatchers = this.inputFilesMatchers;
+
+      files = files.slice().sort(function(x, y) {
+        return inputFilesComparator(x, y, inputFilesMatchers);
+      });
     }
 
     files.forEach(function(file) {

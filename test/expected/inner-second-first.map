@@ -1,0 +1,1 @@
+{"version":3,"sources":["inner/second.js","inner/first.js"],"sourcesContent":["function somethingElse() {\n  throw new Error(\"somethign else\");\n}\n", "function meaningOfLife() {\n  throw new Error(42);\n}\n\nfunction boom() {\n  throw new Error('boom');\n}\n"],"names":[],"mappings":"AAAA;AACA;AACA;;ACFA;AACA;AACA;AACA;AACA;AACA;AACA;","file":"inner-second-first.js"}

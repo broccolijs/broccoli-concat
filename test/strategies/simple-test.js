@@ -1,5 +1,7 @@
-var SimpleConcat = require('../../lib/strategies/simple');
-var expect = require('chai').expect;
+'use strict';
+
+const SimpleConcat = require('../../lib/strategies/simple');
+const expect = require('chai').expect;
 
 describe('SimpleConcat', function() {
   it('is patch based', function() {
@@ -7,18 +9,18 @@ describe('SimpleConcat', function() {
   });
 
   it('can handle no input scenarios', function() {
-    var concat = new SimpleConcat({});
+    let concat = new SimpleConcat({});
     expect(concat.result()).to.equal(undefined);
   });
 
   it('can handle empty input scenarios', function() {
-    var concat = new SimpleConcat({});
+    let concat = new SimpleConcat({});
     concat.addFile('foo.js', '');
     expect(concat.result()).to.equal('');
   });
 
   it('prepends header to the output', function() {
-    var concat = new SimpleConcat({
+    let concat = new SimpleConcat({
       header: 'should be first'
     });
     concat.addFile('a.js', '//a');
@@ -26,7 +28,7 @@ describe('SimpleConcat', function() {
   });
 
   it('appends footer to the output', function() {
-    var concat = new SimpleConcat({
+    let concat = new SimpleConcat({
       footer: 'should be last'
     });
     concat.addFile('a.js', '//a');
@@ -34,7 +36,7 @@ describe('SimpleConcat', function() {
   });
 
   it('prepends header and appends footer to the output', function() {
-    var concat = new SimpleConcat({
+    let concat = new SimpleConcat({
       header: 'should be first',
       footer: 'should be last'
     });
@@ -44,7 +46,7 @@ describe('SimpleConcat', function() {
 
   describe('addFile', function() {
     it('correctly adds files in alphabetical (stable) order', function() {
-      var concat = new SimpleConcat({});
+      let concat = new SimpleConcat({});
 
       concat.addFile('a.js', '//a');
       concat.addFile('a/b.js', '//a/b');
@@ -56,7 +58,7 @@ describe('SimpleConcat', function() {
     });
 
     it('correctly orders headerFiles at the front', function() {
-      var concat = new SimpleConcat({
+      let concat = new SimpleConcat({
         headerFiles: ['b.js', 'a/a.js']
       });
 
@@ -70,7 +72,7 @@ describe('SimpleConcat', function() {
     });
 
     it('correctly orders footerFiles at the end', function() {
-      var concat = new SimpleConcat({
+      let concat = new SimpleConcat({
         footerFiles: ['b.js', 'a/a.js']
       });
 
@@ -86,7 +88,7 @@ describe('SimpleConcat', function() {
 
   describe('updateFile', function() {
     it('correctly updates an existing file', function() {
-      var concat = new SimpleConcat({});
+      let concat = new SimpleConcat({});
 
       concat.addFile('a.js', '//a');
       expect(concat.result()).to.equal('//a');
@@ -96,7 +98,7 @@ describe('SimpleConcat', function() {
     });
 
     it('correctly updates a header file', function() {
-      var concat = new SimpleConcat({
+      let concat = new SimpleConcat({
         headerFiles: [ 'b.js', 'a.js' ]
       });
 
@@ -109,7 +111,7 @@ describe('SimpleConcat', function() {
     });
 
     it('correctly updates a footer file', function() {
-      var concat = new SimpleConcat({
+      let concat = new SimpleConcat({
         footerFiles: [ 'a.js', 'b.js' ]
       });
 
@@ -122,9 +124,9 @@ describe('SimpleConcat', function() {
     });
 
     it('throws an error when updating a non-existent file', function() {
-      var concat = new SimpleConcat({});
+      let concat = new SimpleConcat({});
 
-      expect(function() {
+      expect(() => {
         concat.updateFile('a.js', '');
       }).to.throw('Trying to update a.js but it has not been read before');
     });
@@ -132,7 +134,7 @@ describe('SimpleConcat', function() {
 
   describe('removeFile', function() {
     it('correctly removes an existing file', function() {
-      var concat = new SimpleConcat({});
+      let concat = new SimpleConcat({});
 
       concat.addFile('a.js', '//a');
       concat.addFile('a/b.js', '//a/b');
@@ -149,7 +151,7 @@ describe('SimpleConcat', function() {
     });
 
     it('correctly removes a header file', function() {
-      var concat = new SimpleConcat({
+      let concat = new SimpleConcat({
         headerFiles: ['b.js', 'a.js']
       });
 
@@ -167,7 +169,7 @@ describe('SimpleConcat', function() {
     });
 
     it('correctly removes a footer file', function() {
-      var concat = new SimpleConcat({
+      let concat = new SimpleConcat({
         footerFiles: ['b.js', 'a.js']
       });
 
@@ -185,9 +187,9 @@ describe('SimpleConcat', function() {
     });
 
     it('throws an error when removing a non-existent file', function() {
-      var concat = new SimpleConcat({});
+      let concat = new SimpleConcat({});
 
-      expect(function() {
+      expect(() => {
         concat.removeFile('a.js');
       }).to.throw('Trying to remove a.js but it did not previously exist');
     });

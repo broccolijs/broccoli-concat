@@ -1,6 +1,8 @@
-var fs = require('fs-extra');
-var path = require('path');
-var expect = require('chai').expect;
+'use strict';
+
+const fs = require('fs-extra');
+const path = require('path');
+const expect = require('chai').expect;
 
 function expectSameFiles(actualContent, expectedContent, filename) {
   if (/\.map$/.test(filename)) {
@@ -11,14 +13,14 @@ function expectSameFiles(actualContent, expectedContent, filename) {
 }
 
 module.exports = function expectFile(filename) {
-  var stripURL = false;
+  let stripURL = false;
 
   return {
-    in: function(result) {
-      var actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
+    in(result) {
+      let actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
       fs.writeFileSync(path.join(__dirname, '..' , 'actual', filename), actualContent);
 
-      var expectedContent;
+      let expectedContent;
 
       try {
         expectedContent = fs.readFileSync(path.join(__dirname, '..' , 'expected', filename), 'utf-8');
@@ -35,12 +37,12 @@ module.exports = function expectFile(filename) {
       return this;
     },
 
-    notIn: function(result) {
+    notIn(result) {
       expect(fs.existsSync(path.join(result.directory, filename))).to.equal(false, filename + ' should not have been present');
       return this;
     },
 
-    withoutSrcURL: function() {
+    withoutSrcURL() {
       stripURL = true;
       return this;
     }

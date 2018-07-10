@@ -1,28 +1,28 @@
 'use strict';
 
-var Plugin = require('broccoli-plugin');
-var FSTree = require('fs-tree-diff');
-var path = require('path');
-var fs = require('fs-extra');
-var merge = require('lodash.merge');
-var omit = require('lodash.omit');
-var uniq = require('lodash.uniq');
-var walkSync = require('walk-sync');
-var ensurePosix = require('ensure-posix-path');
+const Plugin = require('broccoli-plugin');
+const FSTree = require('fs-tree-diff');
+const path = require('path');
+const fs = require('fs-extra');
+const merge = require('lodash.merge');
+const omit = require('lodash.omit');
+const uniq = require('lodash.uniq');
+const walkSync = require('walk-sync');
+const ensurePosix = require('ensure-posix-path');
 
-var ensureNoGlob = require('./lib/utils/ensure-no-glob');
-var isDirectory = require('./lib/utils/is-directory');
-var makeIndex = require('./lib/utils/make-index');
+const ensureNoGlob = require('./lib/utils/ensure-no-glob');
+const isDirectory = require('./lib/utils/is-directory');
+const makeIndex = require('./lib/utils/make-index');
 
-var id = 0;
+let id = 0;
 
-class Concat extends Plugin {
+module.exports = class Concat extends Plugin {
   constructor(inputNode, options, Strategy) {
     if (!options || !options.outputFile) {
       throw new Error('the outputFile option is required');
     }
 
-    var inputNodes;
+    let inputNodes;
     id++;
 
     if (process.env.CONCAT_STATS) {
@@ -66,7 +66,7 @@ class Concat extends Plugin {
   }
 
   static inputNodesForConcatStats(inputNode, id, outputFile) {
-    var dir = process.cwd() + '/concat-stats-for';
+    let dir = process.cwd() + '/concat-stats-for';
     fs.mkdirpSync(dir);
 
     return [
@@ -78,8 +78,8 @@ class Concat extends Plugin {
   }
 
   calculatePatch() {
-    var currentTree = this.getCurrentFSTree();
-    var patch = this._lastTree.calculatePatch(currentTree);
+    let currentTree = this.getCurrentFSTree();
+    let patch = this._lastTree.calculatePatch(currentTree);
 
     this._lastTree = currentTree;
 
@@ -87,7 +87,7 @@ class Concat extends Plugin {
   }
 
   build() {
-    var patch = this.calculatePatch();
+    let patch = this.calculatePatch();
 
     // We skip building if this is a rebuild with a zero-length patch
     if (patch.length === 0 && this._hasBuilt) {
@@ -114,10 +114,10 @@ class Concat extends Plugin {
       }));
     }
 
-    for (var i = 0; i < patch.length; i++) {
-      var operation = patch[i];
-      var method = operation[0];
-      var file = operation[1];
+    for (let i = 0; i < patch.length; i++) {
+      let operation = patch[i];
+      let method = operation[0];
+      let file = operation[1];
 
       switch (method) {
         case 'create':
@@ -132,8 +132,8 @@ class Concat extends Plugin {
       }
     }
 
-    var outputFile = path.join(this.outputPath, this.outputFile);
-    var content = this.concat.result();
+    let outputFile = path.join(this.outputPath, this.outputFile);
+    let content = this.concat.result();
 
     // If content is undefined, then we the concat had no input files
     if (content === undefined) {
@@ -145,8 +145,8 @@ class Concat extends Plugin {
     }
 
     if (process.env.CONCAT_STATS) {
-      var fileSizes = this.concat.fileSizes();
-      var outputPath = process.cwd() + '/concat-stats-for/' + this.id + '-' + path.basename(this.outputFile) + '.json';
+      let fileSizes = this.concat.fileSizes();
+      let outputPath = process.cwd() + '/concat-stats-for/' + this.id + '-' + path.basename(this.outputFile) + '.json';
 
       fs.mkdirpSync(path.dirname(outputPath));
       fs.writeFileSync(outputPath, JSON.stringify({
@@ -163,9 +163,9 @@ class Concat extends Plugin {
   }
 
   _doLegacyBuild() {
-    var separator = this.separator;
-    var firstSection = true;
-    var outputFile = path.join(this.outputPath, this.outputFile);
+    let separator = this.separator;
+    let firstSection = true;
+    let outputFile = path.join(this.outputPath, this.outputFile);
 
     fs.mkdirpSync(path.dirname(outputFile));
 
@@ -176,7 +176,7 @@ class Concat extends Plugin {
       pluginId: this.id
     }));
 
-    return this.concat.end(function(concat) {
+    return this.concat.end(concat => {
       function beginSection() {
         if (firstSection) {
           firstSection = false;
@@ -191,7 +191,7 @@ class Concat extends Plugin {
       }
 
       if (this.headerFiles) {
-        this.headerFiles.forEach(function(file) {
+        this.headerFiles.forEach(file => {
           beginSection();
           concat.addFile(file);
         });
@@ -200,7 +200,7 @@ class Concat extends Plugin {
       this.addFiles(beginSection);
 
       if (this.footerFiles) {
-        this.footerFiles.forEach(function(file) {
+        this.footerFiles.forEach(file => {
           beginSection();
           concat.addFile(file);
         });
@@ -220,8 +220,8 @@ class Concat extends Plugin {
   listEntries() {
     // If we have no inputFiles at all, use undefined as the filter to return
     // all files in the inputDir.
-    var filter = this.allInputFiles.length ? this.allInputFiles : undefined;
-    var inputDir = this.inputPaths[0];
+    let filter = this.allInputFiles.length ? this.allInputFiles : undefined;
+    let inputDir = this.inputPaths[0];
     return walkSync.entries(inputDir, filter);
   }
 
@@ -229,18 +229,18 @@ class Concat extends Plugin {
    * Returns the full paths for any matching inputFiles.
    */
   listFiles() {
-    var inputDir = this.inputPaths[0];
+    let inputDir = this.inputPaths[0];
     return this.listEntries().map(function(entry) {
       return ensurePosix(path.join(inputDir, entry.relativePath));
     });
   }
 
   addFiles(beginSection) {
-    var headerFooterFileOverlap = false;
-    var posixInputPath = ensurePosix(this.inputPaths[0]);
+    let headerFooterFileOverlap = false;
+    let posixInputPath = ensurePosix(this.inputPaths[0]);
 
-    var files = this.listFiles().filter(function(file) {
-      var relativePath = file.replace(posixInputPath + '/', '');
+    let files = this.listFiles().filter(file => {
+      let relativePath = file.replace(posixInputPath + '/', '');
 
       // * remove inputFiles that are already contained within headerFiles and footerFiles
       // * allow duplicates between headerFiles and footerFiles
@@ -262,11 +262,9 @@ class Concat extends Plugin {
       throw new Error('Concat: nothing matched [' + this.inputFiles + ']');
     }
 
-    files.forEach(function(file) {
+    files.forEach(file => {
       beginSection();
       this.concat.addFile(file.replace(posixInputPath + '/', ''));
     }, this);
   }
-}
-
-module.exports = Concat;
+};

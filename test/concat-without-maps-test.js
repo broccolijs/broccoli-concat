@@ -1,21 +1,21 @@
 'use strict';
 
-var path = require('path');
+const path = require('path');
 
-var chai = require('chai');
-var chaiFiles = require('chai-files');
+const chai = require('chai');
+const chaiFiles = require('chai-files');
 
 chai.use(chaiFiles);
 
-var expect = chai.expect;
-var file = chaiFiles.file;
-var firstFixture = path.join(__dirname, 'fixtures', 'first');
+const expect = chai.expect;
+const file = chaiFiles.file;
+const firstFixture = path.join(__dirname, 'fixtures', 'first');
 
 describe('concat-without-maps', function() {
-  var Concat = require('../concat-without-source-maps');
-  var quickTemp = require('quick-temp');
-  var concat;
-  var outputFile;
+  const Concat = require('../concat-without-source-maps');
+  const quickTemp = require('quick-temp');
+  let concat;
+  let outputFile;
 
   beforeEach(function() {
     outputFile = quickTemp.makeOrRemake(this, 'tmpDestDir') + '/' + 'foo.js';
@@ -57,7 +57,7 @@ describe('concat-without-maps', function() {
   });
 
   describe('CONCAT_STATS', function() {
-    var outputs;
+    let outputs;
 
     beforeEach(function() {
       process.env.CONCAT_STATS = true;
@@ -85,7 +85,7 @@ describe('concat-without-maps', function() {
       concat.end();
       expect(outputs.length).to.eql(1);
 
-      var outputPath = process.cwd() + '/concat-stats-for/' + concat.id + '-' + path.basename(concat.outputFile) + '.json';
+      let outputPath = process.cwd() + '/concat-stats-for/' + concat.id + '-' + path.basename(concat.outputFile) + '.json';
       expect(outputs[0].outputPath).to.eql(outputPath);
       expect(outputs[0].content).to.eql({
         outputFile: concat.outputFile,

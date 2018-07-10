@@ -1,29 +1,29 @@
 'use strict';
 
-var concat = require('..');
-var co = require('co');
-var fs = require('fs-extra');
-var path = require('path');
-var broccoli = require('broccoli');
-var walkSync = require('walk-sync');
-var expectFile = require('./helpers/expect-file');
+const concat = require('..');
+const co = require('co');
+const fs = require('fs-extra');
+const path = require('path');
+const broccoli = require('broccoli');
+const walkSync = require('walk-sync');
+const expectFile = require('./helpers/expect-file');
 
-var chai = require('chai');
-var chaiFiles = require('chai-files');
-var chaiAsPromised = require('chai-as-promised');
+const chai = require('chai');
+const chaiFiles = require('chai-files');
+const chaiAsPromised = require('chai-as-promised');
 
 chai.use(chaiFiles);
 chai.use(chaiAsPromised);
 
-var expect = chai.expect;
-var file = chaiFiles.file;
+const expect = chai.expect;
+const file = chaiFiles.file;
 
-var firstFixture = path.join(__dirname, 'fixtures', 'first');
-var secondFixture = path.join(__dirname, 'fixtures', 'second');
-var emptyFixture = path.join(__dirname, 'fixtures', 'empty');
+const firstFixture = path.join(__dirname, 'fixtures', 'first');
+const secondFixture = path.join(__dirname, 'fixtures', 'second');
+const emptyFixture = path.join(__dirname, 'fixtures', 'empty');
 
 describe('simple-concat', function() {
-  var builder;
+  let builder;
 
   afterEach(function() {
     if (builder) {
@@ -32,7 +32,7 @@ describe('simple-concat', function() {
   });
 
   it('does not generate sourcemaps', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       header: "/* This is my header. */",
       inputFiles: ['**/*.js'],
       outputFile: '/no-sourcemap.js',
@@ -49,7 +49,7 @@ describe('simple-concat', function() {
    */
 
   it('concatenates all files in one dir', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/all-inner.js',
       inputFiles: ['inner/*.js'],
       sourceMapConfig: { enabled: false }
@@ -60,7 +60,7 @@ describe('simple-concat', function() {
   }));
 
   it('concatenates files across dirs', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/all.js',
       inputFiles: ['**/*.js'],
       sourceMapConfig: { enabled: false }
@@ -71,7 +71,7 @@ describe('simple-concat', function() {
   }));
 
   it('concatenates all files across dirs when inputFiles is not specified', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/all.js',
       sourceMapConfig: { enabled: false }
     });
@@ -81,7 +81,7 @@ describe('simple-concat', function() {
   }));
 
   it('inserts header', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       header: "/* This is my header. */",
       inputFiles: ['**/*.js'],
       outputFile: '/all-with-header.js',
@@ -94,7 +94,7 @@ describe('simple-concat', function() {
   }));
 
   it('inserts header, headeFiles, footer and footerFiles - and overlaps with inputFiles', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       header: '/* This is my header.s*/',
       headerFiles: ['inner/first.js', 'inner/second.js'],
       inputFiles: ['**/*.js'],
@@ -132,7 +132,7 @@ describe('simple-concat', function() {
   });
 
   it('inserts header, headeFiles, footer and footerFiles (reveresed) - and overlaps with inputFiles', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       header: '/* This is my header.s*/',
       headerFiles: ['inner/second.js', 'inner/first.js'],
       inputFiles: ['**/*.js'],
@@ -148,7 +148,7 @@ describe('simple-concat', function() {
   }));
 
   it('inputFiles are sorted lexicographically (improve stability of build output)', co.wrap(function *() {
-    var final = concat(firstFixture, {
+    let final = concat(firstFixture, {
       outputFile: '/staged.js',
       inputFiles: ['inner/second.js', 'inner/first.js'],
       sourceMapConfig: {
@@ -158,15 +158,15 @@ describe('simple-concat', function() {
 
     builder = new broccoli.Builder(final);
     let result = yield builder.build();
-    var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
-    var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+    let first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+    let second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
-    var expected = first + '\n' +  second;
+    let expected = first + '\n' +  second;
     expect(file(result.directory + '/staged.js')).to.equal(expected);
   }));
 
   it('dedupe uniques in inputFiles', co.wrap(function *() {
-    var final = concat(firstFixture, {
+    let final = concat(firstFixture, {
       outputFile: '/staged.js',
       inputFiles: ['inner/first.js', 'inner/second.js', 'inner/first.js'],
       sourceMapConfig: {
@@ -177,15 +177,15 @@ describe('simple-concat', function() {
     builder = new broccoli.Builder(final);
 
     let result = yield builder.build();
-    var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
-    var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+    let first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+    let second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
-    var expected = first + '\n' +  second;
+    let expected = first + '\n' +  second;
     expect(file(result.directory + '/staged.js')).to.equal(expected);
   }));
 
   it('prepends headerFiles', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/inner-with-headers.js',
       inputFiles: ['inner/*.js'],
       headerFiles: ['other/third.js', 'other/fourth.js'],
@@ -198,7 +198,7 @@ describe('simple-concat', function() {
   }));
 
   it('prepends headerFiles (order reversed)', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/inner-with-headers-reversed.js',
       inputFiles: ['inner/*.js'],
       headerFiles: ['other/fourth.js', 'other/third.js'],
@@ -211,7 +211,7 @@ describe('simple-concat', function() {
   }));
 
   it('appends footer files', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
       footerFiles: ['other/third.js', 'other/fourth.js'],
@@ -224,7 +224,7 @@ describe('simple-concat', function() {
   }));
 
   it('can build empty files with allowNone disabled', co.wrap(function *() {
-    var node = concat(emptyFixture, {
+    let node = concat(emptyFixture, {
       outputFile: '/empty-no-sourcemap.js',
       inputFiles: ['*.js'],
       sourceMapConfig: { enabled: false }
@@ -235,7 +235,7 @@ describe('simple-concat', function() {
   }));
 
   it('can ignore non-existent input', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css'],
       sourceMapConfig: { enabled: false },
@@ -247,7 +247,7 @@ describe('simple-concat', function() {
   }));
 
   it('does not ignore non-existent input when allowNone is not explicitly set', function() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css'],
       sourceMapConfig: { enabled: false }
@@ -257,7 +257,7 @@ describe('simple-concat', function() {
   });
 
   it('is not fooled by directories named *.js', co.wrap(function *() {
-    var node = concat(secondFixture, {
+    let node = concat(secondFixture, {
       outputFile: '/sneaky.js',
       inputFiles: ['**/*.js'],
       sourceMapConfig: { enabled: false }
@@ -268,8 +268,8 @@ describe('simple-concat', function() {
   }));
 
   describe('rebuild', function() {
-    var inputDir;
-    var quickTemp = require('quick-temp');
+    let inputDir;
+    let quickTemp = require('quick-temp');
     beforeEach(function() {
       inputDir = quickTemp.makeOrRemake(this, 'rebuild-tests');
     });
@@ -282,7 +282,7 @@ describe('simple-concat', function() {
     function read(fullPath)       { return fs.readFileSync(fullPath, 'UTF8'); }
 
     it('add/remove inputFile', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         inputFiles: ['**/*.js'],
         allowNone: true,
@@ -306,7 +306,7 @@ describe('simple-concat', function() {
     }));
 
     it('inputFile ordering', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         inputFiles: ['**/*.js'],
         allowNone: true,
@@ -335,7 +335,7 @@ describe('simple-concat', function() {
     }));
 
     it('headerFiles', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         headerFiles: ['b.js', 'a.js'],
         sourceMapConfig: { enabled: false }
@@ -366,7 +366,7 @@ describe('simple-concat', function() {
     }));
 
     it('footerFiles', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         footerFiles: ['b.js', 'a.js'],
         sourceMapConfig: { enabled: false }
@@ -397,7 +397,7 @@ describe('simple-concat', function() {
     }));
 
     it('footerFiles + headerFiles', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         headerFiles: ['b.js'],
         footerFiles: ['a.js'],
@@ -429,7 +429,7 @@ describe('simple-concat', function() {
     }));
 
     it('footerFiles + inputFiles (glob) + headerFiles', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         headerFiles: ['b.js'],
         footerFiles: ['a.js'],
@@ -471,8 +471,8 @@ describe('simple-concat', function() {
   });
 
   describe('CONCAT_STATS', function() {
-    var node, inputNodesOutput;
-    var dirPath = process.cwd() + '/concat-stats-for';
+    let node, inputNodesOutput;
+    let dirPath = process.cwd() + '/concat-stats-for';
 
     beforeEach(function() {
       fs.removeSync(dirPath);
@@ -494,7 +494,7 @@ describe('simple-concat', function() {
     });
 
     it('emits files', co.wrap(function *() {
-      var dir = fs.statSync(dirPath);
+      let dir = fs.statSync(dirPath);
 
       expect(dir.isDirectory()).to.eql(true);
       expect(walkSync(dirPath)).to.eql([]);

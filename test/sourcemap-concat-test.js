@@ -1,66 +1,68 @@
 'use strict';
 
-var concat = require('..');
-var co = require('co');
-var fs = require('fs-extra');
-var path = require('path');
-var broccoli = require('broccoli');
-var merge = require('broccoli-merge-trees');
-var validateSourcemap = require('sourcemap-validator');
-var expectFile = require('./helpers/expect-file');
+const concat = require('..');
+const co = require('co');
+const fs = require('fs-extra');
+const path = require('path');
+const broccoli = require('broccoli');
+const merge = require('broccoli-merge-trees');
+const validateSourcemap = require('sourcemap-validator');
+const expectFile = require('./helpers/expect-file');
 
-var chai = require('chai');
-var chaiFiles = require('chai-files');
-var chaiAsPromised = require('chai-as-promised');
+const chai = require('chai');
+const chaiFiles = require('chai-files');
+const chaiAsPromised = require('chai-as-promised');
 
 chai.use(chaiFiles);
 chai.use(chaiAsPromised);
 
-var expect = chai.expect;
-var file = chaiFiles.file;
+const expect = chai.expect;
+const file = chaiFiles.file;
 
-var fixtures = path.join(__dirname, 'fixtures');
-var firstFixture = path.join(fixtures, 'first');
-var secondFixture = path.join(fixtures, 'second');
-var emptyFixture = path.join(fixtures, 'empty');
-var walkSync = require('walk-sync');
+const fixtures = path.join(__dirname, 'fixtures');
+const firstFixture = path.join(fixtures, 'first');
+const secondFixture = path.join(fixtures, 'second');
+const emptyFixture = path.join(fixtures, 'empty');
+const walkSync = require('walk-sync');
 
 describe('sourcemap-concat', function() {
-  var builder;
+  let builder;
+  const originalLog = console.log;
 
   afterEach(function() {
+    console.log = originalLog;
     if (builder) {
       return builder.cleanup();
     }
   });
 
   it('passes sourcemaps config to the sourcemaps engine', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       inputFiles: ['**/*.js'],
       outputFile: '/all-with-source-root.js',
       sourceMapConfig: { enabled: true, sourceRoot: "/foo" }
     });
     builder = new broccoli.Builder(node);
     let result = yield builder.build();
-    var expected = path.join(__dirname, 'expected', 'all-with-source-root.map');
-    var actual = path.join(result.directory, 'all-with-source-root.map');
+    let expected = path.join(__dirname, 'expected', 'all-with-source-root.map');
+    let actual = path.join(result.directory, 'all-with-source-root.map');
 
     expect(file(actual)).to.equal(file(expected));
   }));
 
   it('assimilates existing sourcemap', co.wrap(function *() {
-    var inner = concat(firstFixture, {
+    let inner = concat(firstFixture, {
       outputFile: '/all-inner.js',
       inputFiles: ['inner/*.js'],
       header: "/* This is my header. */"
     });
-    var other = concat(firstFixture, {
+    let other = concat(firstFixture, {
       outputFile: '/all-other.js',
       inputFiles: ['other/*.js'],
       header: "/* Other header. */"
     });
 
-    var final = concat(merge([inner, other]), {
+    let final = concat(merge([inner, other]), {
       outputFile: '/staged.js',
       inputFiles: ['all-inner.js', 'all-other.js'],
     });
@@ -71,7 +73,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('should accept inline sourcemaps', co.wrap(function *() {
-    var node = concat(fixtures, {
+    let node = concat(fixtures, {
       inputFiles: ['inline-mapped/*.js', 'first/**/*.js'],
       outputFile: '/inline-mapped.js'
     });
@@ -81,7 +83,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('should correctly concatenate a sourcemapped coffeescript example', co.wrap(function *() {
-    var node = concat(fixtures, {
+    let node = concat(fixtures, {
       inputFiles: ['coffee/*.js'],
       outputFile: '/coffee.js'
     });
@@ -91,7 +93,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('should discover external sources', co.wrap(function *() {
-    var node = concat(fixtures, {
+    let node = concat(fixtures, {
       headerFiles: ['first/inner/first.js'],
       footerFiles: ['first/inner/second.js'],
       inputFiles: ['external-content/all-inner.js'],
@@ -103,7 +105,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('supports custom "mapURL"', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/all-inner-with-custom-map.js',
       inputFiles: ['inner/*.js'],
       sourceMapConfig: {
@@ -116,7 +118,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('outputs block comments when "mapCommentType" is "block"', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/all-inner-block-comment.js',
       inputFiles: ['inner/*.js'],
       sourceMapConfig: { mapCommentType: 'block' }
@@ -127,27 +129,24 @@ describe('sourcemap-concat', function() {
   }));
 
   it('should warn but tolerate broken sourcemap URL', co.wrap(function *() {
-    var node = concat(fixtures, {
+    let node = concat(fixtures, {
       outputFile: '/with-broken-input-map.js',
       inputFiles: ['broken-sourcemap-url.js']
     });
-    var originalLog = console.log;
-    var logCount = 0;
+    let logCount = 0;
     console.log = function() {
       logCount++;
     };
+
     builder = new broccoli.Builder(node);
     return builder.build().then(function(result) {
       expectValidSourcemap('with-broken-input-map.js').in(result);
-
       expect(logCount).to.equal(1);
-
-      console.log = originalLog;
     });
   }));
 
   it('corrects sourcemap that is too short', co.wrap(function *() {
-    var node = concat(fixtures, {
+    let node = concat(fixtures, {
       inputFiles: ['short/*.js'],
       outputFile: '/short.js'
     });
@@ -157,7 +156,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('should correctly concat input sourcemaps with fewer sourcesContent than sources', co.wrap(function *() {
-    var node = concat(fixtures, {
+    let node = concat(fixtures, {
       headerFiles: ['first/inner/first.js'],
       footerFiles: ['first/inner/second.js'],
       inputFiles: ['sources/too-few.js'],
@@ -169,7 +168,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('should correctly concat input sourcemaps with more sourcesContent than sources', co.wrap(function *() {
-    var node = concat(fixtures, {
+    let node = concat(fixtures, {
       headerFiles: ['first/inner/first.js'],
       footerFiles: ['first/inner/second.js'],
       inputFiles: ['sources/too-many.js'],
@@ -181,7 +180,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('correctly maps multiline header and footer', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/all-inner-multiline.js',
       inputFiles: ['inner/*.js'],
       header: '\n\/\/the best\n\n',
@@ -199,7 +198,7 @@ describe('sourcemap-concat', function() {
    */
 
   it('concatenates files in one dir', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/all-inner.js',
       inputFiles: ['inner/*.js']
     });
@@ -209,7 +208,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('concatenates files across dirs', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/all.js',
       inputFiles: ['**/*.js']
     });
@@ -219,7 +218,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('concatenates all files across dirs when inputFiles is not specified', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/all.js'
     });
     builder = new broccoli.Builder(node);
@@ -228,7 +227,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('inserts header', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/all-with-header.js',
       inputFiles: ['**/*.js'],
       header: "/* This is my header. */"
@@ -239,7 +238,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('inserts header, headerFiles, footer and footerFiles - and overlaps with inputFiles', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       header: '/* This is my header.s*/',
       headerFiles: ['inner/first.js', 'inner/second.js'],
       inputFiles: ['**/*.js'],
@@ -274,7 +273,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('inserts header, headerFiles, footer and footerFiles (reversed) - and overlaps with inputFiles', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       header: '/* This is my header.s*/',
       headerFiles: ['inner/second.js', 'inner/first.js'],
       inputFiles: ['**/*.js'],
@@ -289,37 +288,37 @@ describe('sourcemap-concat', function() {
   }));
 
   it('inputFiles are sorted lexicographically (improve stability of build output)', co.wrap(function *() {
-    var final = concat(firstFixture, {
+    let final = concat(firstFixture, {
       outputFile: '/staged.js',
       inputFiles: ['inner/second.js', 'inner/first.js']
     });
 
     builder = new broccoli.Builder(final);
     let result = yield builder.build();
-    var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
-    var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+    let first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+    let second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
-    var expected = first + '\n' + second + '//# sourceMappingURL=staged.map\n';
+    let expected = first + '\n' + second + '//# sourceMappingURL=staged.map\n';
     expect(file(result.directory + '/staged.js')).to.equal(expected);
   }));
 
   it('dedupe uniques in inputFiles', co.wrap(function *() {
-    var final = concat(firstFixture, {
+    let final = concat(firstFixture, {
       outputFile: '/staged.js',
       inputFiles: ['inner/first.js', 'inner/second.js', 'inner/first.js']
     });
 
     builder = new broccoli.Builder(final);
     let result = yield builder.build();
-    var first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
-    var second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
+    let first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
+    let second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
-    var expected = first + '\n' +  second + '//# sourceMappingURL=staged.map\n';
+    let expected = first + '\n' +  second + '//# sourceMappingURL=staged.map\n';
     expect(file(result.directory + '/staged.js')).to.equal(expected, 'output is wrong');
   }));
 
   it('prepends headerFiles', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/inner-with-headers.js',
       inputFiles: ['inner/*.js'],
       headerFiles: ['other/third.js', 'other/fourth.js']
@@ -331,7 +330,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('prepends headerFiles (order reversed)', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/inner-with-headers-reversed.js',
       inputFiles: ['inner/*.js'],
       headerFiles: ['other/fourth.js', 'other/third.js']
@@ -343,7 +342,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('appends footer files', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
       footerFiles: ['other/third.js', 'other/fourth.js']
@@ -356,7 +355,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('can build empty files with allowNone disabled', co.wrap(function *() {
-    var node = concat(emptyFixture, {
+    let node = concat(emptyFixture, {
       outputFile: '/empty.js',
       inputFiles: ['*.js']
     });
@@ -367,7 +366,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('can ignore non-existent input', co.wrap(function *() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/nothing.js',
       inputFiles: ['nothing/*.js'],
       allowNone: true
@@ -380,7 +379,7 @@ describe('sourcemap-concat', function() {
   }));
 
   it('does not ignore non-existent input when allowNone is not explicitly set', function() {
-    var node = concat(firstFixture, {
+    let node = concat(firstFixture, {
       outputFile: '/nothing.js',
       inputFiles: ['nothing/*.js']
     });
@@ -389,7 +388,7 @@ describe('sourcemap-concat', function() {
   });
 
   it('is not fooled by directories named *.js', co.wrap(function *() {
-    var node = concat(secondFixture, {
+    let node = concat(secondFixture, {
       outputFile: '/sneaky.js',
       inputFiles: ['**/*.js']
     });
@@ -399,8 +398,8 @@ describe('sourcemap-concat', function() {
   }));
 
   describe('rebuild', function() {
-    var inputDir;
-    var quickTemp = require('quick-temp');
+    let inputDir;
+    let quickTemp = require('quick-temp');
     beforeEach(function() {
       inputDir = quickTemp.makeOrRemake(this, 'rebuild-tests');
     });
@@ -413,7 +412,7 @@ describe('sourcemap-concat', function() {
     function read(fullPath)       { return fs.readFileSync(fullPath, 'UTF8'); }
 
     it('add/remove inputFile', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         inputFiles: ['**/*.js'],
         allowNone: true,
@@ -436,7 +435,7 @@ describe('sourcemap-concat', function() {
     }));
 
     it('inputFile ordering', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         inputFiles: ['**/*.js'],
         allowNone: true,
@@ -464,7 +463,7 @@ describe('sourcemap-concat', function() {
     }));
 
     it('headerFiles', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         headerFiles: ['b.js', 'a.js'],
       });
@@ -494,7 +493,7 @@ describe('sourcemap-concat', function() {
     }));
 
     it('footerFiles', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         footerFiles: ['b.js', 'a.js'],
       });
@@ -524,7 +523,7 @@ describe('sourcemap-concat', function() {
     }));
 
     it('footerFiles + headerFiles', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         headerFiles: ['b.js'],
         footerFiles: ['a.js'],
@@ -555,7 +554,7 @@ describe('sourcemap-concat', function() {
     }));
 
     it('footerFiles + inputFiles (glob) + headerFiles', co.wrap(function *() {
-      var node = concat(inputDir, {
+      let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         headerFiles: ['b.js'],
         footerFiles: ['a.js'],
@@ -596,8 +595,8 @@ describe('sourcemap-concat', function() {
   });
 
   describe('CONCAT_STATS', function() {
-    var node, inputNodesOutput;
-    var dirPath = process.cwd() + '/concat-stats-for';
+    let node, inputNodesOutput;
+    let dirPath = process.cwd() + '/concat-stats-for';
 
     beforeEach(function() {
       fs.removeSync(dirPath);
@@ -618,7 +617,7 @@ describe('sourcemap-concat', function() {
     });
 
     it('emits files', co.wrap(function *() {
-      var dir = fs.statSync(dirPath);
+      let dir = fs.statSync(dirPath);
 
       expect(dir.isDirectory()).to.eql(true);
       expect(walkSync(dirPath)).to.eql([]);
@@ -657,8 +656,8 @@ function expectValidSourcemap(jsFilename, mapFilename) {
       expectFile(jsFilename).in(result, subdir);
       expectFile(mapFilename).in(result, subdir);
 
-      var actualMin = fs.readFileSync(path.join(result.directory, subdir, jsFilename), 'utf-8');
-      var actualMap = fs.readFileSync(path.join(result.directory, subdir, mapFilename), 'utf-8');
+      let actualMin = fs.readFileSync(path.join(result.directory, subdir, jsFilename), 'utf-8');
+      let actualMap = fs.readFileSync(path.join(result.directory, subdir, mapFilename), 'utf-8');
       validateSourcemap(actualMin, actualMap, {});
     }
   };

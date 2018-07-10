@@ -1,21 +1,23 @@
-var Concat = require('./concat');
-var merge = require('lodash.merge');
+'use strict';
+
+const Concat = require('./concat');
+const merge = require('lodash.merge');
 
 module.exports = function(inputNode, options) {
   if (!options || !options.outputFile) {
     throw new Error('outputFile is required');
   }
 
-  var config = merge({
+  let config = merge({
     enabled: true
   }, options.sourceMapConfig);
 
-  var Strategy;
+  let Strategy;
 
   if (config.enabled) {
-    var extensions = (config.extensions || ['js']);
-    for (var i=0; i < extensions.length; i++) {
-      var ext = '.' + extensions[i].replace(/^\./,'');
+    let extensions = (config.extensions || ['js']);
+    for (let i=0; i < extensions.length; i++) {
+      let ext = '.' + extensions[i].replace(/^\./,'');
       if (options.outputFile.slice(-1 * ext.length) === ext) {
         Strategy = require('fast-sourcemap-concat');
         break;

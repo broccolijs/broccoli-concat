@@ -40,7 +40,7 @@
     "broccoli-plugin": "^1.3.0",
     "broccoli-stew": "^1.5.0",
     "ensure-posix-path": "^1.0.2",
-    "fast-sourcemap-concat": "~1.1.0",
+    "fast-sourcemap-concat": "1.3.1",
     "find-index": "^1.1.0",
     "fs-extra": "^4.0.3",
     "fs-tree-diff": "^0.5.7",

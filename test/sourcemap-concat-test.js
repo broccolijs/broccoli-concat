@@ -27,10 +27,10 @@ const walkSync = require('walk-sync');
 
 describe('sourcemap-concat', function() {
   let builder;
-  const originalLog = console.log;
+  const originalWarn = console.warn;
 
   afterEach(function() {
-    console.log = originalLog;
+    console.warn = originalWarn;
     if (builder) {
       return builder.cleanup();
     }
@@ -134,7 +134,7 @@ describe('sourcemap-concat', function() {
       inputFiles: ['broken-sourcemap-url.js']
     });
     let logCount = 0;
-    console.log = function() {
+    console.warn = function() {
       logCount++;
     };
 

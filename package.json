@@ -24,30 +24,30 @@
   "devDependencies": {
     "bench-cli": "^0.1.0",
     "broccoli": "^0.16.9",
-    "broccoli-merge-trees": "^1.1.1",
-    "chai": "^3.5.0",
-    "chai-as-promised": "^6.0.0",
+    "broccoli-merge-trees": "^2.0.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
     "chai-files": "^1.2.0",
     "co": "^4.6.0",
-    "fixturify": "^0.3.2",
-    "mocha": "^3.0.0",
-    "mocha-eslint": "^3.0.1",
-    "quick-temp": "^0.1.3",
-    "sourcemap-validator": "^1.0.4"
+    "fixturify": "^0.3.4",
+    "mocha": "^5.2.0",
+    "mocha-eslint": "^4.1.0",
+    "quick-temp": "^0.1.8",
+    "sourcemap-validator": "^1.1.0"
   },
   "dependencies": {
     "broccoli-kitchen-sink-helpers": "^0.3.1",
     "broccoli-plugin": "^1.3.0",
-    "broccoli-stew": "^1.3.3",
+    "broccoli-stew": "^1.5.0",
     "ensure-posix-path": "^1.0.2",
     "fast-sourcemap-concat": "~1.1.0",
     "find-index": "^1.1.0",
-    "fs-extra": "^1.0.0",
-    "fs-tree-diff": "^0.5.6",
-    "lodash.merge": "^4.3.0",
+    "fs-extra": "^4.0.3",
+    "fs-tree-diff": "^0.5.7",
+    "lodash.merge": "^4.3.1",
     "lodash.omit": "^4.1.0",
     "lodash.uniq": "^4.2.0",
-    "walk-sync": "^0.3.1"
+    "walk-sync": "^0.3.2"
   },
   "engines": {
     "node": ">= 4"

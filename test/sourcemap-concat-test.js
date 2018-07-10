@@ -23,6 +23,7 @@ const fixtures = path.join(__dirname, 'fixtures');
 const firstFixture = path.join(fixtures, 'first');
 const secondFixture = path.join(fixtures, 'second');
 const emptyFixture = path.join(fixtures, 'empty');
+const sprintfFixture = path.join(__dirname, 'fixtures', 'sprintf');
 const walkSync = require('walk-sync');
 
 describe('sourcemap-concat', function() {
@@ -35,6 +36,35 @@ describe('sourcemap-concat', function() {
       return builder.cleanup();
     }
   });
+
+  it('concatenates sprintf alone', function() {
+    const node = concat(sprintfFixture, {
+      outputFile: '/sprintf-alone.js',
+      inputFiles: ['dist/*.js'],
+      sourceMapConfig: { enabled: true }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('sprintf-alone.js').in(result);
+      expectFile('sprintf-alone.map').in(result);
+      expectValidSourcemap('sprintf-alone.js').in(result);
+    });
+  });
+
+  it('concatenates sprintf with another lib', function() {
+    const node = concat(sprintfFixture, {
+      outputFile: '/sprintf-multi.js',
+      inputFiles: ['dist/*.js', 'other/*.js'],
+      sourceMapConfig: { enabled: true }
+    });
+    builder = new broccoli.Builder(node);
+    return builder.build().then(function(result) {
+      expectFile('sprintf-multi.js').in(result);
+      expectFile('sprintf-multi.map').in(result);
+      expectValidSourcemap('sprintf-multi.js').in(result);
+    });
+  });
+
 
   it('passes sourcemaps config to the sourcemaps engine', co.wrap(function *() {
     let node = concat(firstFixture, {

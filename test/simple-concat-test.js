@@ -44,6 +44,18 @@ describe('simple-concat', function() {
     expectFile('no-sourcemap.map').notIn(result);
   }));
 
+  it('concatenates files with content higher than limit', co.wrap(function* () {
+    var node = concat(firstFixture, {
+      outputFile: '/all-inner.js',
+      inputFiles: ['inner/*.js'],
+      contentLimit: 10,
+      sourceMapConfig: { enabled: false }
+    });
+    builder = new broccoli.Builder(node);
+    let result = yield builder.build();
+    expectFile('all-inner.js').withoutSrcURL().in(result);
+  }));
+
   /**
    * Tests below here should appear for both simple-concat and sourcemap-concat.
    */

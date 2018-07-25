@@ -2,34 +2,6 @@
 
 const SimpleConcat = require('../../lib/strategies/simple');
 const expect = require('chai').expect;
-const fixturify = require('fixturify');
-
-const testDir = 'test/strategies';
-
-function writeFixturifySync(obj) {
-  fixturify.writeSync(testDir, obj);
-}
-
-beforeEach(function() {
-  writeFixturifySync({
-    'a.js': '//a',
-    a: {
-      'a.js': '//a/a',
-      'b.js': '//a/b'
-    },
-    'b.js': '//b',
-    'c.js': '//c'
-  });
-});
-
-afterEach(function() {
-  writeFixturifySync({
-    'a.js': null,
-    'b.js': null,
-    'c.js': null,
-    a: null
-  });
-});
 
 describe('SimpleConcat', function() {
   it('is patch based', function() {
@@ -42,21 +14,13 @@ describe('SimpleConcat', function() {
   });
 
   it('can handle empty input scenarios', function() {
-    let concat = new SimpleConcat({
-      baseDir: testDir
-    });
-    let fileContent = '';
-    let obj = {
-      'a.js': fileContent
-    };
-    writeFixturifySync(obj);
-    concat.addFile('a.js', fileContent);
+    let concat = new SimpleConcat({});
+    concat.addFile('foo.js', '');
     expect(concat.result()).to.equal('');
   });
 
   it('prepends header to the output', function() {
     let concat = new SimpleConcat({
-      baseDir: testDir,
       header: 'should be first'
     });
     concat.addFile('a.js', '//a');
@@ -65,7 +29,6 @@ describe('SimpleConcat', function() {
 
   it('appends footer to the output', function() {
     let concat = new SimpleConcat({
-      baseDir: testDir,
       footer: 'should be last'
     });
     concat.addFile('a.js', '//a');
@@ -74,7 +37,6 @@ describe('SimpleConcat', function() {
 
   it('prepends header and appends footer to the output', function() {
     let concat = new SimpleConcat({
-      baseDir: testDir,
       header: 'should be first',
       footer: 'should be last'
     });
@@ -84,9 +46,7 @@ describe('SimpleConcat', function() {
 
   describe('addFile', function() {
     it('correctly adds files in alphabetical (stable) order', function() {
-      let concat = new SimpleConcat({
-        baseDir: testDir
-      });
+      let concat = new SimpleConcat({});
 
       concat.addFile('a.js', '//a');
       concat.addFile('a/b.js', '//a/b');
@@ -99,7 +59,6 @@ describe('SimpleConcat', function() {
 
     it('correctly orders headerFiles at the front', function() {
       let concat = new SimpleConcat({
-        baseDir: testDir,
         headerFiles: ['b.js', 'a/a.js']
       });
 
@@ -114,7 +73,6 @@ describe('SimpleConcat', function() {
 
     it('correctly orders footerFiles at the end', function() {
       let concat = new SimpleConcat({
-        baseDir: testDir,
         footerFiles: ['b.js', 'a/a.js']
       });
 
@@ -130,9 +88,7 @@ describe('SimpleConcat', function() {
 
   describe('updateFile', function() {
     it('correctly updates an existing file', function() {
-      let concat = new SimpleConcat({
-        baseDir: testDir
-      });
+      let concat = new SimpleConcat({});
 
       concat.addFile('a.js', '//a');
       expect(concat.result()).to.equal('//a');
@@ -143,8 +99,7 @@ describe('SimpleConcat', function() {
 
     it('correctly updates a header file', function() {
       let concat = new SimpleConcat({
-        baseDir: testDir,
-        headerFiles: ['b.js', 'a.js' ]
+        headerFiles: [ 'b.js', 'a.js' ]
       });
 
       concat.addFile('a.js', '//a');
@@ -157,8 +112,7 @@ describe('SimpleConcat', function() {
 
     it('correctly updates a footer file', function() {
       let concat = new SimpleConcat({
-        baseDir: testDir,
-        footerFiles: ['a.js', 'b.js' ]
+        footerFiles: [ 'a.js', 'b.js' ]
       });
 
       concat.addFile('a.js', '//a');
@@ -180,9 +134,7 @@ describe('SimpleConcat', function() {
 
   describe('removeFile', function() {
     it('correctly removes an existing file', function() {
-      let concat = new SimpleConcat({
-        baseDir: testDir
-      });
+      let concat = new SimpleConcat({});
 
       concat.addFile('a.js', '//a');
       concat.addFile('a/b.js', '//a/b');
@@ -200,7 +152,6 @@ describe('SimpleConcat', function() {
 
     it('correctly removes a header file', function() {
       let concat = new SimpleConcat({
-        baseDir: testDir,
         headerFiles: ['b.js', 'a.js']
       });
 
@@ -219,7 +170,6 @@ describe('SimpleConcat', function() {
 
     it('correctly removes a footer file', function() {
       let concat = new SimpleConcat({
-        baseDir: testDir,
         footerFiles: ['b.js', 'a.js']
       });
 

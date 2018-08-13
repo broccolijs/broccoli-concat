@@ -626,49 +626,68 @@ describe('sourcemap-concat', function() {
 
   describe('CONCAT_STATS', function() {
     let node, inputNodesOutput;
-    let dirPath = process.cwd() + '/concat-stats-for';
 
-    beforeEach(function() {
-      fs.removeSync(dirPath);
-      inputNodesOutput = [];
-      process.env.CONCAT_STATS = true;
+    let runEmitTest = (dirPath) => {
+      beforeEach(function() {
+        fs.removeSync(dirPath);
+        inputNodesOutput = [];
+        process.env.CONCAT_STATS = true;
 
-      node = concat(firstFixture, {
-        outputFile: '/rebuild.js',
-        inputFiles: ['inner/first.js', 'inner/second.js']
+        node = concat(firstFixture, {
+          outputFile: '/rebuild.js',
+          inputFiles: ['inner/first.js', 'inner/second.js']
+        });
       });
+
+      afterEach(function() {
+        fs.removeSync(dirPath);
+        inputNodesOutput.length = 0;
+        delete process.env.CONCAT_STATS;
+        builder.cleanup();
+      });
+
+      it('emits files', co.wrap(function* () {
+        let dir = fs.statSync(dirPath);
+
+        expect(dir.isDirectory()).to.eql(true);
+        expect(walkSync(dirPath)).to.eql([]);
+
+        builder = new broccoli.Builder(node);
+
+        yield builder.build();
+        dir = fs.statSync(dirPath);
+
+        expect(dir.isDirectory()).to.eql(true);
+        expect(walkSync(dirPath)).to.eql([
+          node.id + '-rebuild.js.json',
+          node.id + '-rebuild.js/',
+          node.id + '-rebuild.js/inner/',
+          node.id + '-rebuild.js/inner/first.js',
+          node.id + '-rebuild.js/inner/second.js',
+          node.id + '-rebuild.js/other/',
+          node.id + '-rebuild.js/other/fourth.js',
+          node.id + '-rebuild.js/other/third.js',
+        ]);
+      }));
+    };
+
+    describe('with default path', function() {
+      runEmitTest(process.cwd() + '/concat-stats-for');
     });
 
-    afterEach(function() {
-      fs.removeSync(dirPath);
-      inputNodesOutput.length = 0;
-      delete process.env.CONCAT_STATS;
-      builder.cleanup();
+    describe('with CONCAT_STATS_PATH', function() {
+      let dir = path.join(require('os').tmpdir(), 'concat_temp_dir');
+
+      beforeEach(function() {
+        process.env.CONCAT_STATS_PATH = dir;
+      });
+
+      afterEach(function() {
+        delete process.env.CONCAT_STATS_PATH;
+      });
+
+      runEmitTest(dir);
     });
-
-    it('emits files', co.wrap(function *() {
-      let dir = fs.statSync(dirPath);
-
-      expect(dir.isDirectory()).to.eql(true);
-      expect(walkSync(dirPath)).to.eql([]);
-
-      builder = new broccoli.Builder(node);
-
-      yield builder.build();
-      dir = fs.statSync(dirPath);
-
-      expect(dir.isDirectory()).to.eql(true);
-      expect(walkSync(dirPath)).to.eql([
-        node.id + '-rebuild.js.json',
-        node.id + '-rebuild.js/',
-        node.id + '-rebuild.js/inner/',
-        node.id + '-rebuild.js/inner/first.js',
-        node.id + '-rebuild.js/inner/second.js',
-        node.id + '-rebuild.js/other/',
-        node.id + '-rebuild.js/other/fourth.js',
-        node.id + '-rebuild.js/other/third.js',
-      ]);
-    }));
   });
 });
 

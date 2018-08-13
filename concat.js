@@ -66,15 +66,19 @@ module.exports = class Concat extends Plugin {
   }
 
   static inputNodesForConcatStats(inputNode, id, outputFile) {
-    let dir = process.cwd() + '/concat-stats-for';
+    let dir = Concat.concatStatsPath();
     fs.mkdirpSync(dir);
 
     return [
       require('broccoli-stew').debug(inputNode, {
-        dir: dir,
+        dir,
         name: id + '-' + path.basename(outputFile)
       })
     ];
+  }
+
+  static concatStatsPath() {
+    return process.env.CONCAT_STATS_PATH || `${process.cwd()}/concat-stats-for`;
   }
 
   calculatePatch() {
@@ -146,7 +150,7 @@ module.exports = class Concat extends Plugin {
 
     if (process.env.CONCAT_STATS) {
       let fileSizes = this.concat.fileSizes();
-      let outputPath = process.cwd() + '/concat-stats-for/' + this.id + '-' + path.basename(this.outputFile) + '.json';
+      let outputPath = path.join(Concat.concatStatsPath(), `${this.id}-${path.basename(this.outputFile)}.json`);
 
       fs.mkdirpSync(path.dirname(outputPath));
       fs.writeFileSync(outputPath, JSON.stringify({

@@ -477,7 +477,6 @@ describe('simple-concat', function() {
       beforeEach(function() {
         fs.removeSync(dirPath);
         inputNodesOutput = [];
-        process.env.CONCAT_STATS = true;
 
         node = concat(firstFixture, {
           outputFile: '/rebuild.js',
@@ -501,10 +500,15 @@ describe('simple-concat', function() {
 
         builder = new broccoli.Builder(node);
 
-        yield builder.build();
         dir = fs.statSync(dirPath);
-
         expect(dir.isDirectory()).to.eql(true);
+
+        yield builder.build();
+        expect(walkSync(dirPath)).to.eql([]);
+
+        process.env.CONCAT_STATS = true;
+
+        yield builder.build();
         expect(walkSync(dirPath)).to.eql([
           node.id + '-rebuild.js.json',
           node.id + '-rebuild.js/',

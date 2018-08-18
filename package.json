@@ -36,9 +36,9 @@
     "sourcemap-validator": "^1.1.0"
   },
   "dependencies": {
+    "broccoli-debug": "^0.6.4",
     "broccoli-kitchen-sink-helpers": "^0.3.1",
     "broccoli-plugin": "^1.3.0",
-    "broccoli-stew": "^1.5.0",
     "ensure-posix-path": "^1.0.2",
     "fast-sourcemap-concat": "^1.4.0",
     "find-index": "^1.1.0",

@@ -10,6 +10,7 @@ const uniq = require('lodash.uniq');
 const walkSync = require('walk-sync');
 const ensurePosix = require('ensure-posix-path');
 
+const StatsOutput = require('./lib/stats-output');
 const ensureNoGlob = require('./lib/utils/ensure-no-glob');
 const isDirectory = require('./lib/utils/is-directory');
 const makeIndex = require('./lib/utils/make-index');
@@ -22,14 +23,8 @@ module.exports = class Concat extends Plugin {
       throw new Error('the outputFile option is required');
     }
 
-    let inputNodes;
     id++;
-
-    if (process.env.CONCAT_STATS) {
-      inputNodes = Concat.inputNodesForConcatStats(inputNode, id, options.outputFile);
-    } else {
-      inputNodes = [inputNode];
-    }
+    let inputNodes = Concat.inputNodesForConcatStats(inputNode, id, options.outputFile);
 
     super(inputNodes, {
       annotation: options.annotation,
@@ -61,6 +56,7 @@ module.exports = class Concat extends Plugin {
 
     this._lastTree = FSTree.fromEntries([]);
     this._hasBuilt = false;
+    this._hasStatsOutput = false;
 
     this.encoderCache = {};
   }
@@ -70,7 +66,7 @@ module.exports = class Concat extends Plugin {
     fs.mkdirpSync(dir);
 
     return [
-      require('broccoli-stew').debug(inputNode, {
+      new StatsOutput(inputNode, {
         dir,
         name: id + '-' + path.basename(outputFile)
       })
@@ -94,11 +90,15 @@ module.exports = class Concat extends Plugin {
     let patch = this.calculatePatch();
 
     // We skip building if this is a rebuild with a zero-length patch
-    if (patch.length === 0 && this._hasBuilt) {
+    // and the request for stats output has not changed since the last build
+    if (patch.length === 0 && this._hasBuilt && (!process.env.CONCAT_STATS || this._hasStatsOutput)) {
       return;
     }
 
     this._hasBuilt = true;
+    if (process.env.CONCAT_STATS) {
+      this._hasStatsOutput = true;
+    }
 
     if (this.Strategy.isPatchBased) {
       return this._doPatchBasedBuild(patch);

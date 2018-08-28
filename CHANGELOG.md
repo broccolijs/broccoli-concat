@@ -1,3 +1,35 @@
+# 3.7.1
+
+* Avoid creating concat stats folder when `process.env.CONCAT_STATS` is not set.
+
+# 3.7.0
+
+* Enable `process.env.CONCAT_STATS` to be set _after_ broccoli node construction (but before a build occurs).
+
+# 3.6.0
+
+* Support custom path for concat stats (via `process.env.CONCAT_STATS_PATH`).
+
+# 3.5.1
+
+* Revert changes to synchronously read larger files.
+
+# 3.5.0
+
+* [PERF] Synchronously read larger files.
+
+# 3.4.1
+
+* Remove unused code.
+
+# 3.4.0
+
+* Test cleanup.
+
+# 3.3.0
+
+* Upgrade to latest fast-sourcemap-concat version (^1.3.1).
+
 # 3.2.0
 
 * [Rebuild PERF] move from broccoli-caching-writer to fs-tree-diff + patch based approach (@trentmwillis)

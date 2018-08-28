@@ -17,6 +17,7 @@ chai.use(chaiAsPromised);
 
 const expect = chai.expect;
 const file = chaiFiles.file;
+const dir = chaiFiles.dir;
 
 const firstFixture = path.join(__dirname, 'fixtures', 'first');
 const secondFixture = path.join(__dirname, 'fixtures', 'second');
@@ -267,6 +268,19 @@ describe('simple-concat', function() {
     expectFile('sneaky.js').withoutSrcURL().in(result);
   }));
 
+  it('does not create concat-stats-for directory', co.wrap(function *() {
+    let node = concat(firstFixture, {
+      outputFile: '/all-inner.js',
+      inputFiles: ['inner/*.js'],
+      sourceMapConfig: { enabled: false }
+    });
+
+    builder = new broccoli.Builder(node);
+    yield builder.build();
+
+    expect(dir(process.cwd() + '/concat-stats-for')).to.not.exist;
+  }));
+
   describe('rebuild', function() {
     let inputDir;
     let quickTemp = require('quick-temp');
@@ -493,22 +507,16 @@ describe('simple-concat', function() {
       });
 
       it('emits files', co.wrap(function* () {
-        let dir = fs.statSync(dirPath);
-
-        expect(dir.isDirectory()).to.eql(true);
-        expect(walkSync(dirPath)).to.eql([]);
 
         builder = new broccoli.Builder(node);
-
-        dir = fs.statSync(dirPath);
-        expect(dir.isDirectory()).to.eql(true);
-
         yield builder.build();
-        expect(walkSync(dirPath)).to.eql([]);
+
+        expect(dir(dirPath)).to.not.exist;
 
         process.env.CONCAT_STATS = true;
-
         yield builder.build();
+
+        expect(dir(dirPath)).to.exist;
         expect(walkSync(dirPath)).to.eql([
           node.id + '-rebuild.js.json',
           node.id + '-rebuild.js/',

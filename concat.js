@@ -63,7 +63,6 @@ module.exports = class Concat extends Plugin {
 
   static inputNodesForConcatStats(inputNode, id, outputFile) {
     let dir = Concat.concatStatsPath();
-    fs.mkdirpSync(dir);
 
     return [
       new StatsOutput(inputNode, {
@@ -97,6 +96,7 @@ module.exports = class Concat extends Plugin {
 
     this._hasBuilt = true;
     if (process.env.CONCAT_STATS) {
+      fs.mkdirpSync(Concat.concatStatsPath());
       this._hasStatsOutput = true;
     }
 
@@ -150,9 +150,10 @@ module.exports = class Concat extends Plugin {
 
     if (process.env.CONCAT_STATS) {
       let fileSizes = this.concat.fileSizes();
-      let outputPath = path.join(Concat.concatStatsPath(), `${this.id}-${path.basename(this.outputFile)}.json`);
+      let statsPath = Concat.concatStatsPath();
+      let outputPath = path.join(statsPath, `${this.id}-${path.basename(this.outputFile)}.json`);
 
-      fs.mkdirpSync(path.dirname(outputPath));
+      fs.mkdirpSync(statsPath);
       fs.writeFileSync(outputPath, JSON.stringify({
         outputFile: this.outputFile,
         sizes: fileSizes

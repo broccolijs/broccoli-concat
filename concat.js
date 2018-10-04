@@ -50,6 +50,7 @@ module.exports = class Concat extends Plugin {
     this.footer = options.footer;
     this.footerFiles = options.footerFiles;
     this.separator = (options.separator != null) ? options.separator : '\n';
+    this.contentLimit = options.contentLimit;
 
     ensureNoGlob('headerFiles', this.headerFiles);
     ensureNoGlob('footerFiles', this.footerFiles);
@@ -114,7 +115,9 @@ module.exports = class Concat extends Plugin {
         header: this.header,
         headerFiles: this.headerFiles,
         footerFiles: this.footerFiles,
-        footer: this.footer
+        footer: this.footer,
+        contentLimit: this.contentLimit,
+        baseDir: this.inputPaths[0]
       }));
     }
 

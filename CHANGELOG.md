@@ -1,3 +1,11 @@
+# 3.7.3
+
+* Ensure that `CONCAT_STATS` works properly with broccoli-debug@0.6.5.
+
+# 3.7.2
+
+* Avoid storing larger files in memory, instead always read them from disk.
+
 # 3.7.1
 
 * Avoid creating concat stats folder when `process.env.CONCAT_STATS` is not set.

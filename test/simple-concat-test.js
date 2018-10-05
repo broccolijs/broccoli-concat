@@ -7,6 +7,7 @@ const path = require('path');
 const broccoli = require('broccoli');
 const walkSync = require('walk-sync');
 const expectFile = require('./helpers/expect-file');
+const UnwatchedDir = require('broccoli-source').UnwatchedDir;
 
 const chai = require('chai');
 const chaiFiles = require('chai-files');
@@ -504,7 +505,7 @@ describe('simple-concat', function() {
         fs.removeSync(dirPath);
         inputNodesOutput = [];
 
-        node = concat(firstFixture, {
+        node = concat(new UnwatchedDir(firstFixture), {
           outputFile: '/rebuild.js',
           inputFiles: ['inner/first.js', 'inner/second.js'],
           sourceMapConfig: { enabled: false }

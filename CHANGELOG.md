@@ -1,3 +1,7 @@
+# 3.7.4
+
+* Upgrade: lodash.merge to prevent potential vulnerability (fix #141)
+
 # 3.7.3
 
 * Ensure that `CONCAT_STATS` works properly with broccoli-debug@0.6.5.

@@ -45,7 +45,7 @@
     "find-index": "^1.1.0",
     "fs-extra": "^4.0.3",
     "fs-tree-diff": "^0.5.7",
-    "lodash.merge": "^4.3.1",
+    "lodash.merge": "^4.6.2",
     "lodash.omit": "^4.1.0",
     "lodash.uniq": "^4.2.0",
     "walk-sync": "^0.3.2"

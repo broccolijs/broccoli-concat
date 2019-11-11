@@ -1,3 +1,7 @@
+# 3.7.5
+
+* FIX: support CONCAT_STATS & allowNone at the same time
+
 # 3.7.4
 
 * Upgrade: lodash.merge to prevent potential vulnerability (fix #141)

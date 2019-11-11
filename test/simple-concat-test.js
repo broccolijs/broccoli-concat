@@ -262,8 +262,7 @@ describe('simple-concat', function() {
 
   it('does not ignore non-existent input when allowNone is not explicitly set', function() {
     let node = concat(firstFixture, {
-      outputFile: '/nothing.css',
-      inputFiles: ['nothing/*.css'],
+      outputFile: '/nothing.css', inputFiles: ['nothing/*.css'],
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
@@ -560,5 +559,30 @@ describe('simple-concat', function() {
 
       runEmitTest(dir);
     });
+  });
+
+  describe('fileSizes', function() {
+    beforeEach(function() {
+      process.env.CONCAT_STATS = true;
+      fs.removeSync(__dirname + '/../concat-stats-for');
+    });
+
+    afterEach(function() {
+      delete process.env.CONCAT_STATS;
+      fs.removeSync(__dirname + '/../concat-stats-for');
+    });
+
+    it('can ignore non-existent input', co.wrap(function *() {
+      let node = concat(firstFixture, {
+        headerFiles: ['/nothing.js'],
+        outputFile: '/nothing.css',
+        inputFiles: ['nothing/*.css'],
+        allowNone: true
+      });
+      builder = new broccoli.Builder(node);
+      let result = yield builder.build();
+      expect(fs.existsSync(__dirname + '/../concat-stats-for')).to.eql(true);
+      expectFile('nothing.css').in(result);
+    }));
   });
 });

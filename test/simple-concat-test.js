@@ -41,9 +41,9 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false },
     });
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('no-sourcemap.js').in(result);
-    expectFile('no-sourcemap.map').notIn(result);
+    yield builder.build();
+    expectFile('no-sourcemap.js').in(builder.outputPath);
+    expectFile('no-sourcemap.map').notIn(builder.outputPath);
   }));
 
   it('concatenates files with content higher than limit', co.wrap(function* () {
@@ -54,8 +54,8 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('all-inner.js').withoutSrcURL().in(result);
+    yield builder.build();
+    expectFile('all-inner.js').withoutSrcURL().in(builder.outputPath);
   }));
 
   /**
@@ -69,8 +69,8 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('all-inner.js').withoutSrcURL().in(result);
+    yield builder.build();
+    expectFile('all-inner.js').withoutSrcURL().in(builder.outputPath);
   }));
 
   it('concatenates files across dirs', co.wrap(function *() {
@@ -80,8 +80,8 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('all.js').withoutSrcURL().in(result);
+    yield builder.build();
+    expectFile('all.js').withoutSrcURL().in(builder.outputPath);
   }));
 
   it('concatenates all files across dirs when inputFiles is not specified', co.wrap(function *() {
@@ -90,8 +90,8 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('all.js').withoutSrcURL().in(result);
+    yield builder.build();
+    expectFile('all.js').withoutSrcURL().in(builder.outputPath);
   }));
 
   it('inserts header', co.wrap(function *() {
@@ -102,9 +102,9 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('all-with-header.js').withoutSrcURL().in(result);
-    expectFile('all-with-header.map').notIn(result);
+    yield builder.build();
+    expectFile('all-with-header.js').withoutSrcURL().in(builder.outputPath);
+    expectFile('all-with-header.map').notIn(builder.outputPath);
   }));
 
   it('inserts header, headeFiles, footer and footerFiles - and overlaps with inputFiles', co.wrap(function *() {
@@ -119,8 +119,8 @@ describe('simple-concat', function() {
     });
 
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('all-the-things.js').withoutSrcURL().in(result);
+    yield builder.build();
+    expectFile('all-the-things.js').withoutSrcURL().in(builder.outputPath);
   }));
 
   it('headerFiles, but with a glob', function() {
@@ -157,8 +157,8 @@ describe('simple-concat', function() {
     });
 
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('all-the-things-reversed.js').withoutSrcURL().in(result);
+    yield builder.build();
+    expectFile('all-the-things-reversed.js').withoutSrcURL().in(builder.outputPath);
   }));
 
   it('inputFiles are sorted lexicographically (improve stability of build output)', co.wrap(function *() {
@@ -171,12 +171,12 @@ describe('simple-concat', function() {
     });
 
     builder = new broccoli.Builder(final);
-    let result = yield builder.build();
+    yield builder.build();
     let first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
     let second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
     let expected = first + '\n' +  second;
-    expect(file(result.directory + '/staged.js')).to.equal(expected);
+    expect(file(builder.outputPath + '/staged.js')).to.equal(expected);
   }));
 
   it('dedupe uniques in inputFiles', co.wrap(function *() {
@@ -190,12 +190,12 @@ describe('simple-concat', function() {
 
     builder = new broccoli.Builder(final);
 
-    let result = yield builder.build();
+    yield builder.build();
     let first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
     let second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
     let expected = first + '\n' +  second;
-    expect(file(result.directory + '/staged.js')).to.equal(expected);
+    expect(file(builder.outputPath + '/staged.js')).to.equal(expected);
   }));
 
   it('prepends headerFiles', co.wrap(function *() {
@@ -207,8 +207,8 @@ describe('simple-concat', function() {
     });
 
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('inner-with-headers.js').withoutSrcURL().in(result);
+    yield builder.build();
+    expectFile('inner-with-headers.js').withoutSrcURL().in(builder.outputPath);
   }));
 
   it('prepends headerFiles (order reversed)', co.wrap(function *() {
@@ -220,8 +220,8 @@ describe('simple-concat', function() {
     });
 
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('inner-with-headers-reversed.js').withoutSrcURL().in(result);
+    yield builder.build();
+    expectFile('inner-with-headers-reversed.js').withoutSrcURL().in(builder.outputPath);
   }));
 
   it('appends footer files', co.wrap(function *() {
@@ -232,9 +232,9 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('inner-with-footers.js').withoutSrcURL().in(result);
-    expectFile('inner-with-footers.map').notIn(result);
+    yield builder.build();
+    expectFile('inner-with-footers.js').withoutSrcURL().in(builder.outputPath);
+    expectFile('inner-with-footers.map').notIn(builder.outputPath);
   }));
 
   it('can build empty files with allowNone disabled', co.wrap(function *() {
@@ -244,8 +244,8 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('empty-no-sourcemap.js').in(result);
+    yield builder.build();
+    expectFile('empty-no-sourcemap.js').in(builder.outputPath);
   }));
 
   it('can ignore non-existent input', co.wrap(function *() {
@@ -256,8 +256,8 @@ describe('simple-concat', function() {
       allowNone: true
     });
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('nothing.css').in(result);
+    yield builder.build();
+    expectFile('nothing.css').in(builder.outputPath);
   }));
 
   it('does not ignore non-existent input when allowNone is not explicitly set', function() {
@@ -276,8 +276,8 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    let result = yield builder.build();
-    expectFile('sneaky.js').withoutSrcURL().in(result);
+    yield builder.build();
+    expectFile('sneaky.js').withoutSrcURL().in(builder.outputPath);
   }));
 
   it('does not create concat-stats-for directory', co.wrap(function *() {
@@ -317,16 +317,16 @@ describe('simple-concat', function() {
 
       builder = new broccoli.Builder(node);
 
-      let result = yield builder.build();
-      expect(fs.readFileSync(result.directory + '/rebuild.js', 'UTF8')).to.eql('');
+      yield builder.build();
+      expect(fs.readFileSync(builder.outputPath + '/rebuild.js', 'UTF8')).to.eql('');
 
       write('omg.js', 'hi');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('hi');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('hi');
 
       unlink('omg.js');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('');
 
       yield builder.build();
     }));
@@ -340,22 +340,22 @@ describe('simple-concat', function() {
       });
       builder = new broccoli.Builder(node);
 
-      let result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('');
 
       write('z.js', 'z');
       write('a.js', 'a');
       write('b.js', 'b');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('a\nb\nz');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('a\nb\nz');
 
       unlink('a.js');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\nz');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz');
 
       write('a.js', 'a');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('a\nb\nz');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('a\nb\nz');
 
       yield builder.build();
     }));
@@ -373,20 +373,20 @@ describe('simple-concat', function() {
 
       builder = new broccoli.Builder(node);
 
-      let result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('a.js', 'a-updated');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na-updated');
 
       write('a.js', 'a');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('z.js', 'z-updated');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       yield builder.build();
     }));
@@ -404,20 +404,20 @@ describe('simple-concat', function() {
 
       builder = new broccoli.Builder(node);
 
-      let result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('a.js', 'a-updated');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na-updated');
 
       write('a.js', 'a');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('z.js', 'z-updated');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       yield builder.build();
     }));
@@ -436,20 +436,20 @@ describe('simple-concat', function() {
 
       builder = new broccoli.Builder(node);
 
-      let result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('a.js', 'a-updated');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na-updated');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na-updated');
 
       write('a.js', 'a');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('z.js', 'z-updated');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       yield builder.build();
     }));
@@ -469,28 +469,28 @@ describe('simple-concat', function() {
 
       builder = new broccoli.Builder(node);
 
-      let result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz\na');
 
       write('a.js', 'a-updated');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na-updated');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz\na-updated');
 
       write('a.js', 'a');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz\na');
 
       write('z.js', 'z-updated');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\nz-updated\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz-updated\na');
 
       unlink('z.js');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('z.js', 'z');
-      result = yield builder.build();
-      expect(read(result.directory + '/rebuild.js')).to.eql('b\nz\na');
+      yield builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz\na');
 
       yield builder.build();
     }));

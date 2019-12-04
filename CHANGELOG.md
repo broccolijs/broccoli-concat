@@ -1,3 +1,7 @@
+# 4.0.0
+
+* BREAKING: Drop Node 8 support
+
 # 3.7.5
 
 * FIX: support CONCAT_STATS & allowNone at the same time

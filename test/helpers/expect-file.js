@@ -16,8 +16,8 @@ module.exports = function expectFile(filename) {
   let stripURL = false;
 
   return {
-    in(result) {
-      let actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
+    in(outputPath) {
+      let actualContent = fs.readFileSync(path.join(outputPath, filename), 'utf-8');
       fs.writeFileSync(path.join(__dirname, '..' , 'actual', filename), actualContent);
 
       let expectedContent;
@@ -37,8 +37,8 @@ module.exports = function expectFile(filename) {
       return this;
     },
 
-    notIn(result) {
-      expect(fs.existsSync(path.join(result.directory, filename))).to.equal(false, filename + ' should not have been present');
+    notIn(outputPath) {
+      expect(fs.existsSync(path.join(outputPath, filename))).to.equal(false, filename + ' should not have been present');
       return this;
     },
 

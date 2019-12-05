@@ -7,7 +7,6 @@ const fs = require('fs-extra');
 const merge = require('lodash.merge');
 const omit = require('lodash.omit');
 const uniq = require('lodash.uniq');
-const walkSync = require('walk-sync');
 const ensurePosix = require('ensure-posix-path');
 
 const StatsOutput = require('./lib/stats-output');
@@ -128,10 +127,10 @@ module.exports = class Concat extends Plugin {
 
       switch (method) {
         case 'create':
-          this.concat.addFile(file, this._readFile(file));
+          this.concat.addFile(file, this.input.readFileSync(file, 'utf-8'));
           break;
         case 'change':
-          this.concat.updateFile(file, this._readFile(file));
+          this.concat.updateFile(file, this.input.readFileSync(file, 'utf-8'));
           break;
         case 'unlink':
           this.concat.removeFile(file);
@@ -139,7 +138,6 @@ module.exports = class Concat extends Plugin {
       }
     }
 
-    let outputFile = path.join(this.outputPath, this.outputFile);
     let content = this.concat.result();
 
     // If content is undefined, then we the concat had no input files
@@ -163,11 +161,7 @@ module.exports = class Concat extends Plugin {
       }, null, 2));
     }
 
-    fs.outputFileSync(outputFile, content);
-  }
-
-  _readFile(file) {
-    return fs.readFileSync(path.join(this.inputPaths[0], file), 'UTF-8');
+    this.output.writeFileSync(this.outputFile.replace(/^\//,''), content);
   }
 
   _doLegacyBuild() {
@@ -229,8 +223,7 @@ module.exports = class Concat extends Plugin {
     // If we have no inputFiles at all, use undefined as the filter to return
     // all files in the inputDir.
     let filter = this.allInputFiles.length ? this.allInputFiles : undefined;
-    let inputDir = this.inputPaths[0];
-    return walkSync.entries(inputDir, filter);
+    return this.input.entries('./', filter);
   }
 
   /**

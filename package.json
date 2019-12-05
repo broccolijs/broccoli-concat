@@ -33,12 +33,13 @@
     "mocha": "^6.2.1",
     "mocha-eslint": "^4.1.0",
     "quick-temp": "^0.1.8",
-    "sourcemap-validator": "^1.1.0"
+    "sourcemap-validator": "^1.1.0",
+    "walk-sync": "^0.3.2"
   },
   "dependencies": {
     "broccoli-debug": "^0.6.5",
     "broccoli-kitchen-sink-helpers": "^0.3.1",
-    "broccoli-plugin": "^3.0.0",
+    "broccoli-plugin": "^3.1.0",
     "ensure-posix-path": "^1.0.2",
     "fast-sourcemap-concat": "^1.4.0",
     "find-index": "^1.1.0",
@@ -46,8 +47,7 @@
     "fs-tree-diff": "^0.5.7",
     "lodash.merge": "^4.6.2",
     "lodash.omit": "^4.1.0",
-    "lodash.uniq": "^4.2.0",
-    "walk-sync": "^0.3.2"
+    "lodash.uniq": "^4.2.0"
   },
   "engines": {
     "node": "10.* || >= 12.*"

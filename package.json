@@ -29,12 +29,12 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-files": "^1.2.0",
-    "fixturify": "^0.3.4",
+    "fixturify": "^1.2.0",
     "mocha": "^6.2.1",
     "mocha-eslint": "^4.1.0",
     "quick-temp": "^0.1.8",
-    "sourcemap-validator": "^1.1.0",
-    "walk-sync": "^0.3.2"
+    "sourcemap-validator": "^2.1.0",
+    "walk-sync": "^2.0.2"
   },
   "dependencies": {
     "broccoli-debug": "^0.6.5",
@@ -44,7 +44,7 @@
     "fast-sourcemap-concat": "^1.4.0",
     "find-index": "^1.1.0",
     "fs-extra": "^8.1.0",
-    "fs-tree-diff": "^0.5.7",
+    "fs-tree-diff": "^2.0.1",
     "lodash.merge": "^4.6.2",
     "lodash.omit": "^4.1.0",
     "lodash.uniq": "^4.2.0"

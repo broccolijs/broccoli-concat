@@ -1,3 +1,7 @@
+# 4.1.0
+
+* upgrade broccoli-plugin (and other dependencies)
+
 # 4.0.0
 
 * BREAKING: Drop Node 8 support

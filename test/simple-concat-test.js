@@ -1,7 +1,6 @@
 'use strict';
 
 const concat = require('..');
-const co = require('co');
 const fs = require('fs-extra');
 const path = require('path');
 const broccoli = require('broccoli');
@@ -33,7 +32,7 @@ describe('simple-concat', function() {
     }
   });
 
-  it('does not generate sourcemaps', co.wrap(function *() {
+  it('does not generate sourcemaps', async function() {
     let node = concat(firstFixture, {
       header: "/* This is my header. */",
       inputFiles: ['**/*.js'],
@@ -41,12 +40,12 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false },
     });
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('no-sourcemap.js').in(builder.outputPath);
     expectFile('no-sourcemap.map').notIn(builder.outputPath);
-  }));
+  });
 
-  it('concatenates files with content higher than limit', co.wrap(function* () {
+  it('concatenates files with content higher than limit', async function() {
     var node = concat(firstFixture, {
       outputFile: '/all-inner.js',
       inputFiles: ['inner/*.js'],
@@ -54,47 +53,47 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('all-inner.js').withoutSrcURL().in(builder.outputPath);
-  }));
+  });
 
   /**
    * Tests below here should appear for both simple-concat and sourcemap-concat.
    */
 
-  it('concatenates all files in one dir', co.wrap(function *() {
+  it('concatenates all files in one dir', async function() {
     let node = concat(firstFixture, {
       outputFile: '/all-inner.js',
       inputFiles: ['inner/*.js'],
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('all-inner.js').withoutSrcURL().in(builder.outputPath);
-  }));
+  });
 
-  it('concatenates files across dirs', co.wrap(function *() {
+  it('concatenates files across dirs', async function() {
     let node = concat(firstFixture, {
       outputFile: '/all.js',
       inputFiles: ['**/*.js'],
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('all.js').withoutSrcURL().in(builder.outputPath);
-  }));
+  });
 
-  it('concatenates all files across dirs when inputFiles is not specified', co.wrap(function *() {
+  it('concatenates all files across dirs when inputFiles is not specified', async function() {
     let node = concat(firstFixture, {
       outputFile: '/all.js',
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('all.js').withoutSrcURL().in(builder.outputPath);
-  }));
+  });
 
-  it('inserts header', co.wrap(function *() {
+  it('inserts header', async function() {
     let node = concat(firstFixture, {
       header: "/* This is my header. */",
       inputFiles: ['**/*.js'],
@@ -102,12 +101,12 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('all-with-header.js').withoutSrcURL().in(builder.outputPath);
     expectFile('all-with-header.map').notIn(builder.outputPath);
-  }));
+  });
 
-  it('inserts header, headeFiles, footer and footerFiles - and overlaps with inputFiles', co.wrap(function *() {
+  it('inserts header, headeFiles, footer and footerFiles - and overlaps with inputFiles', async function() {
     let node = concat(firstFixture, {
       header: '/* This is my header.s*/',
       headerFiles: ['inner/first.js', 'inner/second.js'],
@@ -119,9 +118,9 @@ describe('simple-concat', function() {
     });
 
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('all-the-things.js').withoutSrcURL().in(builder.outputPath);
-  }));
+  });
 
   it('headerFiles, but with a glob', function() {
     expect(function() {
@@ -145,7 +144,7 @@ describe('simple-concat', function() {
     }).to.throw('footerFiles cannot contain a glob,  `inner/*.js`');
   });
 
-  it('inserts header, headeFiles, footer and footerFiles (reveresed) - and overlaps with inputFiles', co.wrap(function *() {
+  it('inserts header, headeFiles, footer and footerFiles (reveresed) - and overlaps with inputFiles', async function() {
     let node = concat(firstFixture, {
       header: '/* This is my header.s*/',
       headerFiles: ['inner/second.js', 'inner/first.js'],
@@ -157,11 +156,11 @@ describe('simple-concat', function() {
     });
 
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('all-the-things-reversed.js').withoutSrcURL().in(builder.outputPath);
-  }));
+  });
 
-  it('inputFiles are sorted lexicographically (improve stability of build output)', co.wrap(function *() {
+  it('inputFiles are sorted lexicographically (improve stability of build output)', async function() {
     let final = concat(firstFixture, {
       outputFile: '/staged.js',
       inputFiles: ['inner/second.js', 'inner/first.js'],
@@ -171,15 +170,15 @@ describe('simple-concat', function() {
     });
 
     builder = new broccoli.Builder(final);
-    yield builder.build();
+    await builder.build();
     let first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
     let second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
     let expected = first + '\n' +  second;
     expect(file(builder.outputPath + '/staged.js')).to.equal(expected);
-  }));
+  });
 
-  it('dedupe uniques in inputFiles', co.wrap(function *() {
+  it('dedupe uniques in inputFiles', async function() {
     let final = concat(firstFixture, {
       outputFile: '/staged.js',
       inputFiles: ['inner/first.js', 'inner/second.js', 'inner/first.js'],
@@ -190,15 +189,15 @@ describe('simple-concat', function() {
 
     builder = new broccoli.Builder(final);
 
-    yield builder.build();
+    await builder.build();
     let first = fs.readFileSync(path.join(firstFixture, 'inner/first.js'), 'UTF-8');
     let second = fs.readFileSync(path.join(firstFixture, 'inner/second.js'), 'UTF-8');
 
     let expected = first + '\n' +  second;
     expect(file(builder.outputPath + '/staged.js')).to.equal(expected);
-  }));
+  });
 
-  it('prepends headerFiles', co.wrap(function *() {
+  it('prepends headerFiles', async function() {
     let node = concat(firstFixture, {
       outputFile: '/inner-with-headers.js',
       inputFiles: ['inner/*.js'],
@@ -207,11 +206,11 @@ describe('simple-concat', function() {
     });
 
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('inner-with-headers.js').withoutSrcURL().in(builder.outputPath);
-  }));
+  });
 
-  it('prepends headerFiles (order reversed)', co.wrap(function *() {
+  it('prepends headerFiles (order reversed)', async function() {
     let node = concat(firstFixture, {
       outputFile: '/inner-with-headers-reversed.js',
       inputFiles: ['inner/*.js'],
@@ -220,11 +219,11 @@ describe('simple-concat', function() {
     });
 
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('inner-with-headers-reversed.js').withoutSrcURL().in(builder.outputPath);
-  }));
+  });
 
-  it('appends footer files', co.wrap(function *() {
+  it('appends footer files', async function() {
     let node = concat(firstFixture, {
       outputFile: '/inner-with-footers.js',
       inputFiles: ['inner/*.js'],
@@ -232,23 +231,23 @@ describe('simple-concat', function() {
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('inner-with-footers.js').withoutSrcURL().in(builder.outputPath);
     expectFile('inner-with-footers.map').notIn(builder.outputPath);
-  }));
+  });
 
-  it('can build empty files with allowNone disabled', co.wrap(function *() {
+  it('can build empty files with allowNone disabled', async function() {
     let node = concat(emptyFixture, {
       outputFile: '/empty-no-sourcemap.js',
       inputFiles: ['*.js'],
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('empty-no-sourcemap.js').in(builder.outputPath);
-  }));
+  });
 
-  it('can ignore non-existent input', co.wrap(function *() {
+  it('can ignore non-existent input', async function() {
     let node = concat(firstFixture, {
       outputFile: '/nothing.css',
       inputFiles: ['nothing/*.css'],
@@ -256,9 +255,9 @@ describe('simple-concat', function() {
       allowNone: true
     });
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('nothing.css').in(builder.outputPath);
-  }));
+  });
 
   it('does not ignore non-existent input when allowNone is not explicitly set', function() {
     let node = concat(firstFixture, {
@@ -269,18 +268,18 @@ describe('simple-concat', function() {
     return expect(builder.build()).to.be.rejectedWith("Concat: nothing matched [nothing/*.css]");
   });
 
-  it('is not fooled by directories named *.js', co.wrap(function *() {
+  it('is not fooled by directories named *.js', async function() {
     let node = concat(secondFixture, {
       outputFile: '/sneaky.js',
       inputFiles: ['**/*.js'],
       sourceMapConfig: { enabled: false }
     });
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
     expectFile('sneaky.js').withoutSrcURL().in(builder.outputPath);
-  }));
+  });
 
-  it('does not create concat-stats-for directory', co.wrap(function *() {
+  it('does not create concat-stats-for directory', async function() {
     let node = concat(firstFixture, {
       outputFile: '/all-inner.js',
       inputFiles: ['inner/*.js'],
@@ -288,10 +287,10 @@ describe('simple-concat', function() {
     });
 
     builder = new broccoli.Builder(node);
-    yield builder.build();
+    await builder.build();
 
     expect(dir(process.cwd() + '/concat-stats-for')).to.not.exist;
-  }));
+  });
 
   describe('rebuild', function() {
     let inputDir;
@@ -307,7 +306,7 @@ describe('simple-concat', function() {
     // other helper
     function read(fullPath)       { return fs.readFileSync(fullPath, 'UTF8'); }
 
-    it('add/remove inputFile', co.wrap(function *() {
+    it('add/remove inputFile', async function() {
       let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         inputFiles: ['**/*.js'],
@@ -317,21 +316,21 @@ describe('simple-concat', function() {
 
       builder = new broccoli.Builder(node);
 
-      yield builder.build();
+      await builder.build();
       expect(fs.readFileSync(builder.outputPath + '/rebuild.js', 'UTF8')).to.eql('');
 
       write('omg.js', 'hi');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('hi');
 
       unlink('omg.js');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('');
 
-      yield builder.build();
-    }));
+      await builder.build();
+    });
 
-    it('inputFile ordering', co.wrap(function *() {
+    it('inputFile ordering', async function() {
       let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         inputFiles: ['**/*.js'],
@@ -340,27 +339,27 @@ describe('simple-concat', function() {
       });
       builder = new broccoli.Builder(node);
 
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('');
 
       write('z.js', 'z');
       write('a.js', 'a');
       write('b.js', 'b');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('a\nb\nz');
 
       unlink('a.js');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz');
 
       write('a.js', 'a');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('a\nb\nz');
 
-      yield builder.build();
-    }));
+      await builder.build();
+    });
 
-    it('headerFiles', co.wrap(function *() {
+    it('headerFiles', async function() {
       let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         headerFiles: ['b.js', 'a.js'],
@@ -373,25 +372,25 @@ describe('simple-concat', function() {
 
       builder = new broccoli.Builder(node);
 
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('a.js', 'a-updated');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na-updated');
 
       write('a.js', 'a');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('z.js', 'z-updated');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
-      yield builder.build();
-    }));
+      await builder.build();
+    });
 
-    it('footerFiles', co.wrap(function *() {
+    it('footerFiles', async function() {
       let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         footerFiles: ['b.js', 'a.js'],
@@ -404,25 +403,25 @@ describe('simple-concat', function() {
 
       builder = new broccoli.Builder(node);
 
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('a.js', 'a-updated');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na-updated');
 
       write('a.js', 'a');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('z.js', 'z-updated');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
-      yield builder.build();
-    }));
+      await builder.build();
+    });
 
-    it('footerFiles + headerFiles', co.wrap(function *() {
+    it('footerFiles + headerFiles', async function() {
       let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         headerFiles: ['b.js'],
@@ -436,25 +435,25 @@ describe('simple-concat', function() {
 
       builder = new broccoli.Builder(node);
 
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('a.js', 'a-updated');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na-updated');
 
       write('a.js', 'a');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('z.js', 'z-updated');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
-      yield builder.build();
-    }));
+      await builder.build();
+    });
 
-    it('footerFiles + inputFiles (glob) + headerFiles', co.wrap(function *() {
+    it('footerFiles + inputFiles (glob) + headerFiles', async function() {
       let node = concat(inputDir, {
         outputFile: '/rebuild.js',
         headerFiles: ['b.js'],
@@ -469,31 +468,31 @@ describe('simple-concat', function() {
 
       builder = new broccoli.Builder(node);
 
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz\na');
 
       write('a.js', 'a-updated');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz\na-updated');
 
       write('a.js', 'a');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz\na');
 
       write('z.js', 'z-updated');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz-updated\na');
 
       unlink('z.js');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\na');
 
       write('z.js', 'z');
-      yield builder.build();
+      await builder.build();
       expect(read(builder.outputPath + '/rebuild.js')).to.eql('b\nz\na');
 
-      yield builder.build();
-    }));
+      await builder.build();
+    });
   });
 
   describe('CONCAT_STATS', function() {
@@ -518,15 +517,15 @@ describe('simple-concat', function() {
         builder.cleanup();
       });
 
-      it('emits files', co.wrap(function* () {
+      it('emits files', async function() {
 
         builder = new broccoli.Builder(node);
-        yield builder.build();
+        await builder.build();
 
         expect(dir(dirPath)).to.not.exist;
 
         process.env.CONCAT_STATS = true;
-        yield builder.build();
+        await builder.build();
 
         expect(dir(dirPath)).to.exist;
         expect(walkSync(dirPath)).to.eql([
@@ -539,7 +538,7 @@ describe('simple-concat', function() {
           node.id + '-rebuild.js/other/fourth.js',
           node.id + '-rebuild.js/other/third.js',
         ]);
-      }));
+      });
     };
 
     describe('with default path', function() {
@@ -572,7 +571,7 @@ describe('simple-concat', function() {
       fs.removeSync(__dirname + '/../concat-stats-for');
     });
 
-    it('can ignore non-existent input', co.wrap(function *() {
+    it('can ignore non-existent input', async function() {
       let node = concat(firstFixture, {
         headerFiles: ['/nothing.js'],
         outputFile: '/nothing.css',
@@ -580,9 +579,9 @@ describe('simple-concat', function() {
         allowNone: true
       });
       builder = new broccoli.Builder(node);
-      let result = yield builder.build();
+      await builder.build();
       expect(fs.existsSync(__dirname + '/../concat-stats-for')).to.eql(true);
-      expectFile('nothing.css').in(result);
-    }));
+      expectFile('nothing.css').in(builder.outputPath);
+    });
   });
 });

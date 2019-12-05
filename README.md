@@ -15,13 +15,13 @@ It discovers input sourcemaps in relative URLs, including data URIs.
 ### Usage
 
 ```js
-var node = concat(node);
+const node = concat(node);
 ```
 
 #### Advanced Usage
 
 ```js
-var node = concat(node, {
+const node = concat(node, {
   outputFile: '/output.js',
   header: ";(function() {",
   headerFiles: ['loader.js'],

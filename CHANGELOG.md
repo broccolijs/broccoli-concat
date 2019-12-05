@@ -1,3 +1,8 @@
+# 4.2.0
+
+* Upgrade Dependencies
+* Utilize new input/output broccoli-plugin api
+
 # 4.1.0
 
 * upgrade broccoli-plugin (and other dependencies)

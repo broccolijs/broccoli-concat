@@ -109,7 +109,7 @@ module.exports = class Concat extends Plugin {
 
   _doPatchBasedBuild(patch) {
     if (!this.concat) {
-      this.concat = new this.Strategy(merge(this.sourceMapConfig, {
+      let options = merge(this.sourceMapConfig, {
         separator: this.separator,
         header: this.header,
         headerFiles: this.headerFiles,
@@ -117,7 +117,9 @@ module.exports = class Concat extends Plugin {
         footer: this.footer,
         contentLimit: this.contentLimit,
         baseDir: this.inputPaths[0]
-      }));
+      });
+      options['fs'] = this.input;
+      this.concat = new this.Strategy(options);
     }
 
     for (let i = 0; i < patch.length; i++) {
@@ -170,13 +172,16 @@ module.exports = class Concat extends Plugin {
     let outputFile = path.join(this.outputPath, this.outputFile);
 
     fs.mkdirpSync(path.dirname(outputFile));
-
-    this.concat = new this.Strategy(merge(this.sourceMapConfig, {
+    let options = merge(this.sourceMapConfig, {
       outputFile: outputFile,
       baseDir: this.inputPaths[0],
       cache: this.encoderCache,
       pluginId: this.id
-    }));
+    });
+
+    options['fs'] = this.input;
+    this.concat = new this.Strategy(options);
+
 
     return this.concat.end(concat => {
       function beginSection() {

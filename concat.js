@@ -118,7 +118,7 @@ module.exports = class Concat extends Plugin {
         contentLimit: this.contentLimit,
         baseDir: this.inputPaths[0]
       });
-      options['fs'] = this.input;
+      options.fs = this.input;
       this.concat = new this.Strategy(options);
     }
 
@@ -179,7 +179,7 @@ module.exports = class Concat extends Plugin {
       pluginId: this.id
     });
 
-    options['fs'] = this.input;
+    options.fs = this.input;
     this.concat = new this.Strategy(options);
 
 

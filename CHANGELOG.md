@@ -1,3 +1,8 @@
+
+# 4.2.1
+
+* utilize new input/output facade
+
 # 4.2.0
 
 * Upgrade Dependencies

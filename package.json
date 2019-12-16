@@ -12,7 +12,7 @@
   "scripts": {
     "test": "mocha --recursive",
     "test:lint": "mocha lint.js",
-    "test:debug": "mocha --no-timeouts --inspect-brk",
+    "test:debug": "mocha --no-timeouts --inspect",
     "bench": "node bench/info && bench bench/suites -i 10"
   },
   "repository": "https://github.com/ember-cli/broccoli-concat",
@@ -30,6 +30,7 @@
     "chai-as-promised": "^7.1.1",
     "chai-files": "^1.2.0",
     "fixturify": "^1.2.0",
+    "fs-merger": "^3.0.2",
     "mocha": "^6.2.1",
     "mocha-eslint": "^4.1.0",
     "quick-temp": "^0.1.8",
@@ -39,9 +40,9 @@
   "dependencies": {
     "broccoli-debug": "^0.6.5",
     "broccoli-kitchen-sink-helpers": "^0.3.1",
-    "broccoli-plugin": "^3.1.0",
+    "broccoli-plugin": "^4.0.1",
     "ensure-posix-path": "^1.0.2",
-    "fast-sourcemap-concat": "^1.4.0",
+    "fast-sourcemap-concat": "^2.1.0",
     "find-index": "^1.1.0",
     "fs-extra": "^8.1.0",
     "fs-tree-diff": "^2.0.1",

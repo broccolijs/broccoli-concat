@@ -240,6 +240,17 @@ describe('sourcemap-concat', function() {
     expectValidSourcemap('all-inner.js').in(builder.outputPath);
   });
 
+  it('concatenates outputFile path has subpath', async function() {
+    let node = concat(firstFixture, {
+      outputFile: 'sub-path/sub-sub-path/all-inner.js',
+      inputFiles: ['inner/*.js'],
+      sourceMapConfig: { enabled: false }
+    });
+    builder = new broccoli.Builder(node);
+    await builder.build();
+    expectFile('all-inner.js').withoutSrcURL().in(path.join(builder.outputPath, 'sub-path/sub-sub-path/'));
+  });
+
   it('concatenates files across dirs', async function() {
     let node = concat(firstFixture, {
       outputFile: '/all.js',

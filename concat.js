@@ -163,7 +163,7 @@ module.exports = class Concat extends Plugin {
       }, null, 2));
     }
 
-    this.output.writeFileSync(this.outputFile.replace(/^\//,''), content);
+    this.output.outputFileSync(this.outputFile.replace(/^\//,''), content);
   }
 
   _doLegacyBuild() {

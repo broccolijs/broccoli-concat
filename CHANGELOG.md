@@ -1,4 +1,14 @@
 
+# 4.2.3
+
+* Add test for case outputFile having subpath
+* changing writeFileSync to outputFileSync
+
+# 4.2.2
+
+* Updating fast-sourcemap-concat versions
+* Use input facade in simple stratagies as a custom fs
+
 # 4.2.1
 
 * utilize new input/output facade

@@ -1,3 +1,6 @@
+# 4.2.4
+
+* upgrade broccoli-plugin
 
 # 4.2.3
 

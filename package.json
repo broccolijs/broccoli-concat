@@ -40,7 +40,7 @@
   "dependencies": {
     "broccoli-debug": "^0.6.5",
     "broccoli-kitchen-sink-helpers": "^0.3.1",
-    "broccoli-plugin": "^4.0.1",
+    "broccoli-plugin": "^4.0.2",
     "ensure-posix-path": "^1.0.2",
     "fast-sourcemap-concat": "^2.1.0",
     "find-index": "^1.1.0",

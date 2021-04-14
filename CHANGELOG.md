@@ -1,3 +1,12 @@
+## v4.2.5 (2021-04-14)
+
+#### :bug: Bug Fix
+* [#156](https://github.com/broccolijs/broccoli-concat/pull/156) invalidate `_content` on rebuild if necessary ([@brendenpalmer](https://github.com/brendenpalmer))
+
+#### Committers: 1
+- Brenden Palmer ([@brendenpalmer](https://github.com/brendenpalmer))
+
+
 # 4.2.4
 
 * upgrade broccoli-plugin

@@ -504,6 +504,32 @@ describe('simple-concat', function() {
 
       await builder.build();
     });
+
+    it('properly invalidates if contentLimit is exceeded on rebuild', async function() {
+      let node = concat(inputDir, {
+        outputFile: '/rebuild.js',
+        inputFiles: ['**/*.js'],
+        allowNone: true,
+        contentLimit: 5,
+        sourceMapConfig: { enabled: false }
+      });
+
+      builder = new broccoli.Builder(node);
+
+      await builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('');
+
+      write('z.js', 'z');
+      write('a.js', 'a');
+      await builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('a\nz');
+
+      write('a.js', 'abcdefg');
+      await builder.build();
+      expect(read(builder.outputPath + '/rebuild.js')).to.eql('abcdefg\nz');
+
+      await builder.build();
+    });
   });
 
   describe('CONCAT_STATS', function() {

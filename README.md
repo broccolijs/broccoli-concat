@@ -4,7 +4,7 @@ Broccoli concatenator that generates & propagates sourcemaps
 [![Build Status](https://travis-ci.org/ef4/broccoli-sourcemap-concat.svg?branch=master)](https://travis-ci.org/ef4/broccoli-sourcemap-concat)
 [![Build status](https://ci.appveyor.com/api/projects/status/bpxeh0we50eod6xw/branch/master?svg=true)](https://ci.appveyor.com/project/embercli/broccoli-sourcemap-concat/branch/master)
 
-This filter is designed to be fast & good enough. It can generates
+This filter is designed to be fast & good enough. It can generate
 source maps substantially faster than you'll get via
 mozilla/source-map, because it's special-cased for straight
 line-to-line contenation.

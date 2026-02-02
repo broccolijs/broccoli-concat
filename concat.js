@@ -4,9 +4,7 @@ const Plugin = require('broccoli-plugin');
 const FSTree = require('fs-tree-diff');
 const path = require('path');
 const fs = require('fs-extra');
-const merge = require('lodash.merge');
-const omit = require('lodash.omit');
-const uniq = require('lodash.uniq');
+const { merge, omit, uniq } = require('lodash');
 const ensurePosix = require('ensure-posix-path');
 
 const StatsOutput = require('./lib/stats-output');

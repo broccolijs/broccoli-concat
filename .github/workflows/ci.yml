@@ -27,6 +27,21 @@ jobs:
       - run: pnpm install
       - run: pnpm run lint
 
+  floating:
+    name: "Floating Dependencies"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --no-lockfile
+      - run: pnpm test
+
   test:
     name: "Test"
     runs-on: ubuntu-latest

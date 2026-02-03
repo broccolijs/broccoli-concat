@@ -65,6 +65,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+      # prevent yarn from complaining about the packageManager key in the package.json
+      - run: cat package.json | jq ".packageManager = \"yarn@1.22.22\"" | tee package.json
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}

@@ -1,7 +1,7 @@
 'use strict';
 
 const Concat = require('./concat');
-const merge = require('lodash.merge');
+const { merge } = require('lodash');
 
 module.exports = function(inputNode, options) {
   if (!options || !options.outputFile) {

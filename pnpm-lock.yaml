@@ -29,15 +29,9 @@ importers:
       fs-tree-diff:
         specifier: ^2.0.1
         version: 2.0.1
-      lodash.merge:
-        specifier: ^4.6.2
-        version: 4.6.2
-      lodash.omit:
-        specifier: ^4.1.0
-        version: 4.5.0
-      lodash.uniq:
-        specifier: ^4.2.0
-        version: 4.5.0
+      lodash:
+        specifier: ^4.17.23
+        version: 4.17.23
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.2
@@ -1624,10 +1618,6 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lodash.omit@4.5.0:
-    resolution: {integrity: sha512-XeqSp49hNGmlkj2EJlfrQFIzQ6lXdNro9sddtQzcJY8QaoC2GO0DT7xaIokHeyM+mIT0mPMlPvkYzg2xCuHdZg==}
-    deprecated: This package is deprecated. Use destructuring assignment syntax instead.
-
   lodash.template@4.5.0:
     resolution: {integrity: sha512-84vYFxIkmidUiFxidA/KjjH9pAycqW+h980j7Fuz5qxRtO9pgB7MDFTdys1N7A5mcucRiDyEq4fusljItR1T/A==}
     deprecated: This package is deprecated. Use https://socket.dev/npm/package/eta instead.
@@ -1635,11 +1625,8 @@ packages:
   lodash.templatesettings@4.2.0:
     resolution: {integrity: sha512-stgLz+i3Aa9mZgnjr/O+v9ruKZsPsndy7qPZOchbqk2cnTU1ZaldKK+v7m54WoKIyxiuMZTKT2H81F8BeAc3ZQ==}
 
-  lodash.uniq@4.5.0:
-    resolution: {integrity: sha512-xfBaXQd9ryd9dlSDvnvI0lvxfLJlYAZzXomUYzLKtUeOQvOP5piqAWuGtrhWeqaXK9hhoM/iyJc5AV+XfsX3HQ==}
-
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+  lodash@4.17.23:
+    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
 
   log-symbols@2.2.0:
     resolution: {integrity: sha512-VeIAFslyIerEJLXHziedo2basKbMKtTw3vfn5IzG0XTjhAVEJyNHnL2p7vc+wBDSdQuUpNw3M2u6xb9QsAY5Eg==}
@@ -3683,7 +3670,7 @@ snapshots:
       js-yaml: 3.13.1
       json-stable-stringify-without-jsonify: 1.0.1
       levn: 0.3.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       minimatch: 3.0.4
       mkdirp: 0.5.1
       natural-compare: 1.4.0
@@ -4321,7 +4308,7 @@ snapshots:
       cli-width: 2.2.0
       external-editor: 2.2.0
       figures: 2.0.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       mute-stream: 0.0.7
       run-async: 2.4.1
       rx-lite: 4.0.8
@@ -4338,7 +4325,7 @@ snapshots:
       cli-width: 2.2.0
       external-editor: 3.1.0
       figures: 2.0.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       mute-stream: 0.0.7
       run-async: 2.4.1
       rxjs: 6.6.7
@@ -4550,8 +4537,6 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lodash.omit@4.5.0: {}
-
   lodash.template@4.5.0:
     dependencies:
       lodash._reinterpolate: 3.0.0
@@ -4561,9 +4546,7 @@ snapshots:
     dependencies:
       lodash._reinterpolate: 3.0.0
 
-  lodash.uniq@4.5.0: {}
-
-  lodash@4.17.21: {}
+  lodash@4.17.23: {}
 
   log-symbols@2.2.0:
     dependencies:
@@ -5501,7 +5484,7 @@ snapshots:
       ajv: 5.5.2
       ajv-keywords: 2.1.1(ajv@5.5.2)
       chalk: 2.4.2
-      lodash: 4.17.21
+      lodash: 4.17.23
       slice-ansi: 1.0.0
       string-width: 2.1.1
 
@@ -5746,7 +5729,7 @@ snapshots:
   yargs-unparser@1.6.0:
     dependencies:
       flat: 4.1.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       yargs: 13.3.2
 
   yargs@1.2.6:

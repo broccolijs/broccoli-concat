@@ -29,9 +29,7 @@
     "find-index": "^1.1.0",
     "fs-extra": "^8.1.0",
     "fs-tree-diff": "^2.0.1",
-    "lodash.merge": "^4.6.2",
-    "lodash.omit": "^4.1.0",
-    "lodash.uniq": "^4.2.0"
+    "lodash": "^4.17.23"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

@@ -1,5 +1,22 @@
 # Changelog
 
+## Release (2026-02-08)
+
+* broccoli-concat 4.2.6 (patch)
+
+#### :bug: Bug Fix
+* `broccoli-concat`
+  * [#170](https://github.com/broccolijs/broccoli-concat/pull/170) stop using deprecated lodash.merge and just use lodash instead ([@mansona](https://github.com/mansona))
+  * [#169](https://github.com/broccolijs/broccoli-concat/pull/169) remove unused dependency broccoli-kitchen-sink-helpers ([@mansona](https://github.com/mansona))
+
+#### :house: Internal
+* `broccoli-concat`
+  * [#173](https://github.com/broccolijs/broccoli-concat/pull/173) start using release-plan ([@mansona](https://github.com/mansona))
+  * [#171](https://github.com/broccolijs/broccoli-concat/pull/171) Add a basic github actions CI ([@mansona](https://github.com/mansona))
+
+#### Committers: 1
+- Chris Manson ([@mansona](https://github.com/mansona))
+
 ## v4.2.5 (2021-04-14)
 
 #### :bug: Bug Fix

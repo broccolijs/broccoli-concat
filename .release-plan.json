@@ -2,8 +2,8 @@
   "solution": {
     "broccoli-concat": {
       "impact": "patch",
-      "oldVersion": "4.2.5",
-      "newVersion": "4.2.6",
+      "oldVersion": "4.2.6",
+      "newVersion": "4.2.7",
       "tagName": "latest",
       "constraints": [
         {
@@ -18,5 +18,5 @@
       "pkgJSONPath": "./package.json"
     }
   },
-  "description": "## Release (2026-02-08)\n\n* broccoli-concat 4.2.6 (patch)\n\n#### :bug: Bug Fix\n* `broccoli-concat`\n  * [#170](https://github.com/broccolijs/broccoli-concat/pull/170) stop using deprecated lodash.merge and just use lodash instead ([@mansona](https://github.com/mansona))\n  * [#169](https://github.com/broccolijs/broccoli-concat/pull/169) remove unused dependency broccoli-kitchen-sink-helpers ([@mansona](https://github.com/mansona))\n\n#### :house: Internal\n* `broccoli-concat`\n  * [#173](https://github.com/broccolijs/broccoli-concat/pull/173) start using release-plan ([@mansona](https://github.com/mansona))\n  * [#171](https://github.com/broccolijs/broccoli-concat/pull/171) Add a basic github actions CI ([@mansona](https://github.com/mansona))\n\n#### Committers: 1\n- Chris Manson ([@mansona](https://github.com/mansona))\n"
+  "description": "## Release (2026-02-11)\n\n* broccoli-concat 4.2.7 (patch)\n\n#### :bug: Bug Fix\n* `broccoli-concat`\n  * [#175](https://github.com/broccolijs/broccoli-concat/pull/175) fix repo url ([@mansona](https://github.com/mansona))\n  * [#170](https://github.com/broccolijs/broccoli-concat/pull/170) stop using deprecated lodash.merge and just use lodash instead ([@mansona](https://github.com/mansona))\n  * [#169](https://github.com/broccolijs/broccoli-concat/pull/169) remove unused dependency broccoli-kitchen-sink-helpers ([@mansona](https://github.com/mansona))\n\n#### :house: Internal\n* `broccoli-concat`\n  * [#173](https://github.com/broccolijs/broccoli-concat/pull/173) start using release-plan ([@mansona](https://github.com/mansona))\n  * [#171](https://github.com/broccolijs/broccoli-concat/pull/171) Add a basic github actions CI ([@mansona](https://github.com/mansona))\n\n#### Committers: 1\n- Chris Manson ([@mansona](https://github.com/mansona))\n"
 }

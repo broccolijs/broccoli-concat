@@ -5,7 +5,7 @@
   "keywords": [
     "broccoli-plugin"
   ],
-  "repository": "https://github.com/ember-cli/broccoli-concat",
+  "repository": "https://github.com/broccolijs/broccoli-concat",
   "license": "MIT",
   "author": "Edward Faulkner <ef@alum.mit.edu>",
   "main": "index.js",
